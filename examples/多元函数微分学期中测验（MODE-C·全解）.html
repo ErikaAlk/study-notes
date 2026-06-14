@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多元函数微分学 — 期中测验解析</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left:'$$', right:'$$', display:true},
+        {left:'$',  right:'$',  display:false}
+      ],
+      throwOnError: false,
+      macros: {
+        '\\d':  '{\\mathrm{d}}',
+        '\\e':  '{\\mathrm{e}}'
+      }
+    });
+    window.__katexDone = true;
+    window.dispatchEvent(new Event('katexdone'));
+    var errs = document.querySelectorAll('.katex-error');
+    if(errs.length){
+      var banner = document.createElement('div');
+      banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#A32D2D;color:#fff;font-size:13px;padding:8px 16px;';
+      banner.textContent = '⚠ 发现 ' + errs.length + ' 处公式渲染错误（红色高亮）。';
+      document.body.appendChild(banner);
+    }
+  "></script>
+<script>if('scrollRestoration' in history) history.scrollRestoration = 'manual';</script>
+<style>
+:root {
+  --bg:#ffffff; --bg2:#f7f6f2; --bg3:#f0ede6; --bg4:#e8e4db;
+  --text:#1a1a18; --text2:#5a5a56; --text3:#8a8a84;
+  --border:rgba(0,0,0,0.11);
+  --purple:#534AB7; --purple-light:#EEEDFE; --purple-dark:#3C3489; --purple-mid:#7F77DD;
+  --teal:#0F6E56;   --teal-light:#E1F5EE;   --teal-dark:#085041;   --teal-mid:#1D9E75;
+  --coral:#993C1D;  --coral-light:#FAECE7;  --coral-dark:#712B13;  --coral-mid:#D85A30;
+  --amber:#BA7517;  --amber-light:#FAEEDA;  --amber-dark:#854F0B;  --amber-mid:#EF9F27;
+  --blue:#185FA5;   --blue-light:#E6F1FB;   --blue-dark:#0C447C;   --blue-mid:#378ADD;
+  --green:#3B6D11;  --green-light:#EAF3DE;  --green-dark:#27500A;  --green-mid:#639922;
+  --red:#A32D2D;    --red-light:#FCEBEB;    --red-dark:#791F1F;
+  --pink:#993556;   --pink-light:#FBEAF0;
+  --radius:10px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1e1e1c; --bg2:#252523; --bg3:#2c2c2a; --bg4:#333330;
+    --text:#e8e6de; --text2:#a8a69e; --text3:#706e68;
+    --border:rgba(255,255,255,0.1);
+    --purple-light:#26215C; --teal-light:#04342C; --coral-light:#4A1B0C;
+    --amber-light:#412402; --blue-light:#042C53; --green-light:#173404;
+    --red-light:#501313; --pink-light:#4B1528;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.8;}
+.page{max-width:900px;margin:0 auto;padding:32px 24px 100px;}
+body>*:not(.page){max-width:900px;margin-left:auto;margin-right:auto;padding-left:24px;padding-right:24px;}
+.katex{font-size:1.06em;}
+.katex-display{margin:4px 0!important;overflow:visible;}
+.card,.fbox,.callout,.big-formula,.example-block,.toc,
+table,.answer-box,.two-col,.steps,.visual-row{
+  width:100%;max-width:100%;box-sizing:border-box;
+}
+table{overflow-x:auto;display:block;}
+.header{text-align:center;padding:48px 0 36px;border-bottom:1px solid var(--border);margin-bottom:40px;}
+.header h1{font-size:30px;font-weight:700;margin-bottom:10px;letter-spacing:-0.5px;}
+.header .subtitle{color:var(--text2);font-size:14px;margin-bottom:16px;}
+.tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.tag{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px 26px;margin-bottom:44px;}
+.toc-title{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;}
+.toc-l1{margin-bottom:2px;}
+.toc-l1>a{display:flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;
+  font-size:14px;font-weight:600;padding:5px 6px;border-radius:6px;transition:background 0.12s;}
+.toc-l1>a:hover{background:var(--bg3);}
+.toc-l1>a .sec-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.toc-l2{padding-left:22px;margin-top:1px;margin-bottom:3px;}
+.toc-l2 a{display:flex;align-items:center;gap:7px;color:var(--blue);text-decoration:none;
+  font-size:13px;padding:3px 6px;border-radius:5px;transition:background 0.12s;
+  border-left:2px solid var(--border);}
+.toc-l2 a:hover{background:var(--bg3);text-decoration:none;}
+.toc-l2 a .sec-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;opacity:0.7;}
+.section{margin-bottom:60px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:14px;border-bottom:2.5px solid var(--border);}
+.section-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;}
+.section h2{font-size:23px;font-weight:700;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px 26px;margin-bottom:16px;}
+.card h3{font-size:17px;font-weight:700;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.card h4{font-size:14px;font-weight:700;margin:20px 0 8px;padding-left:10px;
+  border-left:3px solid var(--border);color:var(--text);line-height:1.4;}
+.card h5{font-size:13px;font-weight:600;margin:14px 0 6px;color:var(--text2);letter-spacing:0.02em;}
+.card p{margin-bottom:10px;line-height:1.8;}
+.card p:last-child{margin-bottom:0;}
+.card ul,.card ol{padding-left:22px;margin-bottom:10px;}
+.card li{margin-bottom:6px;line-height:1.8;font-size:14px;}
+.fbox{background:var(--bg3);border-left:3.5px solid;border-radius:0 10px 10px 0;padding:18px 22px;margin:14px 0;overflow:visible;}
+.fbox .flabel{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:12px;opacity:0.75;}
+.fbox .frow{margin:10px 0;line-height:normal;overflow:visible;}
+.fbox .frow:first-of-type{margin-top:0;}
+.fbox .fnote{font-size:13px;color:var(--text2);margin-top:10px;line-height:1.6;}
+.big-formula{text-align:center;padding:22px 18px;background:var(--bg2);border-radius:10px;margin:18px 0;overflow:visible;border:1px solid var(--border);line-height:normal;}
+.big-formula.highlight{border-width:2px;}
+.callout{border-radius:9px;padding:14px 18px;margin:14px 0;display:flex;gap:13px;}
+.callout-icon{font-size:15px;flex-shrink:0;margin-top:3px;line-height:1;}
+.callout-body{flex:1;}
+.callout-body > strong{display:block;font-size:13px;font-weight:700;margin-bottom:5px;}
+.callout-body p strong,.callout-body li strong{display:inline;font-size:inherit;font-weight:700;}
+.callout-body p,.callout-body li{font-size:14px;margin:0 0 4px;line-height:1.7;}
+.callout-body ul{padding-left:18px;margin:0;}
+.note{background:var(--blue-light);border:1px solid rgba(24,95,165,0.18);}
+.note .callout-icon::before{content:"💡";}
+.tip{background:var(--teal-light);border:1px solid rgba(15,110,86,0.18);}
+.tip .callout-icon::before{content:"✦";color:var(--teal);font-size:13px;}
+.warn{background:var(--amber-light);border:1px solid rgba(186,117,23,0.2);}
+.warn .callout-icon::before{content:"⚠";color:var(--amber);}
+.exam{background:var(--red-light);border:1px solid rgba(163,45,45,0.22);}
+.exam .callout-icon::before{content:"★";color:var(--red);}
+.intuition{background:var(--purple-light);border:1px solid rgba(83,74,183,0.2);}
+.intuition .callout-icon::before{content:"🔍";}
+.mistake{background:var(--pink-light);border:1px solid rgba(153,53,86,0.2);}
+.mistake .callout-icon::before{content:"✗";color:var(--pink);font-size:13px;}
+.derivation{background:var(--bg3);border:1px solid var(--border);}
+.derivation .callout-icon::before{content:"∴";color:var(--text3);font-size:14px;font-weight:700;}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0;}
+th{background:var(--bg3);font-weight:600;padding:10px 14px;text-align:left;border:1px solid var(--border);}
+td{padding:10px 14px;border:1px solid var(--border);vertical-align:middle;line-height:1.9;}
+tr:nth-child(even) td{background:var(--bg2);}
+td .katex,th .katex{font-size:0.95em;}
+details{border:1px solid var(--border);border-radius:9px;margin-bottom:10px;overflow:visible;}
+summary{padding:13px 18px;font-weight:600;font-size:14px;cursor:pointer;background:var(--bg2);display:flex;align-items:center;gap:8px;list-style:none;user-select:none;}
+summary::-webkit-details-marker{display:none;}
+summary::before{content:"▶";font-size:9px;color:var(--text3);transition:transform 0.2s;flex-shrink:0;}
+details[open] summary::before{transform:rotate(90deg);}
+.details-body{padding:18px 20px;}
+.details-body p{margin-bottom:8px;font-size:14px;}
+.step{display:flex;gap:14px;margin-bottom:16px;}
+.step-num{width:28px;height:28px;border-radius:50%;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.step-body{flex:1;font-size:14px;line-height:1.75;}
+.step-body > strong{display:block;margin-bottom:4px;}
+.step-body p strong,.step-body li strong{display:inline;font-weight:700;}
+.sec-purple .section-num{background:var(--purple-light);color:var(--purple-dark);}
+.sec-purple .section h2{color:var(--purple-dark);}
+.sec-purple .fbox{border-color:var(--purple);}
+.sec-purple .step-num{background:var(--purple-light);color:var(--purple-dark);}
+.sec-teal .section-num{background:var(--teal-light);color:var(--teal-dark);}
+.sec-teal .section h2{color:var(--teal-dark);}
+.sec-teal .fbox{border-color:var(--teal);}
+.sec-teal .step-num{background:var(--teal-light);color:var(--teal-dark);}
+.sec-coral .section-num{background:var(--coral-light);color:var(--coral-dark);}
+.sec-coral .section h2{color:var(--coral-dark);}
+.sec-coral .fbox{border-color:var(--coral);}
+.sec-coral .step-num{background:var(--coral-light);color:var(--coral-dark);}
+.sec-amber .section-num{background:var(--amber-light);color:var(--amber-dark);}
+.sec-amber .section h2{color:var(--amber-dark);}
+.sec-amber .fbox{border-color:var(--amber);}
+.sec-amber .step-num{background:var(--amber-light);color:var(--amber-dark);}
+.sec-blue .section-num{background:var(--blue-light);color:var(--blue-dark);}
+.sec-blue .section h2{color:var(--blue-dark);}
+.sec-blue .fbox{border-color:var(--blue);}
+.sec-blue .step-num{background:var(--blue-light);color:var(--blue-dark);}
+.sec-green .section-num{background:var(--green-light);color:var(--green-dark);}
+.sec-green .section h2{color:var(--green-dark);}
+.sec-green .fbox{border-color:var(--green);}
+.sec-green .step-num{background:var(--green-light);color:var(--green-dark);}
+.sec-red .section-num{background:var(--red-light);color:var(--red-dark);}
+.sec-red .section h2{color:var(--red-dark);}
+.sec-red .fbox{border-color:var(--red);}
+.sec-red .step-num{background:var(--red-light);color:var(--red-dark);}
+.badge{display:inline-block;padding:2px 9px;border-radius:4px;font-size:11px;font-weight:600;margin-right:4px;}
+.b-purple{background:var(--purple-light);color:var(--purple-dark);}
+.b-teal{background:var(--teal-light);color:var(--teal-dark);}
+.b-coral{background:var(--coral-light);color:var(--coral-dark);}
+.b-amber{background:var(--amber-light);color:var(--amber-dark);}
+.b-blue{background:var(--blue-light);color:var(--blue-dark);}
+.b-green{background:var(--green-light);color:var(--green-dark);}
+.b-red{background:var(--red-light);color:var(--red-dark);}
+.answer-box{background:var(--green-light);border:1.5px solid rgba(59,109,17,0.25);border-radius:8px;padding:12px 16px;margin-top:10px;}
+.answer-box p{font-size:14px;margin:0;}
+/* ── extra helpers for exam questions ── */
+.qstem{font-size:15px;line-height:2.0;margin-bottom:12px;}
+.opts{margin:8px 0 4px;}
+.opt{padding:8px 14px;margin:7px 0;background:var(--bg3);border-radius:8px;font-size:14px;line-height:1.85;}
+.opt .ol{font-weight:700;margin-right:9px;color:var(--text2);}
+.opt.correct{background:var(--green-light);border:1px solid rgba(59,109,17,0.35);}
+.opt.correct .ol{color:var(--green-dark);}
+#nav-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:34px;height:34px;border-radius:8px;
+  background:var(--bg2);color:var(--text2);border:1px solid var(--border);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 1px 6px rgba(0,0,0,0.18);
+  transition:background 0.15s,color 0.15s,box-shadow 0.15s;font-size:15px;line-height:1;}
+#nav-btn:hover{background:var(--bg3);color:var(--text);box-shadow:0 2px 12px rgba(0,0,0,0.22);}
+#nav-panel{position:fixed;bottom:66px;right:24px;z-index:9998;background:var(--bg);border:1px solid var(--border);border-radius:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.18);width:240px;max-height:65vh;overflow-y:auto;padding:8px 0;
+  opacity:0;transform:translateY(8px) scale(0.97);pointer-events:none;transition:opacity 0.15s,transform 0.15s;}
+#nav-panel.open{opacity:1;transform:none;pointer-events:auto;}
+#nav-panel a{display:flex;align-items:center;gap:9px;padding:6px 14px;font-size:13px;color:var(--text);text-decoration:none;line-height:1.4;transition:background 0.1s;}
+#nav-panel a:hover{background:var(--bg2);}
+#nav-panel .nav-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;padding:0 14px 5px;border-bottom:1px solid var(--border);margin-bottom:3px;}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="header">
+  <h1>多元函数微分学 · 期中测验全解</h1>
+  <p class="subtitle">20 道单选题 · 极限与连续 / 偏导数与全微分 / 极值判别 / 隐函数求导 / 定义域与二次曲面</p>
+  <div class="tags">
+    <span class="tag" style="background:var(--purple-light);color:var(--purple-dark)">自测版：先做后看解析</span>
+    <span class="tag" style="background:var(--teal-light);color:var(--teal-dark)">每题含 思路·求解·验算·考点</span>
+    <span class="tag" style="background:var(--amber-light);color:var(--amber-dark)">满分 100</span>
+  </div>
+</div>
+
+<div class="callout note" style="margin-bottom:30px;">
+  <div class="callout-icon"></div>
+  <div class="callout-body">
+    <strong>使用说明</strong>
+    <p>本页按原卷顺序（第 1–20 题）排好。每道题的 <strong>题干与四个选项</strong> 直接可见，正确答案与完整解析（思路 → 详细求解 → 验算 → 考试要点）收在 <strong>「点击展开解答与解析」</strong> 折叠块里——建议先独立作答，再展开核对。文末附 <strong>答案速查表</strong> 与 <strong>高频考点小结</strong>。</p>
+  </div>
+</div>
+
+<div class="toc">
+  <div class="toc-title">目录 · 20 题</div>
+  <div class="toc-l1"><a href="#q1"><span class="sec-dot" style="background:var(--purple-mid)"></span>第 1 题 · 分段函数的偏导数存在性</a></div>
+  <div class="toc-l1"><a href="#q2"><span class="sec-dot" style="background:var(--teal-mid)"></span>第 2 题 · 隐函数的二阶偏导关系</a></div>
+  <div class="toc-l1"><a href="#q3"><span class="sec-dot" style="background:var(--coral-mid)"></span>第 3 题 · 全微分的判定（相等条件）</a></div>
+  <div class="toc-l1"><a href="#q4"><span class="sec-dot" style="background:var(--amber-mid)"></span>第 4 题 · 极值点的必要条件</a></div>
+  <div class="toc-l1"><a href="#q5"><span class="sec-dot" style="background:var(--blue-mid)"></span>第 5 题 · 处处连续的二元函数</a></div>
+  <div class="toc-l1"><a href="#q6"><span class="sec-dot" style="background:var(--green-mid)"></span>第 6 题 · 二阶判别法（鞍点）</a></div>
+  <div class="toc-l1"><a href="#q7"><span class="sec-dot" style="background:var(--red)"></span>第 7 题 · 偏导数的几何意义（切向量）</a></div>
+  <div class="toc-l1"><a href="#q8"><span class="sec-dot" style="background:var(--purple-mid)"></span>第 8 题 · 由全微分还原原函数</a></div>
+  <div class="toc-l1"><a href="#q9"><span class="sec-dot" style="background:var(--teal-mid)"></span>第 9 题 · 判别失效时的极值分析</a></div>
+  <div class="toc-l1"><a href="#q10"><span class="sec-dot" style="background:var(--coral-mid)"></span>第 10 题 · 连续但偏导不存在</a></div>
+  <div class="toc-l1"><a href="#q11"><span class="sec-dot" style="background:var(--amber-mid)"></span>第 11 题 · 介值定理（连通性）</a></div>
+  <div class="toc-l1"><a href="#q12"><span class="sec-dot" style="background:var(--blue-mid)"></span>第 12 题 · 二重极限的存在性</a></div>
+  <div class="toc-l1"><a href="#q13"><span class="sec-dot" style="background:var(--green-mid)"></span>第 13 题 · 由极限条件判极值</a></div>
+  <div class="toc-l1"><a href="#q14"><span class="sec-dot" style="background:var(--red)"></span>第 14 题 · 二阶偏导存在的推论</a></div>
+  <div class="toc-l1"><a href="#q15"><span class="sec-dot" style="background:var(--purple-mid)"></span>第 15 题 · 连续且偏导存在</a></div>
+  <div class="toc-l1"><a href="#q16"><span class="sec-dot" style="background:var(--teal-mid)"></span>第 16 题 · 间断点的判定</a></div>
+  <div class="toc-l1"><a href="#q17"><span class="sec-dot" style="background:var(--coral-mid)"></span>第 17 题 · 隐函数求导 (x^y=y^x)</a></div>
+  <div class="toc-l1"><a href="#q18"><span class="sec-dot" style="background:var(--amber-mid)"></span>第 18 题 · 曲面图形与方程匹配</a></div>
+  <div class="toc-l1"><a href="#q19"><span class="sec-dot" style="background:var(--blue-mid)"></span>第 19 题 · 连续性与偏导（含 sin）</a></div>
+  <div class="toc-l1"><a href="#q20"><span class="sec-dot" style="background:var(--green-mid)"></span>第 20 题 · 反正弦函数的定义域</a></div>
+  <div class="toc-l1"><a href="#key"><span class="sec-dot" style="background:var(--red)"></span>答案速查表 &amp; 考点小结</a></div>
+</div>
+<!-- ===================== 第 1 题 ===================== -->
+<div class="sec-purple" id="q1">
+<div class="section">
+  <div class="section-header"><div class="section-num">1</div><h2>第 1 题</h2></div>
+  <div class="card">
+    <h3>分段函数在原点的偏导数存在性</h3>
+    <p class="qstem">设 $f(x,y)=\begin{cases} y\sin\dfrac{1}{x^2+y^2}, & x^2+y^2\neq 0\\[6pt] 0, & x^2+y^2=0\end{cases}$，则 $f(x,y)$ 在点 $(0,0)$ 处</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>两个偏导数都不存在</div>
+      <div class="opt"><span class="ol">B.</span>$f_x(0,0)=0$，$f_y(0,0)$ 不存在</div>
+      <div class="opt"><span class="ol">C.</span>两个偏导数都存在</div>
+      <div class="opt"><span class="ol">D.</span>$f_x(0,0)$ 不存在，$f_y(0,0)=0$</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：B</strong></p></div>
+      <h4>思路</h4>
+      <p>原点处的偏导数不能套公式，必须回到定义：把另一个变量固定为 $0$，化成一元极限。关键是先看 $f(x,0)$ 与 $f(0,y)$ 长什么样。</p>
+      <h4>详细求解</h4>
+      <p>沿 $x$ 方向（令 $y=0$）：此时 $f(x,0)=0\cdot\sin\dfrac{1}{x^2}=0$，于是</p>
+      <div class="fbox"><div class="frow">$$f_x(0,0)=\lim_{x\to0}\frac{f(x,0)-f(0,0)}{x}=\lim_{x\to0}\frac{0}{x}=0.$$</div></div>
+      <p>沿 $y$ 方向（令 $x=0$）：此时 $f(0,y)=y\sin\dfrac{1}{y^2}$，于是</p>
+      <div class="fbox"><div class="frow">$$f_y(0,0)=\lim_{y\to0}\frac{f(0,y)-f(0,0)}{y}=\lim_{y\to0}\frac{y\sin\frac{1}{y^2}}{y}=\lim_{y\to0}\sin\frac{1}{y^2}.$$</div></div>
+      <p>当 $y\to0$ 时 $\frac{1}{y^2}\to+\infty$，$\sin\frac{1}{y^2}$ 在 $[-1,1]$ 间无限振荡，极限不存在。故 $f_x(0,0)=0$ 存在，$f_y(0,0)$ 不存在 —— 选 <strong>B</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>$f(x,0)\equiv0$ 是恒等于零的函数，其导数当然为 $0$，与上面一致；而取 $y_n=\dfrac{1}{\sqrt{2n\pi+\pi/2}}$ 与 $y_n'=\dfrac{1}{\sqrt{2n\pi}}$ 分别得 $\sin\frac{1}{y_n^2}=1$、$\sin\frac{1}{(y_n')^2}=0$，两子列极限不同，确认 $f_y(0,0)$ 不存在。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>分段函数在"分界点（常为原点）"处求偏导一律用<strong>定义</strong>。先把另一变量取 $0$ 化简被求函数；带 $\sin\frac{1}{(\cdot)}$ 的振荡型是判"不存在"的经典素材。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 2 题 ===================== -->
+<div class="sec-teal" id="q2">
+<div class="section">
+  <div class="section-header"><div class="section-num">2</div><h2>第 2 题</h2></div>
+  <div class="card">
+    <h3>隐函数确定的二阶偏导关系</h3>
+    <p class="qstem">设函数 $z=f(x,y)$ 由方程 $x+y+z=\e^{z}$ 确定，则正确的结论是</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>$\dfrac{\partial^2 z}{\partial x^2}\neq\dfrac{\partial^2 z}{\partial y^2}$</div>
+      <div class="opt"><span class="ol">B.</span>$\dfrac{\partial^2 z}{\partial x\,\partial y}\neq\dfrac{\partial^2 z}{\partial y^2}$</div>
+      <div class="opt"><span class="ol">C.</span>$\dfrac{\partial^2 z}{\partial x\,\partial y}=\dfrac{\partial^2 z}{\partial x^2}$</div>
+      <div class="opt"><span class="ol">D.</span>$\dfrac{\partial z}{\partial x}\neq\dfrac{\partial z}{\partial y}$</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：C</strong></p></div>
+      <h4>思路</h4>
+      <p>方程里 $x,y$ 完全对称、且只以 $x+y$ 的组合出现，因此 $z$ 实际上只依赖 $x+y$。抓住这一点，所有一阶、二阶偏导都能瞬间比较。</p>
+      <h4>详细求解</h4>
+      <p>令 $s=x+y$，方程化为 $s+z=\e^{z}$，说明 $z=\varphi(s)=\varphi(x+y)$ 只是 $x+y$ 的一元函数。于是</p>
+      <div class="fbox"><div class="frow">$$\frac{\partial z}{\partial x}=\varphi'(s),\qquad \frac{\partial z}{\partial y}=\varphi'(s)\ \Rightarrow\ z_x=z_y,$$</div>
+      <div class="frow">$$z_{xx}=\varphi''(s),\quad z_{xy}=\varphi''(s),\quad z_{yy}=\varphi''(s)\ \Rightarrow\ z_{xx}=z_{xy}=z_{yy}.$$</div></div>
+      <p>所以 D 错（$z_x=z_y$）、A 错、B 错，唯有 C：$z_{xy}=z_{xx}$ 成立 —— 选 <strong>C</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>直接微分：对 $x$ 求导得 $1+z_x=\e^{z}z_x\Rightarrow z_x=\dfrac{1}{\e^{z}-1}$；同理 $z_y=\dfrac{1}{\e^{z}-1}$，二者相等。再求二阶：$z_{xx}=z_{xy}=z_{yy}=-\dfrac{\e^{z}}{(\e^{z}-1)^3}$，三者一致，验证无误。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>看到方程仅含 $x+y$（或 $x-y$ 等）组合，立刻断定 $z$ 是该组合的一元复合函数——这是"对称化简"的高频技巧，可省去大量隐函数二阶求导。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 3 题 ===================== -->
+<div class="sec-coral" id="q3">
+<div class="section">
+  <div class="section-header"><div class="section-num">3</div><h2>第 3 题</h2></div>
+  <div class="card">
+    <h3>全微分的判定（相容条件 $P_y=Q_x$）</h3>
+    <p class="qstem">下列各式中，（&nbsp;&nbsp;）是某二元函数 $f(x,y)$ 的全微分</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>$(3x^2+4xy)\,\d x+(2x^3-3y^2)\,\d y$</div>
+      <div class="opt"><span class="ol">B.</span>$y\cos(x+y)\,\d x+[\sin(x+y)-y\cos(x+y)]\,\d y$</div>
+      <div class="opt"><span class="ol">C.</span>$(2xy+1)\,\d x+(x^2+2y)\,\d y$</div>
+      <div class="opt"><span class="ol">D.</span>$(2x^2y+x)\,\d x+(x^3+2xy)\,\d y$</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：C</strong></p></div>
+      <h4>思路</h4>
+      <p>$P\,\d x+Q\,\d y$ 是某 $f$ 的全微分，当且仅当（在单连通域上）$\dfrac{\partial P}{\partial y}=\dfrac{\partial Q}{\partial x}$。逐项验证这一相容条件即可。</p>
+      <h4>详细求解</h4>
+      <p>记每项为 $P\,\d x+Q\,\d y$，比较 $P_y$ 与 $Q_x$：</p>
+      <div class="fbox">
+        <div class="frow">$$\text{A: }P_y=4x,\quad Q_x=6x^2\ \Rightarrow\ \text{不等}.$$</div>
+        <div class="frow">$$\text{B: }P_y=\cos(x+y)-y\sin(x+y),\ Q_x=\cos(x+y)+y\sin(x+y)\ \Rightarrow\ \text{不等}.$$</div>
+        <div class="frow">$$\text{C: }P_y=2x,\quad Q_x=2x\ \Rightarrow\ \text{相等 ✓}.$$</div>
+        <div class="frow">$$\text{D: }P_y=2x^2,\quad Q_x=3x^2+2y\ \Rightarrow\ \text{不等}.$$</div>
+      </div>
+      <p>只有 C 满足相容条件 —— 选 <strong>C</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>对 C 还原原函数：$f=\displaystyle\int(2xy+1)\,\d x=x^2y+x+g(y)$，再令 $f_y=x^2+g'(y)=x^2+2y\Rightarrow g(y)=y^2$。故 $f=x^2y+x+y^2+C$，其全微分正是 $(2xy+1)\d x+(x^2+2y)\d y$，验证成立。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>"是否为全微分" $\Leftrightarrow$ "$P_y=Q_x$"。这同时也是曲线积分与原函数（势函数）存在的判据，是本章必考的统一结论。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 4 题 ===================== -->
+<div class="sec-amber" id="q4">
+<div class="section">
+  <div class="section-header"><div class="section-num">4</div><h2>第 4 题</h2></div>
+  <div class="card">
+    <h3>极值点的必要条件（费马引理的陷阱）</h3>
+    <p class="qstem">若 $P_0(x_0,y_0)$ 是函数 $f(x,y)$ 的极值点，则</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>$[f''_{xy}(x_0,y_0)]^2-f''_{xx}(x_0,y_0)\cdot f''_{yy}(x_0,y_0)=0$</div>
+      <div class="opt"><span class="ol">B.</span>$f'_x(x_0,y_0)$ 和 $f'_y(x_0,y_0)$ 均不存在</div>
+      <div class="opt"><span class="ol">C.</span>以上都不对</div>
+      <div class="opt"><span class="ol">D.</span>$f'_x(x_0,y_0)=0$，$f'_y(x_0,y_0)=0$</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：C</strong></p></div>
+      <h4>思路</h4>
+      <p>极值的必要条件（费马引理）有一个前提：偏导数<strong>存在</strong>时才必为 $0$。若偏导数不存在，极值依然可能发生。逐项检查是否"无条件成立"。</p>
+      <h4>详细求解</h4>
+      <p>关键反例：$f(x,y)=\sqrt{x^2+y^2}$ 在原点取极小值，但 $f_x(0,0),f_y(0,0)$ 都不存在（参见第 10 题）。据此逐项否定：</p>
+      <ul>
+        <li><strong>D 错：</strong>"偏导数都等于 $0$"只在偏导数存在时才成立；上述反例的极值点处偏导不存在。</li>
+        <li><strong>B 错：</strong>偏导数也可能存在且为 $0$（如 $f=x^2+y^2$ 在原点），并非"均不存在"。</li>
+        <li><strong>A 错：</strong>判别式取值与极值点无固定关系（可正可负可零）。</li>
+      </ul>
+      <p>三者都不能保证 —— 选 <strong>C</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>把正确的必要条件补全应为："若 $P_0$ 是极值点<strong>且偏导存在</strong>，则 $f_x=f_y=0$"。D 漏掉了加粗的前提，因而不是无条件正确的命题。</p>
+      <div class="callout mistake"><div class="callout-icon"></div><div class="callout-body"><strong>常见错误</strong><p>误选 D。要牢记：可导极值点 $\Rightarrow$ 驻点；但极值点不一定可导（尖点型极值），故 D 不是普遍真命题。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 5 题 ===================== -->
+<div class="sec-blue" id="q5">
+<div class="section">
+  <div class="section-header"><div class="section-num">5</div><h2>第 5 题</h2></div>
+  <div class="card">
+    <h3>哪个二元函数在整个平面处处连续</h3>
+    <p class="qstem">下列函数中，在整个 $xOy$ 平面上处处连续的是</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>$z=\ln|1-x^2-y^2|$</div>
+      <div class="opt"><span class="ol">B.</span>$z=\begin{cases}\dfrac{\sin(xy)}{y}, & x\neq0\\[5pt] 0, & x=0\end{cases}$</div>
+      <div class="opt"><span class="ol">C.</span>$z=\begin{cases}\dfrac{x^2y}{x^4+y^2}, & x^2+y^2\neq0\\[5pt] 0, & x^2+y^2=0\end{cases}$</div>
+      <div class="opt"><span class="ol">D.</span>$z=\dfrac{x^2y^2}{x^2y^2+(x-y)^2}$</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：B</strong></p></div>
+      <h4>思路</h4>
+      <p>逐个排除"真正的间断"：A 在一条曲线上发散；C、D 在原点沿不同路径极限不同。剩下 B 的可疑点其极限恰好与函数值吻合（可去），故处处连续。</p>
+      <h4>详细求解</h4>
+      <ul>
+        <li><strong>A 不行：</strong>在单位圆 $x^2+y^2=1$ 上 $|1-x^2-y^2|=0$，$\ln0\to-\infty$，整条圆周间断。</li>
+        <li><strong>C 不行：</strong>沿 $y=x^2$，$\dfrac{x^2\cdot x^2}{x^4+x^4}=\dfrac12$；沿坐标轴极限为 $0$。原点极限不存在。</li>
+        <li><strong>D 不行：</strong>沿 $y=x$，$\dfrac{x^4}{x^4+0}=1$；沿 $y=0$ 为 $0$。原点极限不存在。</li>
+      </ul>
+      <div class="fbox"><div class="frow">$$\text{B: }\ \lim_{y\to0}\frac{\sin(xy)}{y}=\lim_{y\to0}x\cdot\frac{\sin(xy)}{xy}=x.$$</div></div>
+      <p>对 $x\neq0$，$\dfrac{\sin(xy)}{y}$ 在 $y=0$ 处的极限为 $x$（可去奇点）；在 $x=0$ 处函数定义为 $0$，而 $\lim\limits_{(x,y)\to(0,y_0)}\dfrac{\sin xy}{y}=\dfrac{0}{y_0}=0$、原点处 $\lim\dfrac{\sin xy}{y}=0$，处处与函数值衔接。故 B 处处连续 —— 选 <strong>B</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>程序复核：C 沿 $y=x^2$ 的极限 $=\tfrac12\neq0$，D 沿 $y=x$ 的极限 $=\tfrac12\,$（按 $\frac{xy}{x^2+y^2}$ 型）/ $=1$（本题型），均与 $0$ 不符——确认只有 B。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>判二重极限"不存在"的利器是<strong>取特殊路径</strong>（$y=kx$、$y=kx^2$）得到不同值；判"存在/连续"则常用 $|\sin t|\le|t|$、夹逼或极坐标。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+<!-- ===================== 第 6 题 ===================== -->
+<div class="sec-green" id="q6">
+<div class="section">
+  <div class="section-header"><div class="section-num">6</div><h2>第 6 题</h2></div>
+  <div class="card">
+    <h3>二阶判别法：判别式为正 ⇒ 鞍点</h3>
+    <p class="qstem">设点 $P_0(x_0,y_0)$ 是函数 $f(x,y)$ 的驻点，$f(x,y)$ 在 $P_0$ 的某邻域内具有二阶连续偏导数，且 $\big[f''_{xy}(x_0,y_0)\big]^2-f''_{xx}(x_0,y_0)\cdot f''_{yy}(x_0,y_0)>0$，则</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>当 $f''_{xx}(x_0,y_0)<0$ 时，$P_0$ 是极小值点</div>
+      <div class="opt"><span class="ol">B.</span>当 $f''_{xx}(x_0,y_0)<0$ 时，$P_0$ 是极大值点</div>
+      <div class="opt"><span class="ol">C.</span>点 $P_0$ 不是 $f(x,y)$ 的极值点</div>
+      <div class="opt"><span class="ol">D.</span>当 $f''_{yy}(x_0,y_0)>0$ 时，$P_0$ 是极大值点</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：C</strong></p></div>
+      <h4>思路</h4>
+      <p>记 $A=f''_{xx},\,B=f''_{xy},\,C=f''_{yy}$，二阶判别量为 $\Delta=AC-B^2$。题给条件 $B^2-AC>0$ 即 $\Delta=AC-B^2<0$，对应"非极值（鞍点）"情形。</p>
+      <h4>详细求解</h4>
+      <div class="fbox"><div class="frow">$$B^2-AC>0\ \Longleftrightarrow\ \Delta=AC-B^2<0.$$</div></div>
+      <p>二元函数极值充分条件：在驻点处</p>
+      <ul>
+        <li>$\Delta>0$ 且 $A>0$：极小值；$\Delta>0$ 且 $A<0$：极大值；</li>
+        <li>$\Delta<0$：<strong>不是极值（鞍点）</strong>；</li>
+        <li>$\Delta=0$：判别失效，需另行讨论。</li>
+      </ul>
+      <p>本题 $\Delta<0$，无论 $A$、$C$ 符号如何都不是极值点，故 A、B、D 全错 —— 选 <strong>C</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>原卷判别式首项排版略显模糊，但能使本题"四选一"成立的唯一合理读法即标准判别式 $B^2-AC=[f''_{xy}]^2-f''_{xx}f''_{yy}$。典型鞍点例：$f=xy$ 在原点，$A=C=0,\,B=1$，$B^2-AC=1>0$，确为鞍点、非极值，符合结论。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>牢记判别量 $\Delta=AC-B^2$（$A=f_{xx},B=f_{xy},C=f_{yy}$）：$\Delta>0$ 看 $A$ 符号定极大/极小；$\Delta<0$ 必为鞍点；$\Delta=0$ 需用定义或高阶项判断（见第 9 题）。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 7 题 ===================== -->
+<div class="sec-red" id="q7">
+<div class="section">
+  <div class="section-header"><div class="section-num">7</div><h2>第 7 题</h2></div>
+  <div class="card">
+    <h3>偏导数的几何意义：切向量 vs 可微</h3>
+    <p class="qstem">设函数 $f(x,y)$ 在点 $(0,0)$ 的某邻域内有定义，且 $f_x(0,0)=3,\ f_y(0,0)=-1$，则有</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>曲线 $\begin{cases}z=f(x,y)\\ y=0\end{cases}$ 在点 $(0,0,f(0,0))$ 的一个切向量为 $(3,0,1)$</div>
+      <div class="opt"><span class="ol">B.</span>$\d z\big|_{(0,0)}=3\,\d x-\d y$</div>
+      <div class="opt"><span class="ol">C.</span>曲面 $z=f(x,y)$ 在点 $(0,0,f(0,0))$ 的一个法向量为 $(3,-1,1)$</div>
+      <div class="opt"><span class="ol">D.</span>曲线 $\begin{cases}z=f(x,y)\\ y=0\end{cases}$ 在点 $(0,0,f(0,0))$ 的一个切向量为 $(1,0,3)$</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：D</strong></p></div>
+      <h4>思路</h4>
+      <p>只给"偏导数存在"，<strong>不能</strong>推出可微（全微分、切平面、法向量都需要可微）。但截痕曲线 $y=0$ 的切向量只用到一元导数 $f_x(0,0)$，必然成立。</p>
+      <h4>详细求解</h4>
+      <p>曲线 $\{z=f(x,y),\,y=0\}$ 即 $z=f(x,0)$，用 $x$ 作参数 $\vec r(x)=(x,\,0,\,f(x,0))$，</p>
+      <div class="fbox"><div class="frow">$$\vec r\,'(0)=\big(1,\,0,\,f_x(0,0)\big)=(1,0,3).$$</div></div>
+      <p>故 D 正确、A（$(3,0,1)$ 方向不符）错误。再看 B、C：</p>
+      <ul>
+        <li><strong>B 错：</strong>$\d z=3\,\d x-\d y$ 需要 $f$ 在原点<strong>可微</strong>，而仅有偏导存在不足以保证可微。</li>
+        <li><strong>C 错：</strong>法向量同样以可微为前提；即便可微，法向量应为 $(f_x,f_y,-1)=(3,-1,-1)$ 或 $(-3,1,1)$，并非 $(3,-1,1)$。</li>
+      </ul>
+      <p>选 <strong>D</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>切向量第三分量 = 截痕曲线斜率 $\dfrac{\d z}{\d x}=f_x(0,0)=3$，所以方向 $(1,0,3)$ 正确，$(3,0,1)$ 的斜率为 $\tfrac13$ 显然不符。</p>
+      <div class="callout mistake"><div class="callout-icon"></div><div class="callout-body"><strong>常见错误</strong><p>把"偏导数存在"当作"可微"而误选 B 或 C。二元函数：可微 ⇒ 偏导存在 + 连续；反之偏导存在<strong>不</strong>一定可微。涉及全微分/切平面/法向量的选项都暗含可微前提。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 8 题 ===================== -->
+<div class="sec-purple" id="q8">
+<div class="section">
+  <div class="section-header"><div class="section-num">8</div><h2>第 8 题</h2></div>
+  <div class="card">
+    <h3>由全微分还原原函数</h3>
+    <p class="qstem">已知函数的全微分 $\d f(x,y)=(x^2+2xy-y^2)\,\d x+(x^2-2xy-y^2)\,\d y$，则 $f(x,y)=$</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>$\dfrac{x^3}{3}+x^2y-xy^2-\dfrac{y^3}{3}+C$</div>
+      <div class="opt"><span class="ol">B.</span>$\dfrac{x^3}{3}+x^2y+xy^2-\dfrac{y^3}{3}$</div>
+      <div class="opt"><span class="ol">C.</span>$\dfrac{x^3}{3}-x^2y-xy^2-\dfrac{y^3}{3}$</div>
+      <div class="opt"><span class="ol">D.</span>$\dfrac{x^3}{3}-x^2y+xy^2-\dfrac{1}{3}y^3$</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：A</strong></p></div>
+      <h4>思路</h4>
+      <p>由 $f_x=P$ 对 $x$ 积分得到含待定函数 $g(y)$ 的表达式，再用 $f_y=Q$ 定出 $g(y)$。别忘了任意常数 $C$。</p>
+      <h4>详细求解</h4>
+      <p>先验证可积性 $P_y=2x-2y=Q_x$ ✓。对 $x$ 积分：</p>
+      <div class="fbox"><div class="frow">$$f=\int(x^2+2xy-y^2)\,\d x=\frac{x^3}{3}+x^2y-xy^2+g(y).$$</div></div>
+      <p>再求 $f_y$ 并与 $Q$ 比较：</p>
+      <div class="fbox"><div class="frow">$$f_y=x^2-2xy+g'(y)=x^2-2xy-y^2\ \Rightarrow\ g'(y)=-y^2\ \Rightarrow\ g(y)=-\frac{y^3}{3}+C.$$</div></div>
+      <div class="big-formula highlight" style="border-color:rgba(83,74,183,0.5);background:var(--purple-light);">
+        $$f(x,y)=\frac{x^3}{3}+x^2y-xy^2-\frac{y^3}{3}+C.$$
+      </div>
+      <p>选 <strong>A</strong>（唯一带任意常数 $C$ 的选项，也是符号全对的一个）。</p>
+      <h4>验算 / 检验</h4>
+      <p>对 A 反求全微分：$f_x=x^2+2xy-y^2$，$f_y=x^2-2xy-y^2$，与题目完全一致（程序已核对）。注意原函数相差任意常数，故必须有 $+C$，B/C/D 既缺常数又有符号错误。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>"凑原函数"三步：①验 $P_y=Q_x$；②对 $x$ 积分留 $g(y)$；③用 $f_y=Q$ 定 $g(y)$。结果务必带 $+C$。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 9 题 ===================== -->
+<div class="sec-teal" id="q9">
+<div class="section">
+  <div class="section-header"><div class="section-num">9</div><h2>第 9 题</h2></div>
+  <div class="card">
+    <h3>判别式 $=0$ 失效时的极值分析</h3>
+    <p class="qstem">函数 $z=y^2+x^3$ 和 $z=(x^2+y^2)^2$ 在驻点 $(0,0)$ 处，均有 $[f''_{xy}(0,0)]^2-f''_{xx}(0,0)\cdot f''_{yy}(0,0)=0$，则这两个函数在原点 $(0,0)$ 处</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>都取极值</div>
+      <div class="opt"><span class="ol">B.</span>$z=y^2+x^3$ 无极值，而 $z=(x^2+y^2)^2$ 取极小值</div>
+      <div class="opt"><span class="ol">C.</span>$z=y^2+x^3$ 取极小值，而 $z=(x^2+y^2)^2$ 无极值</div>
+      <div class="opt"><span class="ol">D.</span>都没有极值</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：B</strong></p></div>
+      <h4>思路</h4>
+      <p>判别式为 $0$ 时充分条件失效，回到极值<strong>定义</strong>：看 $f(x,y)-f(0,0)$ 在原点附近是否保持定号。</p>
+      <h4>详细求解</h4>
+      <p><strong>① $z=y^2+x^3$：</strong>沿 $x$ 轴（$y=0$）$z=x^3$，当 $x>0$ 时 $>0$、$x<0$ 时 $<0$，函数值在原点两侧变号，故<strong>无极值</strong>。</p>
+      <div class="fbox"><div class="frow">$$z(x,0)=x^3:\quad x>0\Rightarrow z>0,\ \ x<0\Rightarrow z<0.$$</div></div>
+      <p><strong>② $z=(x^2+y^2)^2$：</strong>恒有 $z\ge0$，且仅在原点 $z=0$，因此原点是<strong>极小值（也是最小值）</strong>。</p>
+      <div class="fbox"><div class="frow">$$z=(x^2+y^2)^2\ge0=z(0,0),\quad\text{当且仅当 }(x,y)=(0,0)\text{ 取等}.$$</div></div>
+      <p>故 $z=y^2+x^3$ 无极值，$z=(x^2+y^2)^2$ 取极小值 —— 选 <strong>B</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>两函数在原点都是驻点且判别式为 $0$（题设已给）。第一函数借"立方项变号"否定极值，第二函数借"完全平方非负"确认极小，逻辑自洽。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>判别式 $\Delta=0$ ⇒ 充分条件失效 ⇒ 用<strong>定义</strong>判定。常用手段：找一条让增量变号的路径（否定极值），或把函数写成非负/非正形式（肯定极值）。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 10 题 ===================== -->
+<div class="sec-coral" id="q10">
+<div class="section">
+  <div class="section-header"><div class="section-num">10</div><h2>第 10 题</h2></div>
+  <div class="card">
+    <h3>连续但偏导数不存在（圆锥面顶点）</h3>
+    <p class="qstem">函数 $f(x,y)=\sqrt{x^2+y^2}$ 在点 $(0,0)$ 处</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>不连续，两个偏导数存在</div>
+      <div class="opt"><span class="ol">B.</span>不连续，两个偏导数不存在</div>
+      <div class="opt"><span class="ol">C.</span>连续，两个偏导数不存在</div>
+      <div class="opt"><span class="ol">D.</span>连续，两个偏导数存在</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：C</strong></p></div>
+      <h4>思路</h4>
+      <p>连续性看二重极限是否等于函数值；偏导数仍用定义，注意会出现 $\dfrac{|x|}{x}$ 的左右不一致。</p>
+      <h4>详细求解</h4>
+      <p><strong>连续：</strong>$\lim\limits_{(x,y)\to(0,0)}\sqrt{x^2+y^2}=0=f(0,0)$，故连续。</p>
+      <p><strong>偏导：</strong></p>
+      <div class="fbox"><div class="frow">$$f_x(0,0)=\lim_{x\to0}\frac{\sqrt{x^2}-0}{x}=\lim_{x\to0}\frac{|x|}{x},$$</div></div>
+      <p>右极限 $=+1$、左极限 $=-1$，不存在；由对称性 $f_y(0,0)$ 也不存在。故"连续、两偏导都不存在" —— 选 <strong>C</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>几何上 $z=\sqrt{x^2+y^2}$ 是上半圆锥面，顶点 $(0,0,0)$ 是尖点：图像连续不断，但任一方向切线斜率不唯一（尖角），所以偏导不存在。这正是第 4 题"极值点偏导可不存在"的同款反例。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>$\sqrt{x^2+y^2}$（圆锥顶点）是"连续但不可导/偏导不存在"的标准例。判偏导出现 $\frac{|x|}{x}$ 即左右极限不等 ⇒ 不存在。对照第 15 题（连续且偏导存在）一起记。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+<!-- ===================== 第 11 题 ===================== -->
+<div class="sec-amber" id="q11">
+<div class="section">
+  <div class="section-header"><div class="section-num">11</div><h2>第 11 题</h2></div>
+  <div class="card">
+    <h3>多元介值定理：连通性是关键</h3>
+    <p class="qstem">设 $m,M$ 分别为函数 $\alpha=f(x,y)$ 在区域 $D$ 上的最小值与最大值，且 $m\le\mu\le M$，则</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>当 $D$ 为闭集，$f$ 为连续函数，则在 $D$ 上至少有一点 $P$，使 $f(P)=\mu$</div>
+      <div class="opt"><span class="ol">B.</span>函数 $z=f(x,y)$ 在定义域 $D$ 内一定有点 $P$ 使 $f(P)=\mu$，满足 $m\le\mu\le M$</div>
+      <div class="opt"><span class="ol">C.</span>当 $D$ 为连通区域，$f$ 为 $D$ 上的连续函数，则在 $D$ 上至少有一点 $P$，使 $f(P)=\mu$</div>
+      <div class="opt"><span class="ol">D.</span>当 $D$ 为有界集合，$f$ 为连续函数，则在 $D$ 上至少有一点 $P$，使 $f(P)=\mu$</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：C</strong></p></div>
+      <h4>思路</h4>
+      <p>多元"介值定理"要取到介于最小、最大值之间的任意值 $\mu$，需要两个条件：函数<strong>连续</strong> + 定义域<strong>连通</strong>。逐项检查是否凑齐。</p>
+      <h4>详细求解</h4>
+      <ul>
+        <li><strong>A 错：</strong>闭集不一定连通。例如 $D=\{(0,0)\}\cup\{(2,0)\}$ 两点，连续函数取不到中间值。</li>
+        <li><strong>B 错：</strong>未假设连续与连通，结论不成立。</li>
+        <li><strong>C 对：</strong>连通区域 + 连续函数 ⇒ 介值定理成立，必有 $P$ 使 $f(P)=\mu$。</li>
+        <li><strong>D 错：</strong>有界集合同样可不连通，反例同 A。</li>
+      </ul>
+      <div class="fbox"><div class="frow">$$f\in C(D),\ D\ \text{连通},\ m\le\mu\le M\ \Longrightarrow\ \exists\,P\in D:\ f(P)=\mu.$$</div></div>
+      <p>选 <strong>C</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>核心是"连通"控制了值域的<strong>连续填充</strong>：连续函数把连通集映成连通集（区间），区间内自然取遍 $[m,M]$ 的每个值。闭、有界都不能替代连通这一条。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>介值定理的两块基石：<strong>连续</strong>（保值域连通）+ <strong>连通定义域</strong>。"闭""有界"是最值定理（取到 $m,M$）的条件，别与介值定理混淆。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 12 题 ===================== -->
+<div class="sec-blue" id="q12">
+<div class="section">
+  <div class="section-header"><div class="section-num">12</div><h2>第 12 题</h2></div>
+  <div class="card">
+    <h3>二重极限的存在性判定</h3>
+    <p class="qstem">下列函数中，当 $(x,y)\to(0,0)$ 时，极限存在的是</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>$\sin\dfrac{1}{xy}$</div>
+      <div class="opt"><span class="ol">B.</span>$\dfrac{x+y}{x-y}$</div>
+      <div class="opt"><span class="ol">C.</span>$\dfrac{xy}{\sqrt{x^2+y^2}}$</div>
+      <div class="opt"><span class="ol">D.</span>$\dfrac{xy}{x^2+y^2}$</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：C</strong></p></div>
+      <h4>思路</h4>
+      <p>"分子比分母低阶 + 有界因子"往往极限为 $0$；振荡型和"齐次同阶"型常因路径不同而不存在。用极坐标或特殊路径快速判定。</p>
+      <h4>详细求解</h4>
+      <ul>
+        <li><strong>A 不存在：</strong>$\frac{1}{xy}\to\infty$，$\sin\frac{1}{xy}$ 无限振荡。</li>
+        <li><strong>B 不存在：</strong>沿 $y=0$ 得 $1$，沿 $x=0$ 得 $-1$。</li>
+        <li><strong>D 不存在：</strong>沿 $y=x$ 得 $\tfrac12$，沿 $y=0$ 得 $0$。</li>
+      </ul>
+      <p><strong>C 存在：</strong>令 $x=r\cos\theta,\ y=r\sin\theta$，</p>
+      <div class="fbox"><div class="frow">$$\frac{xy}{\sqrt{x^2+y^2}}=\frac{r^2\cos\theta\sin\theta}{r}=r\cos\theta\sin\theta,\quad \Big|\,\cdot\,\Big|\le r\to0.$$</div></div>
+      <p>极限为 $0$，存在 —— 选 <strong>C</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>程序复核：C 的极坐标极限 $=0$；D 沿 $y=x$ 极限 $=\tfrac12$，确认 D 不存在。C 也可用 $|xy|\le\tfrac12(x^2+y^2)$ 得 $\big|\tfrac{xy}{\sqrt{x^2+y^2}}\big|\le\tfrac12\sqrt{x^2+y^2}\to0$。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>分母 $\sqrt{x^2+y^2}$（一阶）压不住分子 $xy$（二阶）⇒ 趋 $0$；分母 $x^2+y^2$（二阶）与分子同阶 ⇒ 路径相关、易不存在。极坐标是判二重极限的万能法。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 13 题 ===================== -->
+<div class="sec-green" id="q13">
+<div class="section">
+  <div class="section-header"><div class="section-num">13</div><h2>第 13 题</h2></div>
+  <div class="card">
+    <h3>由极限条件判断是否为极值点</h3>
+    <p class="qstem">已知函数 $f(x,y)$ 在点 $(0,0)$ 的某个邻域内连续，且 $\displaystyle\lim_{(x,y)\to(0,0)}\dfrac{f(x,y)-xy}{(x^2+y^2)^2}=1$，则下述四个选项中正确的是</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>点 $(0,0)$ 是 $f(x,y)$ 的极小值点</div>
+      <div class="opt"><span class="ol">B.</span>点 $(0,0)$ 是 $f(x,y)$ 的极大值点</div>
+      <div class="opt"><span class="ol">C.</span>根据所给条件无法判断 $(0,0)$ 是不是极值点</div>
+      <div class="opt"><span class="ol">D.</span>点 $(0,0)$ 不是 $f(x,y)$ 的极值点</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：D</strong></p></div>
+      <h4>思路</h4>
+      <p>由极限条件把 $f$ 在原点附近写成"主项 $xy$ + 高阶项"。主项 $xy$ 是二次、变号项，量级远大于四次的余项，所以增量符号由 $xy$ 主导。</p>
+      <h4>详细求解</h4>
+      <p>极限有限（$=1$）而分母 $\to0$，故分子 $\to0$，结合连续得 $f(0,0)=0$。当 $(x,y)\to(0,0)$：</p>
+      <div class="fbox"><div class="frow">$$f(x,y)-xy=(x^2+y^2)^2\big[1+o(1)\big]\ \Rightarrow\ f(x,y)=xy+(x^2+y^2)^2+o\big((x^2+y^2)^2\big).$$</div></div>
+      <p>考察增量 $f(x,y)-f(0,0)=f(x,y)$，取两条对称路径（小 $t>0$）：</p>
+      <div class="fbox"><div class="frow">$$y=x:\ f\approx x^2+(2x^2)^2>0;\qquad y=-x:\ f\approx -x^2+(2x^2)^2<0.$$</div></div>
+      <p>增量在原点附近<strong>既取正又取负</strong>，故 $(0,0)$ 不是极值点 —— 选 <strong>D</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>四次项 $(x^2+y^2)^2$ 在 $y=\pm x$ 上同为 $4x^4$，而二次项 $xy=\pm x^2$ 量级更大，故小 $x$ 时符号由 $\pm x^2$ 决定，正负皆有，确认非极值。条件足以判定，故 C 错。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>"极限给出局部展开"题：把条件翻译成 $f=\text{主项}+\text{高阶}$，再用主项定号。出现变号二次型（如 $xy$）即可断定鞍点/非极值。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 14 题 ===================== -->
+<div class="sec-red" id="q14">
+<div class="section">
+  <div class="section-header"><div class="section-num">14</div><h2>第 14 题</h2></div>
+  <div class="card">
+    <h3>"二阶偏导存在"能推出什么</h3>
+    <p class="qstem">若函数 $f(x,y)$ 在区域 $D$ 内具有二阶偏导数，则正确的结论是</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>A、B、C 三个结论都不对</div>
+      <div class="opt"><span class="ol">B.</span>$f(x,y)$ 在 $D$ 内必可微</div>
+      <div class="opt"><span class="ol">C.</span>必有 $\dfrac{\partial^2 f}{\partial x\,\partial y}=\dfrac{\partial^2 f}{\partial y\,\partial x}$</div>
+      <div class="opt"><span class="ol">D.</span>$f(x,y)$ 在 $D$ 内必连续</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：A</strong></p></div>
+      <h4>思路</h4>
+      <p>"二阶偏导存在"只意味着一阶偏导存在并可再次求偏导，它<strong>不蕴含</strong>可微、连续，也不保证混合偏导相等（后者需混合偏导<strong>连续</strong>）。逐条否定 B、C、D。</p>
+      <h4>详细求解</h4>
+      <ul>
+        <li><strong>B 错（不必可微）：</strong>偏导存在不等于可微；二阶偏导存在亦然——一阶偏导未必连续，故 $f$ 未必可微。</li>
+        <li><strong>D 错（不必连续）：</strong>偏导数存在不能推出函数连续（存在偏导存在但函数不连续的经典反例）。</li>
+        <li><strong>C 错（不必相等）：</strong>混合偏导相等需要 Schwarz/Clairaut 条件——$f_{xy},f_{yx}$ <strong>连续</strong>。仅"存在"时存在 $f_{xy}(0,0)\neq f_{yx}(0,0)$ 的反例。</li>
+      </ul>
+      <div class="fbox"><div class="frow">$$f_{xy}=f_{yx}\ \text{需要 }f_{xy},f_{yx}\ \textbf{连续}\ (\text{Clairaut 定理}),\ \text{仅存在不够}.$$</div></div>
+      <p>B、C、D 都不一定成立，故选 <strong>A</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>经典反例 $f(x,y)=\dfrac{xy(x^2-y^2)}{x^2+y^2}$（原点补 $0$）二阶偏导处处存在，但 $f_{xy}(0,0)=-1\neq1=f_{yx}(0,0)$，直接否掉 C；而"偏导存在不连续"的反例否掉 D；缺乏可微性否掉 B。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>混合偏导相等的正确条件是"$f_{xy},f_{yx}$ 连续"。把"存在"当"连续"是本题最大陷阱。记牢蕴含链：连续可微 ⇒ 可微 ⇒（偏导存在 + 连续）。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 15 题 ===================== -->
+<div class="sec-purple" id="q15">
+<div class="section">
+  <div class="section-header"><div class="section-num">15</div><h2>第 15 题</h2></div>
+  <div class="card">
+    <h3>连续且两偏导存在</h3>
+    <p class="qstem">函数 $f(x,y)=\begin{cases}\dfrac{x^2y}{x^2+y^2}, & x^2+y^2\neq0\\[6pt] 0, & x^2+y^2=0\end{cases}$ 在点 $(0,0)$ 处</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>不连续，两个偏导数不存在</div>
+      <div class="opt"><span class="ol">B.</span>连续，两个偏导数不存在</div>
+      <div class="opt"><span class="ol">C.</span>不连续，两个偏导数存在</div>
+      <div class="opt"><span class="ol">D.</span>连续，两个偏导数存在</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：D</strong></p></div>
+      <h4>思路</h4>
+      <p>用放缩判连续，用定义判偏导。注意 $f(x,0)$、$f(0,y)$ 都恒为 $0$，偏导自然存在。</p>
+      <h4>详细求解</h4>
+      <p><strong>连续：</strong>因为 $\dfrac{x^2}{x^2+y^2}\le1$，</p>
+      <div class="fbox"><div class="frow">$$\Big|\frac{x^2y}{x^2+y^2}\Big|=\frac{x^2}{x^2+y^2}\,|y|\le|y|\to0=f(0,0),$$</div></div>
+      <p>故在原点连续。<strong>偏导：</strong>$f(x,0)=0,\ f(0,y)=0$，于是</p>
+      <div class="fbox"><div class="frow">$$f_x(0,0)=\lim_{x\to0}\frac{0}{x}=0,\qquad f_y(0,0)=\lim_{y\to0}\frac{0}{y}=0.$$</div></div>
+      <p>连续且两偏导都存在 —— 选 <strong>D</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>注意区分：本题虽连续、偏导存在，但<strong>并不可微</strong>（沿 $y=x$ 方向导数与用偏导算出的线性主部不符）。不过题目只问连续性与偏导存在性，答案为 D。与第 10 题（连续但偏导不存在）正好对照。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>分母为 $x^2+y^2$、分子比它低阶（这里 $x^2y$ 三阶 vs 二阶）⇒ 连续；轴上恒为 $0$ ⇒ 偏导存在。"连续 + 偏导存在 ≠ 可微"是常考辨析点。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+<!-- ===================== 第 16 题 ===================== -->
+<div class="sec-teal" id="q16">
+<div class="section">
+  <div class="section-header"><div class="section-num">16</div><h2>第 16 题</h2></div>
+  <div class="card">
+    <h3>间断点的判定（定义域边界）</h3>
+    <p class="qstem">对函数 $z=\dfrac{1}{\sqrt{x^2+y^2-1}}$，则正确的结论是</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>在 $xOy$ 平面上，圆周 $x^2+y^2=1$ 上的所有点是它的间断点</div>
+      <div class="opt"><span class="ol">B.</span>以上都不对</div>
+      <div class="opt"><span class="ol">C.</span>它在整个 $xOy$ 平面上连续</div>
+      <div class="opt"><span class="ol">D.</span>在 $xOy$ 平面上，只有点 $(0,1)$ 和 $(1,0)$ 是它的间断点</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：A</strong></p></div>
+      <h4>思路</h4>
+      <p>先定定义域，再看在哪些点函数"该连续却不连续"。要求根号内为正：$x^2+y^2-1>0$，即定义域是单位圆<strong>外部</strong>。</p>
+      <h4>详细求解</h4>
+      <div class="fbox"><div class="frow">$$\text{定义域}:\ x^2+y^2>1\quad(\text{单位圆外部，开区域}).$$</div></div>
+      <p>在定义域内分母连续且不为零，故 $z$ 在 $x^2+y^2>1$ 上处处连续，<strong>C 错</strong>。当点从外侧趋于圆周时 $x^2+y^2-1\to0^{+}$，</p>
+      <div class="fbox"><div class="frow">$$z=\frac{1}{\sqrt{x^2+y^2-1}}\to+\infty,$$</div></div>
+      <p>故圆周 $x^2+y^2=1$ 上每一点都是函数的（无穷型）间断点——它们是定义域的聚点而函数无法连续延拓。圆<strong>内部</strong>的点根本不是定义域的聚点（其邻域整块在域外），不计作间断点。于是间断点恰为整条圆周，<strong>A 对</strong>；D 只说两点显然不全，错。</p>
+      <p>选 <strong>A</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>$(0,1)$、$(1,0)$ 都在圆周上（$0^2+1^2=1$，$1^2+0^2=1$），它们只是圆周的两个点，D 把间断点缩成两点是错的；C 忽略了整块内部与圆周未定义。唯有 A 准确刻画间断集 = 单位圆周。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>含 $\sqrt{\ }$、$\ln$、分母的函数，先求定义域；间断点出现在"定义域边界 / 分母为零的曲线"上。与"$z=\frac{x+y}{x-y}$ 在直线 $y=x$ 上间断"是同类题。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 17 题 ===================== -->
+<div class="sec-coral" id="q17">
+<div class="section">
+  <div class="section-header"><div class="section-num">17</div><h2>第 17 题</h2></div>
+  <div class="card">
+    <h3>对数求导法解隐函数 $x^{y}=y^{x}$</h3>
+    <p class="qstem">设函数 $y=f(x)$ 由方程 $x^{y}=y^{x}$（$x\neq y$）确定，则 $\dfrac{\d y}{\d x}=$</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>$\dfrac{x^2(1-\ln y)}{y^2(1-\ln x)}$</div>
+      <div class="opt"><span class="ol">B.</span>$\dfrac{x^2(1-\ln x)}{y^2(1-\ln y)}$</div>
+      <div class="opt"><span class="ol">C.</span>$\dfrac{y^2(1-\ln y)}{x^2(1-\ln x)}$</div>
+      <div class="opt"><span class="ol">D.</span>$\dfrac{y^2(1-\ln x)}{x^2(1-\ln y)}$</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：D</strong></p></div>
+      <h4>思路</h4>
+      <p>两边取对数化幂为积，再对 $x$ 隐式求导，最后用原约束 $y\ln x=x\ln y$ 把结果整理成选项的 $(1-\ln)$ 形式。</p>
+      <h4>详细求解</h4>
+      <p>取对数：$y\ln x=x\ln y$。对 $x$ 求导（$y=y(x)$）：</p>
+      <div class="fbox"><div class="frow">$$y'\ln x+\frac{y}{x}=\ln y+\frac{x}{y}\,y'.$$</div></div>
+      <p>整理出 $y'$：</p>
+      <div class="fbox"><div class="frow">$$y'\Big(\ln x-\frac{x}{y}\Big)=\ln y-\frac{y}{x}\ \Rightarrow\ y'=\frac{\ln y-\frac{y}{x}}{\ln x-\frac{x}{y}}=\frac{xy\ln y-y^2}{xy\ln x-x^2}.$$</div></div>
+      <p>分子提 $y$、分母提 $x$，并代入约束 $x\ln y=y\ln x$（由 $y\ln x=x\ln y$）化简：</p>
+      <div class="fbox"><div class="frow">$$x\ln y-y=y\ln x-y=-y(1-\ln x),\qquad y\ln x-x=x\ln y-x=-x(1-\ln y).$$</div></div>
+      <div class="big-formula highlight" style="border-color:rgba(153,60,29,0.5);background:var(--coral-light);">
+        $$y'=\frac{y\,(x\ln y-y)}{x\,(y\ln x-x)}=\frac{y\cdot[-y(1-\ln x)]}{x\cdot[-x(1-\ln y)]}=\frac{y^2(1-\ln x)}{x^2(1-\ln y)}.$$
+      </div>
+      <p>选 <strong>D</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>取曲线上的点 $(x,y)=(2,4)$（满足 $2^4=4^2=16$）：直接代未化简式 $y'=\dfrac{8\ln4-16}{8\ln2-4}\approx-3.18$；代选项 D $\dfrac{16(1-\ln2)}{4(1-\ln4)}\approx-3.18$，完全吻合（已用程序复核），其余 A、B、C 数值不符。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>幂指方程优先"两边取对数"。最后一步善用<strong>原约束</strong>回代，把 $\ln$ 组合凑成与选项一致的形式；拿不准时用一个具体满足方程的点（如 $(2,4)$）数值验证最稳。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 18 题 ===================== -->
+<div class="sec-amber" id="q18">
+<div class="section">
+  <div class="section-header"><div class="section-num">18</div><h2>第 18 题</h2></div>
+  <div class="card">
+    <h3>空间图形与方程组的对应</h3>
+    <p class="qstem">考虑以下图形 (a)、(b)、(c)、(d)（见原卷立体图）和下面的方程，求图形与方程的对应关系：</p>
+    <p class="fig-ref" style="color:var(--text3);font-size:13px;font-style:italic;padding:4px 0 4px 12px;border-left:3px solid var(--border);margin:8px 0;">（图形见原试卷：(a) 沿 $x$ 轴张开的抛物柱面被一斜平面所截；(b) 顶点在 $z=1$、沿 $y$ 轴的下开口抛物柱面配三角形底；(c) 上下对称的纺锤形闭曲面；(d) 旋转抛物面与抛物柱面相交的复杂体。）</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">(1)</span>抛物柱面 $2y^2=x$，平面 $z=0$ 及 $\dfrac{x}{4}+\dfrac{y}{2}+\dfrac{z}{2}=1$</div>
+      <div class="opt"><span class="ol">(2)</span>抛物柱面 $x^2=1-z$，平面 $y=0$、$z=0$ 及 $x+y=1$</div>
+      <div class="opt"><span class="ol">(3)</span>圆锥面 $z=\sqrt{x^2+y^2}$ 及旋转抛物面 $z=2-x^2-y^2$</div>
+      <div class="opt"><span class="ol">(4)</span>旋转抛物面 $x^2+y^2=z$，柱面 $y^2=x$，平面 $z=0$ 及 $x=1$</div>
+    </div>
+    <div class="callout warn" style="margin-top:12px;"><div class="callout-icon"></div><div class="callout-body"><p>原卷此题的 A/B/C/D 选项在截图中被裁掉，下面直接给出正确的"图形 ↔ 方程"对应及判据。</p></div></div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确对应：(a)–(1)，(b)–(2)，(c)–(3)，(d)–(4)</strong>（即按自然顺序一一对应）</p></div>
+      <h4>思路</h4>
+      <p>抓每组方程里"最有辨识度的曲面"：是闭合纺锤（锥+抛物面）、还是被斜平面切的柱体、还是抛物面配抛物柱面。逐一对号入座。</p>
+      <h4>逐组判据</h4>
+      <ul>
+        <li><strong>(3) ↔ (c)：</strong>圆锥面 $z=\sqrt{x^2+y^2}$（下半）与旋转抛物面 $z=2-x^2-y^2$（上拱）相交于 $r=1,\,z=1$ 的圆，围成上尖下圆的<strong>纺锤形闭体</strong>——正是对称封闭的图 (c)。</li>
+        <li><strong>(1) ↔ (a)：</strong>$2y^2=x$ 是沿 $z$ 轴方向的抛物柱面，被底面 $z=0$ 和斜面 $\frac{x}{4}+\frac{y}{2}+\frac{z}{2}=1$（交轴于 $x=4,y=2,z=2$）所截，对应被斜平面切顶的柱体图 (a)。</li>
+        <li><strong>(2) ↔ (b)：</strong>$x^2=1-z$ 即 $z=1-x^2$，顶点在 $(0,\,\cdot,\,1)$、沿 $y$ 轴的<strong>下开口</strong>抛物柱面；配 $y=0,\,z=0,\,x+y=1$。图 (b) 中 $E$ 恰在 $z=1$、脊沿 $y$ 轴，对应 (2)。</li>
+        <li><strong>(4) ↔ (d)：</strong>旋转抛物面 $x^2+y^2=z$ 与抛物柱面 $y^2=x$、平面 $z=0,\,x=1$ 围成，曲面交错最复杂，对应图 (d)。</li>
+      </ul>
+      <h4>验算 / 检验</h4>
+      <p>用"封闭性"快速校验：四组里唯有 (3) 由两张曲面围成<strong>有界闭区域</strong>（纺锤），必配对称闭图 (c)；其余三组都含平面边界、为"被切柱体/抛物面"开放体。排除法即得自然顺序对应。</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>立体配对题的突破口：①辨曲面类型（柱面看缺哪个变量、旋转面看 $x^2+y^2$）；②找特征交线/顶点位置；③用"是否封闭、被哪些平面切"缩小范围。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 19 题 ===================== -->
+<div class="sec-blue" id="q19">
+<div class="section">
+  <div class="section-header"><div class="section-num">19</div><h2>第 19 题</h2></div>
+  <div class="card">
+    <h3>含 $\sin(x^2+y^2)$ 的连续性与偏导</h3>
+    <p class="qstem">设函数 $f(x,y)=\begin{cases}\dfrac{\sqrt{|xy|}}{x^2+y^2}\sin(x^2+y^2), & x\neq0,\,y\neq0\\[6pt] 0, & x=0,\,y=0\end{cases}$ 在点 $(0,0)$ 处</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>连续，两个偏导数不存在</div>
+      <div class="opt"><span class="ol">B.</span>连续，两个偏导数存在</div>
+      <div class="opt"><span class="ol">C.</span>极限存在，但不连续</div>
+      <div class="opt"><span class="ol">D.</span>极限不存在</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：B</strong></p></div>
+      <h4>思路</h4>
+      <p>用 $\dfrac{\sin t}{t}\to1$（$t=x^2+y^2$）把分母吸收掉，剩下 $\sqrt{|xy|}$ 趋零判连续；坐标轴上函数恒为 $0$ 判偏导。</p>
+      <h4>详细求解</h4>
+      <p><strong>连续：</strong>当 $(x,y)\to(0,0)$，</p>
+      <div class="fbox"><div class="frow">$$|f|=\sqrt{|xy|}\cdot\frac{|\sin(x^2+y^2)|}{x^2+y^2}\le\sqrt{|xy|}\cdot1\to0=f(0,0),$$</div></div>
+      <p>（用了 $|\sin t|\le|t|$）故连续，从而极限存在，<strong>C、D 排除</strong>。</p>
+      <p><strong>偏导：</strong>在坐标轴上 $\sqrt{|xy|}=0$，故 $f(x,0)=0,\ f(0,y)=0$，</p>
+      <div class="fbox"><div class="frow">$$f_x(0,0)=\lim_{x\to0}\frac{f(x,0)-0}{x}=0,\qquad f_y(0,0)=\lim_{y\to0}\frac{f(0,y)-0}{y}=0.$$</div></div>
+      <p>两偏导都存在（均为 $0$）。连续且偏导存在 —— 选 <strong>B</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>用 $|xy|\le\tfrac12(x^2+y^2)$ 得 $\sqrt{|xy|}\le\tfrac{1}{\sqrt2}\sqrt{x^2+y^2}\to0$，连续无疑；轴上恒零保证偏导存在。（与第 15 题同理：连续 + 偏导存在，但未必可微。）</p>
+      <div class="callout exam"><div class="callout-icon"></div><div class="callout-body"><strong>考试要点</strong><p>看到 $\sin(x^2+y^2)$ 配分母 $x^2+y^2$，立即用 $\frac{\sin t}{t}\to1$ 约掉；再用 $|\sin t|\le|t|$ 放缩判连续。轴上为 $0$ ⇒ 偏导存在，是分段函数的常见结构。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 第 20 题 ===================== -->
+<div class="sec-green" id="q20">
+<div class="section">
+  <div class="section-header"><div class="section-num">20</div><h2>第 20 题</h2></div>
+  <div class="card">
+    <h3>反正弦复合函数的定义域</h3>
+    <p class="qstem">函数 $z=\arcsin\dfrac{y}{x}$ 的定义域是</p>
+    <div class="opts">
+      <div class="opt"><span class="ol">A.</span>$\{(x,y)\mid y\ge x\ \text{且}\ x\neq0\}$</div>
+      <div class="opt"><span class="ol">B.</span>$\{(x,y)\mid y\le x\ \text{且}\ x\neq0\}$</div>
+      <div class="opt"><span class="ol">C.</span>$\{(x,y)\mid |y|\le|x|,\ \text{且}\ x\neq0\}$</div>
+      <div class="opt"><span class="ol">D.</span>$\{(x,y)\mid |y|\le x\ \text{且}\ x\neq0\}$</div>
+    </div>
+  </div>
+  <div class="card">
+    <details><summary>点击展开解答与解析</summary>
+    <div class="details-body">
+      <div class="answer-box"><p><strong>正确答案：C</strong></p></div>
+      <h4>思路</h4>
+      <p>两个限制叠加：$\arcsin$ 的自变量须落在 $[-1,1]$；分式要求分母 $x\neq0$。</p>
+      <h4>详细求解</h4>
+      <div class="fbox"><div class="frow">$$-1\le\frac{y}{x}\le1\quad\text{且}\quad x\neq0.$$</div></div>
+      <p>不等式 $\left|\dfrac{y}{x}\right|\le1$ 两边乘以 $|x|>0$ 得 $|y|\le|x|$。故定义域为</p>
+      <div class="big-formula highlight" style="border-color:rgba(59,109,17,0.5);background:var(--green-light);">
+        $$\{(x,y)\mid |y|\le|x|,\ x\neq0\}.$$
+      </div>
+      <p>选 <strong>C</strong>。</p>
+      <h4>验算 / 检验</h4>
+      <p>用 $|x|$（而非 $x$）才正确处理 $x<0$ 的一侧：例如 $x=-2,\,y=1$，$\frac{y}{x}=-\tfrac12\in[-1,1]$ 合法，且满足 $|y|=1\le2=|x|$，但不满足 D 的 $|y|\le x=-2$。故 D 错、C 对；A、B 漏掉绝对值更不对。</p>
+      <div class="callout mistake"><div class="callout-icon"></div><div class="callout-body"><strong>常见错误</strong><p>把 $\left|\frac{y}{x}\right|\le1$ 化成 $|y|\le x$（误丢绝对值，选 D）。乘 $|x|$ 时务必带绝对值，正确结果是 $|y|\le|x|$。</p></div></div>
+    </div></details>
+  </div>
+</div>
+</div>
+<!-- ===================== 答案速查 & 小结 ===================== -->
+<div class="sec-red" id="key">
+<div class="section">
+  <div class="section-header"><div class="section-num">✓</div><h2>答案速查表 &amp; 考点小结</h2></div>
+
+  <div class="card">
+    <h3>20 题答案速查</h3>
+    <table>
+      <tr><th>题号</th><th>答案</th><th>考点</th><th>题号</th><th>答案</th><th>考点</th></tr>
+      <tr><td>1</td><td><strong>B</strong></td><td>定义求偏导（振荡）</td><td>11</td><td><strong>C</strong></td><td>介值定理·连通性</td></tr>
+      <tr><td>2</td><td><strong>C</strong></td><td>对称隐函数二阶偏导</td><td>12</td><td><strong>C</strong></td><td>二重极限存在性</td></tr>
+      <tr><td>3</td><td><strong>C</strong></td><td>全微分判据 $P_y=Q_x$</td><td>13</td><td><strong>D</strong></td><td>极限定局部展开</td></tr>
+      <tr><td>4</td><td><strong>C</strong></td><td>极值必要条件陷阱</td><td>14</td><td><strong>A</strong></td><td>二阶偏导推论</td></tr>
+      <tr><td>5</td><td><strong>B</strong></td><td>处处连续判定</td><td>15</td><td><strong>D</strong></td><td>连续+偏导存在</td></tr>
+      <tr><td>6</td><td><strong>C</strong></td><td>判别式&gt;0 ⇒ 鞍点</td><td>16</td><td><strong>A</strong></td><td>间断点（圆周）</td></tr>
+      <tr><td>7</td><td><strong>D</strong></td><td>偏导几何·切向量</td><td>17</td><td><strong>D</strong></td><td>对数求导 $x^y=y^x$</td></tr>
+      <tr><td>8</td><td><strong>A</strong></td><td>还原原函数</td><td>18</td><td><strong>a1 b2 c3 d4</strong></td><td>图形↔方程</td></tr>
+      <tr><td>9</td><td><strong>B</strong></td><td>判别式=0 用定义</td><td>19</td><td><strong>B</strong></td><td>连续+偏导存在</td></tr>
+      <tr><td>10</td><td><strong>C</strong></td><td>连续但偏导不存在</td><td>20</td><td><strong>C</strong></td><td>$\arcsin$ 定义域</td></tr>
+    </table>
+    <p style="font-size:13px;color:var(--text2);margin-top:8px;">注：第 18 题原卷选项被截，此处给出图形与方程的正确一一对应。</p>
+  </div>
+
+  <div class="card">
+    <h3>高频考点小结</h3>
+
+    <h4>① 极限 · 连续（第 5、10、12、15、16、19 题）</h4>
+    <ul>
+      <li>判二重极限<strong>不存在</strong>：取特殊路径 $y=kx$、$y=kx^2$ 得到不同值。</li>
+      <li>判<strong>存在/连续</strong>：极坐标、夹逼、$|\sin t|\le|t|$、$|xy|\le\frac12(x^2+y^2)$。</li>
+      <li>间断点出现在"定义域边界 / 分母为零的曲线"上（圆周、直线）。</li>
+    </ul>
+
+    <h4>② 偏导数 · 可微 · 全微分（第 1、7、8、14 题）</h4>
+    <ul>
+      <li>分界点偏导一律用<strong>定义</strong>；蕴含链：<strong>连续可微 ⇒ 可微 ⇒（偏导存在 + 函数连续）</strong>，反向均不成立。</li>
+      <li>全微分存在 / 是某函数的全微分 $\Leftrightarrow P_y=Q_x$；还原原函数记得 $+C$。</li>
+      <li>混合偏导相等需 $f_{xy},f_{yx}$ <strong>连续</strong>（Clairaut），仅"存在"不够。</li>
+    </ul>
+
+    <h4>③ 极值判别（第 4、6、9、13 题）</h4>
+    <div class="fbox"><div class="frow">$$\Delta=AC-B^2,\quad A=f_{xx},\ B=f_{xy},\ C=f_{yy}\ (\text{驻点处}).$$</div></div>
+    <ul>
+      <li>$\Delta>0$：$A>0$ 极小，$A<0$ 极大；$\Delta<0$：鞍点（非极值）；$\Delta=0$：失效，用定义。</li>
+      <li>极值点不一定可导（尖点型，如 $\sqrt{x^2+y^2}$）。</li>
+    </ul>
+
+    <h4>④ 隐函数 · 几何应用（第 2、17、18、20 题）</h4>
+    <ul>
+      <li>幂指方程先两边取对数；最后用原约束回代化简，存疑时代具体点数值验证。</li>
+      <li>对称组合（仅含 $x+y$）⇒ 视为一元复合函数，一阶二阶偏导可秒比。</li>
+      <li>立体配对：辨曲面类型 + 找特征交线/顶点 + 看封闭性与切割平面。</li>
+    </ul>
+
+    <div class="callout tip"><div class="callout-icon"></div><div class="callout-body"><strong>易错点回顾</strong><p>① 把"偏导存在"当"可微"（第 7、14、15 题）；② 极值必要条件漏掉"偏导存在"前提（第 4 题）；③ 绝对值不等式 $|y/x|\le1\Rightarrow|y|\le|x|$ 丢绝对值（第 20 题）；④ 判别式 $=0$ 仍套充分条件（第 9 题）。</p></div></div>
+  </div>
+</div>
+</div>
+
+<div style="text-align:center;color:var(--text3);font-size:12px;padding:24px 0 8px;border-top:1px solid var(--border);margin-top:20px;">
+  多元函数微分学 · 期中测验全解 · 共 20 题
+</div>
+
+</div><!-- closes .page -->
+
+<button id="nav-btn" title="题目导航" aria-label="题目导航">≡</button>
+<div id="nav-panel" role="navigation" aria-label="题目列表">
+  <div class="nav-title">题目导航</div>
+  <div id="nav-list"></div>
+</div>
+
+<script>
+(function(){
+  var SK = 'sp:' + location.pathname;
+  function doRestore(y, tries){
+    if(tries <= 0) return;
+    if(document.body.scrollHeight >= y + window.innerHeight * 0.5){
+      if(location.hash) history.replaceState(null, '', location.pathname + location.search);
+      window.scrollTo({top: y, behavior:'instant'});
+    } else { setTimeout(function(){ doRestore(y, tries - 1); }, 120); }
+  }
+  function tryRestore(){
+    var raw = localStorage.getItem(SK);
+    if(raw !== null && +raw > 0) doRestore(+raw, 20);
+  }
+  if(window.__katexDone) tryRestore();
+  else window.addEventListener('katexdone', tryRestore, {once:true});
+  window.addEventListener('load', function(){ setTimeout(tryRestore, 80); });
+  window.addEventListener('pageshow', function(e){ if(e.persisted) setTimeout(tryRestore, 80); });
+  var saving = false;
+  window.addEventListener('scroll', function(){
+    if(!saving){ saving = true;
+      requestAnimationFrame(function(){
+        if(window.scrollY > 0) localStorage.setItem(SK, window.scrollY);
+        saving = false;
+      });
+    }
+  }, {passive:true});
+
+  var COLORS = {purple:'#534AB7', teal:'#0F6E56', coral:'#993C1D', amber:'#BA7517', blue:'#185FA5', green:'#3B6D11', red:'#A32D2D'};
+  if(window.matchMedia('(prefers-color-scheme:dark)').matches) COLORS = {purple:'#AFA9EC', teal:'#5DCAA5', coral:'#F0997B', amber:'#EF9F27', blue:'#85B7EB', green:'#97C459', red:'#F09595'};
+
+  var list  = document.getElementById('nav-list');
+  var btn   = document.getElementById('nav-btn');
+  var panel = document.getElementById('nav-panel');
+  if(!list || !btn || !panel) return;
+  var anchors = [];
+  var secs = document.querySelectorAll('[id].sec-purple,[id].sec-teal,[id].sec-coral,[id].sec-amber,[id].sec-blue,[id].sec-green,[id].sec-red');
+  secs.forEach(function(sec){
+    var hdr = sec.querySelector('.section-header');
+    if(!hdr) return;
+    var num   = (hdr.querySelector('.section-num')||{}).textContent || '';
+    var ttl   = (hdr.querySelector('h2')||{}).textContent || '';
+    var cls   = (sec.className||'').match(/sec-(\w+)/);
+    var color = cls ? (COLORS[cls[1]] || '#888') : '#888';
+    var row = document.createElement('a');
+    row.href = '#' + sec.id;
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 14px 5px;font-size:13px;font-weight:600;color:inherit;text-decoration:none;transition:background 0.1s;margin-top:2px;';
+    var badge = document.createElement('span');
+    badge.textContent = num;
+    badge.style.cssText = 'min-width:22px;height:20px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;padding:0 3px;background:'+color+';color:#fff;';
+    var lbl = document.createElement('span');
+    lbl.textContent = ttl;
+    lbl.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+    row.appendChild(badge); row.appendChild(lbl);
+    row.addEventListener('click', function(){ panel.classList.remove('open'); });
+    list.appendChild(row);
+    anchors.push({el: hdr, link: row, level: 0, color: color});
+    sec.querySelectorAll('.card h3').forEach(function(h3, i){ if(!h3.id) h3.id = sec.id + '-s' + i; });
+    sec.querySelectorAll('.card h3[id]').forEach(function(h3){
+      var sub = document.createElement('a');
+      sub.href = '#' + h3.id;
+      sub.style.cssText = 'display:flex;align-items:center;gap:7px;padding:3px 14px 3px 32px;font-size:12px;color:var(--text2,#a8a69e);text-decoration:none;transition:background 0.1s,color 0.1s;border-left:2px solid transparent;margin-left:0;';
+      var dot = document.createElement('span');
+      dot.style.cssText = 'width:4px;height:4px;border-radius:50%;background:'+color+';flex-shrink:0;opacity:0.5;transition:opacity 0.1s;';
+      var slbl = document.createElement('span');
+      slbl.textContent = h3.textContent.replace(/^\s*[\d§.]+\s*/, '');
+      slbl.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+      sub.appendChild(dot); sub.appendChild(slbl);
+      sub.addEventListener('click', function(){ panel.classList.remove('open'); });
+      list.appendChild(sub);
+      anchors.push({el: h3, link: sub, level: 1, dot: dot, color: color});
+    });
+  });
+  var active = null;
+  function setActive(a){
+    if(active === a) return;
+    if(active){
+      active.link.style.background = '';
+      if(active.level === 0){ active.link.style.fontWeight = '600'; active.link.style.color = ''; }
+      else { active.link.style.color = 'var(--text2,#a8a69e)'; active.link.style.borderLeftColor = 'transparent'; if(active.dot) active.dot.style.opacity = '0.5'; }
+    }
+    active = a;
+    if(!a) return;
+    a.link.style.background = 'var(--bg3,#2c2c2a)';
+    if(a.level === 0){ a.link.style.fontWeight = '700'; a.link.style.color = 'var(--text,#e8e6de)'; }
+    else { a.link.style.color = 'var(--text,#e8e6de)'; a.link.style.borderLeftColor = a.color || '#378ADD'; if(a.dot) a.dot.style.opacity = '1'; }
+    if(panel.classList.contains('open')) a.link.scrollIntoView({block:'nearest'});
+  }
+  function updateActive(){
+    var threshold = window.innerHeight * 0.30;
+    var best = null;
+    for(var i = 0; i < anchors.length; i++){
+      var rect = anchors[i].el.getBoundingClientRect();
+      if(rect.top <= threshold) best = anchors[i]; else break;
+    }
+    if(!best && anchors.length) best = anchors[0];
+    setActive(best);
+  }
+  var ticking = false;
+  window.addEventListener('scroll', function(){
+    if(!ticking){ ticking = true; requestAnimationFrame(function(){ updateActive(); ticking = false; }); }
+  }, {passive:true});
+  setTimeout(updateActive, 300);
+  window.addEventListener('katexdone', function(){ setTimeout(updateActive, 150); }, {once:true});
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    panel.classList.toggle('open');
+    if(panel.classList.contains('open') && active) setTimeout(function(){ active.link.scrollIntoView({block:'nearest'}); }, 160);
+  });
+  document.addEventListener('click', function(e){
+    if(!panel.contains(e.target) && e.target !== btn) panel.classList.remove('open');
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>重积分的应用 &amp; 含参变量的积分 — 作业解答与学习笔记</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+<!-- KaTeX -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left:'$$', right:'$$', display:true},
+        {left:'$',  right:'$',  display:false}
+      ],
+      throwOnError: false,
+      macros: {
+        '\\dj':      '{\\text{đ}}',
+        '\\degree':  '{{}^\\circ}',
+        '\\d':       '{\\mathrm{d}}',
+        '\\e':       '{\\mathrm{e}}',
+        '\\i':       '{\\mathrm{i}}',
+        '\\cdotp':   '{\\cdot}',
+        '\\bm':      '{\\boldsymbol}'
+      }
+    });
+    window.__katexDone = true;
+    window.dispatchEvent(new Event('katexdone'));
+    var errs = document.querySelectorAll('.katex-error');
+    if(errs.length){
+      var banner = document.createElement('div');
+      banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#A32D2D;color:#fff;font-size:13px;padding:8px 16px;';
+      banner.textContent = '⚠ 发现 ' + errs.length + ' 处公式渲染错误（红色高亮）。';
+      document.body.appendChild(banner);
+    }
+  "></script>
+<script>if('scrollRestoration' in history) history.scrollRestoration = 'manual';</script>
+<style>
+:root {
+  --bg:#ffffff; --bg2:#f7f6f2; --bg3:#f0ede6; --bg4:#e8e4db;
+  --text:#1a1a18; --text2:#5a5a56; --text3:#8a8a84;
+  --border:rgba(0,0,0,0.11);
+  --purple:#534AB7; --purple-light:#EEEDFE; --purple-dark:#3C3489; --purple-mid:#7F77DD;
+  --teal:#0F6E56;   --teal-light:#E1F5EE;   --teal-dark:#085041;   --teal-mid:#1D9E75;
+  --coral:#993C1D;  --coral-light:#FAECE7;  --coral-dark:#712B13;  --coral-mid:#D85A30;
+  --amber:#BA7517;  --amber-light:#FAEEDA;  --amber-dark:#854F0B;  --amber-mid:#EF9F27;
+  --blue:#185FA5;   --blue-light:#E6F1FB;   --blue-dark:#0C447C;   --blue-mid:#378ADD;
+  --green:#3B6D11;  --green-light:#EAF3DE;  --green-dark:#27500A;  --green-mid:#639922;
+  --red:#A32D2D;    --red-light:#FCEBEB;    --red-dark:#791F1F;
+  --pink:#993556;   --pink-light:#FBEAF0;
+  --radius:10px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1e1e1c; --bg2:#252523; --bg3:#2c2c2a; --bg4:#333330;
+    --text:#e8e6de; --text2:#a8a69e; --text3:#706e68;
+    --border:rgba(255,255,255,0.1);
+    --purple-light:#26215C; --teal-light:#04342C; --coral-light:#4A1B0C;
+    --amber-light:#412402; --blue-light:#042C53; --green-light:#173404;
+    --red-light:#501313; --pink-light:#4B1528;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.8;}
+.page{max-width:900px;margin:0 auto;padding:32px 24px 100px;}
+body>*:not(.page){max-width:900px;margin-left:auto;margin-right:auto;padding-left:24px;padding-right:24px;}
+.katex{font-size:1.06em;}
+.katex-display{margin:4px 0!important;overflow:visible;}
+.card,.fbox,.callout,.big-formula,.example-block,.toc,
+table,.answer-box,.two-col,.steps,.visual-row{
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+}
+table{overflow-x:auto;display:block;}
+.header{text-align:center;padding:48px 0 36px;border-bottom:1px solid var(--border);margin-bottom:40px;}
+.header h1{font-size:30px;font-weight:700;margin-bottom:10px;letter-spacing:-0.5px;}
+.header .subtitle{color:var(--text2);font-size:14px;margin-bottom:16px;}
+.tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.tag{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px 26px;margin-bottom:44px;}
+.toc-title{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;}
+.toc-l1{margin-bottom:2px;}
+.toc-l1>a{display:flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;
+  font-size:14px;font-weight:600;padding:5px 6px;border-radius:6px;transition:background 0.12s;}
+.toc-l1>a:hover{background:var(--bg3);}
+.toc-l1>a .sec-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.toc-l2{padding-left:22px;margin-top:1px;margin-bottom:3px;}
+.toc-l2 a{display:flex;align-items:center;gap:7px;color:var(--blue);text-decoration:none;
+  font-size:13px;padding:3px 6px;border-radius:5px;transition:background 0.12s;
+  border-left:2px solid var(--border);}
+.toc-l2 a:hover{background:var(--bg3);text-decoration:none;}
+.toc-l2 a .sec-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;opacity:0.7;}
+.section{margin-bottom:60px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:14px;border-bottom:2.5px solid var(--border);}
+.section-num{min-width:36px;height:36px;padding:0 6px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
+.section h2{font-size:23px;font-weight:700;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px 26px;margin-bottom:16px;}
+.card h3{font-size:17px;font-weight:700;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.card h4{font-size:14px;font-weight:700;margin:20px 0 8px;padding-left:10px;
+  border-left:3px solid var(--border);color:var(--text);line-height:1.4;}
+.card h5{font-size:13px;font-weight:600;margin:14px 0 6px;color:var(--text2);letter-spacing:0.02em;}
+.card p{margin-bottom:10px;line-height:1.8;}
+.card p:last-child{margin-bottom:0;}
+.card ul,.card ol{padding-left:22px;margin-bottom:10px;}
+.card li{margin-bottom:6px;line-height:1.8;font-size:14px;}
+.fbox{background:var(--bg3);border-left:3.5px solid;border-radius:0 10px 10px 0;padding:18px 22px;margin:14px 0;overflow:visible;}
+.fbox .flabel{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:12px;opacity:0.75;}
+.fbox .frow{margin:10px 0;line-height:normal;overflow:visible;}
+.fbox .frow:first-of-type{margin-top:0;}
+.fbox .fnote{font-size:13px;color:var(--text2);margin-top:10px;line-height:1.6;}
+.big-formula{text-align:center;padding:22px 18px;background:var(--bg2);border-radius:10px;margin:18px 0;overflow:visible;border:1px solid var(--border);line-height:normal;}
+.big-formula.highlight{border-width:2px;}
+.callout{border-radius:9px;padding:14px 18px;margin:14px 0;display:flex;gap:13px;}
+.callout-icon{font-size:15px;flex-shrink:0;margin-top:3px;line-height:1;}
+.callout-body{flex:1;}
+.callout-body > strong{display:block;font-size:13px;font-weight:700;margin-bottom:5px;}
+.callout-body p strong,.callout-body li strong{display:inline;font-size:inherit;font-weight:700;}
+.callout-body p,.callout-body li{font-size:14px;margin:0 0 4px;line-height:1.7;}
+.callout-body ul{padding-left:18px;margin:0;}
+.note{background:var(--blue-light);border:1px solid rgba(24,95,165,0.18);}
+.note .callout-icon::before{content:"💡";}
+.tip{background:var(--teal-light);border:1px solid rgba(15,110,86,0.18);}
+.tip .callout-icon::before{content:"✦";color:var(--teal);font-size:13px;}
+.warn{background:var(--amber-light);border:1px solid rgba(186,117,23,0.2);}
+.warn .callout-icon::before{content:"⚠";color:var(--amber);}
+.exam{background:var(--red-light);border:1px solid rgba(163,45,45,0.22);}
+.exam .callout-icon::before{content:"★";color:var(--red);}
+.intuition{background:var(--purple-light);border:1px solid rgba(83,74,183,0.2);}
+.intuition .callout-icon::before{content:"🔍";}
+.mistake{background:var(--pink-light);border:1px solid rgba(153,53,86,0.2);}
+.mistake .callout-icon::before{content:"✗";color:var(--pink);font-size:13px;}
+.derivation{background:var(--bg3);border:1px solid var(--border);}
+.derivation .callout-icon::before{content:"∴";color:var(--text3);font-size:14px;font-weight:700;}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0;}
+th{background:var(--bg3);font-weight:600;padding:10px 14px;text-align:left;border:1px solid var(--border);}
+td{padding:10px 14px;border:1px solid var(--border);vertical-align:middle;line-height:1.9;}
+tr:nth-child(even) td{background:var(--bg2);}
+td .katex,th .katex{font-size:0.95em;}
+details{border:1px solid var(--border);border-radius:9px;margin-bottom:10px;overflow:visible;}
+summary{padding:13px 18px;font-weight:600;font-size:14px;cursor:pointer;background:var(--bg2);display:flex;align-items:center;gap:8px;list-style:none;user-select:none;}
+summary::-webkit-details-marker{display:none;}
+summary::before{content:"▶";font-size:9px;color:var(--text3);transition:transform 0.2s;flex-shrink:0;}
+details[open] summary::before{transform:rotate(90deg);}
+.details-body{padding:18px 20px;}
+.details-body p{margin-bottom:8px;font-size:14px;}
+.step{display:flex;gap:14px;margin-bottom:16px;}
+.step-num{width:28px;height:28px;border-radius:50%;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.step-body{flex:1;font-size:14px;line-height:1.75;}
+.step-body > strong{display:block;margin-bottom:4px;}
+.step-body p strong,.step-body li strong{display:inline;font-weight:700;}
+.sec-purple .section-num{background:var(--purple-light);color:var(--purple-dark);}
+.sec-purple .section h2{color:var(--purple-dark);}
+.sec-purple .fbox{border-color:var(--purple);}
+.sec-purple .step-num{background:var(--purple-light);color:var(--purple-dark);}
+.sec-teal .section-num{background:var(--teal-light);color:var(--teal-dark);}
+.sec-teal .section h2{color:var(--teal-dark);}
+.sec-teal .fbox{border-color:var(--teal);}
+.sec-teal .step-num{background:var(--teal-light);color:var(--teal-dark);}
+.sec-coral .section-num{background:var(--coral-light);color:var(--coral-dark);}
+.sec-coral .section h2{color:var(--coral-dark);}
+.sec-coral .fbox{border-color:var(--coral);}
+.sec-coral .step-num{background:var(--coral-light);color:var(--coral-dark);}
+.sec-amber .section-num{background:var(--amber-light);color:var(--amber-dark);}
+.sec-amber .section h2{color:var(--amber-dark);}
+.sec-amber .fbox{border-color:var(--amber);}
+.sec-amber .step-num{background:var(--amber-light);color:var(--amber-dark);}
+.sec-blue .section-num{background:var(--blue-light);color:var(--blue-dark);}
+.sec-blue .section h2{color:var(--blue-dark);}
+.sec-blue .fbox{border-color:var(--blue);}
+.sec-blue .step-num{background:var(--blue-light);color:var(--blue-dark);}
+.sec-green .section-num{background:var(--green-light);color:var(--green-dark);}
+.sec-green .section h2{color:var(--green-dark);}
+.sec-green .fbox{border-color:var(--green);}
+.sec-green .step-num{background:var(--green-light);color:var(--green-dark);}
+.sec-red .section-num{background:var(--red-light);color:var(--red-dark);}
+.sec-red .section h2{color:var(--red-dark);}
+.sec-red .fbox{border-color:var(--red);}
+.sec-red .step-num{background:var(--red-light);color:var(--red-dark);}
+.badge{display:inline-block;padding:2px 9px;border-radius:4px;font-size:11px;font-weight:600;margin-right:4px;}
+.b-purple{background:var(--purple-light);color:var(--purple-dark);}
+.b-teal{background:var(--teal-light);color:var(--teal-dark);}
+.b-coral{background:var(--coral-light);color:var(--coral-dark);}
+.b-amber{background:var(--amber-light);color:var(--amber-dark);}
+.b-blue{background:var(--blue-light);color:var(--blue-dark);}
+.b-green{background:var(--green-light);color:var(--green-dark);}
+.b-red{background:var(--red-light);color:var(--red-dark);}
+.example-block{border:1px solid var(--border);border-radius:9px;overflow:visible;margin:14px 0;
+  height:auto !important;max-height:none !important;}
+.example-header{background:var(--bg3);padding:10px 18px;font-size:13px;font-weight:700;
+  display:flex;align-items:center;gap:8px;flex-direction:row;flex-wrap:nowrap;
+  border-bottom:1px solid var(--border);border-radius:9px 9px 0 0;
+  writing-mode:horizontal-tb !important;height:auto !important;}
+.example-header .badge{flex-shrink:0;}
+.example-body{padding:16px 20px;height:auto !important;max-height:none !important;}
+.example-body p{font-size:14px;margin-bottom:8px;line-height:1.75;}
+.example-body p:last-child{margin-bottom:0;}
+.answer-box{background:var(--green-light);border:1.5px solid rgba(59,109,17,0.25);border-radius:8px;padding:12px 16px;margin-top:10px;}
+.answer-box p{font-size:14px;margin:0 0 6px;}
+.answer-box p:last-child{margin-bottom:0;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+@media(max-width:580px){.two-col{grid-template-columns:1fr;}}
+.fig-wrap{text-align:center;margin:14px 0;}
+.fig-cap{color:var(--text3);font-size:12px;font-style:italic;margin-top:4px;}
+#nav-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:34px;height:34px;border-radius:8px;
+  background:var(--bg2);color:var(--text2);border:1px solid var(--border);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 1px 6px rgba(0,0,0,0.18);
+  transition:background 0.15s,color 0.15s,box-shadow 0.15s;font-size:15px;line-height:1;}
+#nav-btn:hover{background:var(--bg3);color:var(--text);box-shadow:0 2px 12px rgba(0,0,0,0.22);}
+#nav-panel{position:fixed;bottom:66px;right:24px;z-index:9998;background:var(--bg);border:1px solid var(--border);border-radius:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.18);width:240px;max-height:65vh;overflow-y:auto;padding:8px 0;
+  opacity:0;transform:translateY(8px) scale(0.97);pointer-events:none;transition:opacity 0.15s,transform 0.15s;}
+#nav-panel.open{opacity:1;transform:none;pointer-events:auto;}
+#nav-panel a{display:flex;align-items:center;gap:9px;padding:6px 14px;font-size:13px;color:var(--text);
+  text-decoration:none;line-height:1.4;transition:background 0.1s;}
+#nav-panel a:hover{background:var(--bg2);}
+#nav-panel a .nd{width:20px;height:20px;border-radius:5px;font-size:10px;font-weight:700;
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;}
+#nav-panel .nav-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;
+  padding:0 14px 5px;border-bottom:1px solid var(--border);margin-bottom:3px;}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<div class="header">
+  <h1>重积分的应用 &amp; 含参变量的积分</h1>
+  <p class="subtitle">同济《高等数学》第十章 · 习题 10-4 答案速查 + 习题 10-5 详解教学</p>
+  <div class="tags">
+    <span class="tag" style="background:var(--teal-light);color:var(--teal-dark)">曲面面积</span>
+    <span class="tag" style="background:var(--coral-light);color:var(--coral-dark)">质心</span>
+    <span class="tag" style="background:var(--amber-light);color:var(--amber-dark)">转动惯量</span>
+    <span class="tag" style="background:var(--blue-light);color:var(--blue-dark)">引力</span>
+    <span class="tag" style="background:var(--purple-light);color:var(--purple-dark)">含参积分</span>
+    <span class="tag" style="background:var(--green-light);color:var(--green-dark)">莱布尼茨公式</span>
+    <span class="tag" style="background:var(--red-light);color:var(--red-dark)">对参数微分法</span>
+  </div>
+</div>
+
+<!-- 使用说明 -->
+<div class="callout note" style="margin-bottom:28px;">
+  <div class="callout-icon"></div>
+  <div class="callout-body">
+    <strong>怎么用这份材料</strong>
+    <p><strong>习题 10-4（你已学过）：</strong>答案直接写在绿色「答案」框里，方便快速核对；若某题对不上，点开「解题要点」看简要步骤定位错误。</p>
+    <p><strong>习题 10-5（你还没学）：</strong>先读第 5 节<strong>「核心概念与三大工具」</strong>把方法学会，再做后面 6–9 节的题目；每题的完整推导藏在「详细解答」里，建议先自己动手、再点开对照。</p>
+    <p>所有结果均已用 <strong>SymPy / mpmath 独立数值与符号双重验证</strong>（标注 <span class="badge b-green">已核验 ✓</span>）。</p>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+  <div class="toc-title">目录</div>
+
+  <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.06em;margin:6px 0 8px;">第一部分 · 习题 10-4 重积分的应用（答案速查）</div>
+
+  <div class="toc-l1">
+    <a href="#s1"><span class="sec-dot" style="background:var(--teal-mid)"></span>一、曲面的面积（题 1 · 3 · 4）</a>
+    <div class="toc-l2">
+      <a href="#q1"><span class="sec-dot" style="background:var(--teal-mid)"></span>题1　球面在圆柱面内的面积</a>
+      <a href="#q3"><span class="sec-dot" style="background:var(--teal-mid)"></span>题3　两直交圆柱面所围立体表面积</a>
+      <a href="#q4"><span class="sec-dot" style="background:var(--teal-mid)"></span>题4　球面内最大球冠面积</a>
+    </div>
+  </div>
+
+  <div class="toc-l1">
+    <a href="#s2"><span class="sec-dot" style="background:var(--coral-mid)"></span>二、平面薄片的质心（题 5）</a>
+    <div class="toc-l2">
+      <a href="#q5_1"><span class="sec-dot" style="background:var(--coral-mid)"></span>题5(1)　抛物线弓形的质心</a>
+      <a href="#q5_3"><span class="sec-dot" style="background:var(--coral-mid)"></span>题5(3)　两圆之间区域的质心</a>
+    </div>
+  </div>
+
+  <div class="toc-l1">
+    <a href="#s3"><span class="sec-dot" style="background:var(--amber-mid)"></span>三、平面薄片的转动惯量（题 10）</a>
+    <div class="toc-l2">
+      <a href="#q10_1"><span class="sec-dot" style="background:var(--amber-mid)"></span>题10(1)　椭圆盘 $I_y$</a>
+      <a href="#q10_2"><span class="sec-dot" style="background:var(--amber-mid)"></span>题10(2)　抛物线弓形 $I_x,I_y$</a>
+      <a href="#q10_3"><span class="sec-dot" style="background:var(--amber-mid)"></span>题10(3)　矩形 $I_x,I_y$</a>
+    </div>
+  </div>
+
+  <div class="toc-l1">
+    <a href="#s4"><span class="sec-dot" style="background:var(--blue-mid)"></span>四、引力（题 14）</a>
+    <div class="toc-l2">
+      <a href="#q14"><span class="sec-dot" style="background:var(--blue-mid)"></span>题14　半圆环薄片对质点的引力</a>
+    </div>
+  </div>
+
+  <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.06em;margin:14px 0 8px;">第二部分 · 习题 10-5 含参变量的积分（详解教学）</div>
+
+  <div class="toc-l1">
+    <a href="#s5"><span class="sec-dot" style="background:var(--purple-mid)"></span>五、核心概念与三大工具（先学这里）</a>
+    <div class="toc-l2">
+      <a href="#c0"><span class="sec-dot" style="background:var(--purple-mid)"></span>5.0　什么是「含参变量的积分」</a>
+      <a href="#c1"><span class="sec-dot" style="background:var(--purple-mid)"></span>5.1　工具一：连续性 → 求极限</a>
+      <a href="#c2"><span class="sec-dot" style="background:var(--purple-mid)"></span>5.2　工具二：莱布尼茨求导公式</a>
+      <a href="#c3"><span class="sec-dot" style="background:var(--purple-mid)"></span>5.3　工具三：对参数的微分法</a>
+      <a href="#c4"><span class="sec-dot" style="background:var(--purple-mid)"></span>5.4　常用配套技巧</a>
+    </div>
+  </div>
+
+  <div class="toc-l1">
+    <a href="#s6"><span class="sec-dot" style="background:var(--green-mid)"></span>六、求含参积分的极限（题 1）</a>
+    <div class="toc-l2">
+      <a href="#p1_1"><span class="sec-dot" style="background:var(--green-mid)"></span>题1(1)</a>
+      <a href="#p1_3"><span class="sec-dot" style="background:var(--green-mid)"></span>题1(3)</a>
+    </div>
+  </div>
+
+  <div class="toc-l1">
+    <a href="#s7"><span class="sec-dot" style="background:var(--teal-mid)"></span>七、求含参积分的导数（题 2）</a>
+    <div class="toc-l2">
+      <a href="#p2_2"><span class="sec-dot" style="background:var(--teal-mid)"></span>题2(2)</a>
+      <a href="#p2_4"><span class="sec-dot" style="background:var(--teal-mid)"></span>题2(4)</a>
+    </div>
+  </div>
+
+  <div class="toc-l1">
+    <a href="#s8"><span class="sec-dot" style="background:var(--coral-mid)"></span>八、对参数的微分法计算积分（题 4）</a>
+    <div class="toc-l2">
+      <a href="#p4_1"><span class="sec-dot" style="background:var(--coral-mid)"></span>题4(1)</a>
+      <a href="#p4_2"><span class="sec-dot" style="background:var(--coral-mid)"></span>题4(2)</a>
+    </div>
+  </div>
+
+  <div class="toc-l1">
+    <a href="#s9"><span class="sec-dot" style="background:var(--red)"></span>九、综合计算（题 5）</a>
+    <div class="toc-l2">
+      <a href="#p5_1"><span class="sec-dot" style="background:var(--red)"></span>题5(1)</a>
+      <a href="#p5_2"><span class="sec-dot" style="background:var(--red)"></span>题5(2)</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 第一部分：习题 10-4 ============ -->
+
+<!-- ===== 一、曲面的面积 ===== -->
+<div class="sec-teal" id="s1">
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">一</div>
+    <h2>曲面的面积（题 1 · 3 · 4）</h2>
+  </div>
+
+  <div class="callout note" style="margin:0 0 16px;">
+    <div class="callout-icon"></div>
+    <div class="callout-body">
+      <strong>用到的公式</strong>
+      <p>曲面 $z=f(x,y)$ 在区域 $D$ 上的面积 $\displaystyle A=\iint_D\sqrt{1+f_x^2+f_y^2}\,\mathrm{d}x\,\mathrm{d}y$。球面 $z=\sqrt{a^2-x^2-y^2}$ 时 $\sqrt{1+z_x^2+z_y^2}=\dfrac{a}{\sqrt{a^2-x^2-y^2}}$。球冠（半径 $r$、冠高 $h$）面积 $=2\pi r h$。</p>
+    </div>
+  </div>
+
+  <!-- 题1 -->
+  <div class="card">
+    <h3 id="q1">题 1　球面在圆柱面内部的面积 <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>求球面 $x^2+y^2+z^2=a^2$ 含在圆柱面 $x^2+y^2=ax$ 内部的那部分面积（$a>0$）。</p>
+
+    <div class="fig-wrap">
+      <svg viewBox="0 0 300 260" width="290" xmlns="http://www.w3.org/2000/svg">
+        <!-- 俯视投影 -->
+        <circle cx="100" cy="130" r="100" fill="none" stroke="#1D9E75" stroke-width="2"/>
+        <circle cx="150" cy="130" r="50" fill="rgba(29,158,117,0.18)" stroke="#0F6E56" stroke-width="2"/>
+        <line x1="0" y1="130" x2="290" y2="130" stroke="#8a8a84" stroke-width="1"/>
+        <line x1="100" y1="20" x2="100" y2="245" stroke="#8a8a84" stroke-width="1"/>
+        <circle cx="100" cy="130" r="2.5" fill="#1a1a18"/>
+        <text x="86" y="148" font-size="12" fill="#5a5a56">O</text>
+        <text x="280" y="124" font-size="12" fill="#5a5a56">x</text>
+        <text x="106" y="30" font-size="12" fill="#5a5a56">y</text>
+        <text x="205" y="96" font-size="11.5" fill="#0F6E56">x²+y²=ax</text>
+        <text x="20" y="60" font-size="11.5" fill="#1D9E75">x²+y²=a²</text>
+        <text x="128" y="135" font-size="11" fill="#085041">D</text>
+      </svg>
+      <div class="fig-cap">俯视图：投影区域 $D$ 是圆 $x^2+y^2\le ax$（即 $\rho\le a\cos\theta$）</div>
+    </div>
+
+    <div class="answer-box">
+      <p><strong>答案：</strong>$\;S = 2a^2(\pi-2)$　（球面上下两片之和）</p>
+    </div>
+
+    <details>
+      <summary>解题要点</summary>
+      <div class="details-body">
+        <p>取上半球 $z=\sqrt{a^2-x^2-y^2}$，面积元 $\mathrm{d}S=\dfrac{a}{\sqrt{a^2-x^2-y^2}}\,\mathrm{d}x\,\mathrm{d}y$。由上下对称，</p>
+        <div class="fbox"><div class="frow">$$S=2\iint_D\frac{a}{\sqrt{a^2-x^2-y^2}}\,\mathrm{d}\sigma=2\int_{-\pi/2}^{\pi/2}\!\!\int_0^{a\cos\theta}\frac{a\rho}{\sqrt{a^2-\rho^2}}\,\mathrm{d}\rho\,\mathrm{d}\theta.$$</div></div>
+        <p>内层 $\displaystyle\int_0^{a\cos\theta}\frac{a\rho}{\sqrt{a^2-\rho^2}}\mathrm{d}\rho=a^2(1-|\sin\theta|)$，于是</p>
+        <div class="fbox"><div class="frow">$$S=2a^2\!\int_{-\pi/2}^{\pi/2}(1-|\sin\theta|)\,\mathrm{d}\theta=2a^2(\pi-2).$$</div></div>
+        <div class="callout tip" style="margin-top:10px;"><div class="callout-icon"></div><div class="callout-body"><strong>检验</strong><p>整球面积 $4\pi a^2\approx12.57a^2$，本结果 $\approx2.28a^2$，小于整球，合理。</p></div></div>
+      </div>
+    </details>
+  </div>
+
+  <!-- 题3 -->
+  <div class="card">
+    <h3 id="q3">题 3　两直交圆柱面所围立体的表面积 <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>求底圆半径相等的两个直交圆柱面 $x^2+y^2=R^2$ 及 $x^2+z^2=R^2$ 所围立体（牟合方盖 / Steinmetz 立体）的表面积。</p>
+
+    <div class="fig-wrap">
+      <svg viewBox="0 0 300 200" width="280" xmlns="http://www.w3.org/2000/svg">
+        <!-- 竖直圆柱 -->
+        <rect x="110" y="35" width="80" height="130" fill="rgba(24,95,165,0.10)" stroke="#378ADD" stroke-width="1.6"/>
+        <ellipse cx="150" cy="35" rx="40" ry="13" fill="rgba(24,95,165,0.18)" stroke="#185FA5" stroke-width="1.6"/>
+        <ellipse cx="150" cy="165" rx="40" ry="13" fill="none" stroke="#185FA5" stroke-width="1.6" stroke-dasharray="3 3"/>
+        <!-- 水平圆柱 -->
+        <rect x="35" y="80" width="230" height="60" fill="rgba(15,110,86,0.10)" stroke="#1D9E75" stroke-width="1.6"/>
+        <ellipse cx="35" cy="110" rx="13" ry="30" fill="rgba(15,110,86,0.18)" stroke="#0F6E56" stroke-width="1.6"/>
+        <ellipse cx="265" cy="110" rx="13" ry="30" fill="none" stroke="#0F6E56" stroke-width="1.6"/>
+        <text x="196" y="50" font-size="11.5" fill="#185FA5">x²+y²=R²</text>
+        <text x="40" y="74" font-size="11.5" fill="#0F6E56">x²+z²=R²</text>
+      </svg>
+      <div class="fig-cap">两轴垂直、半径相等的圆柱相交，公共立体的表面由两段柱面拼成</div>
+    </div>
+
+    <div class="answer-box">
+      <p><strong>答案：</strong>$\;S = 16R^2$</p>
+    </div>
+
+    <details>
+      <summary>解题要点</summary>
+      <div class="details-body">
+        <p>由对称性，整个表面 $=$ 落在另一柱体内的柱面 $x^2+z^2=R^2$ 的面积的 2 倍。取 $z=\sqrt{R^2-x^2}$，$\mathrm{d}S=\dfrac{R}{\sqrt{R^2-x^2}}\mathrm{d}x\,\mathrm{d}y$，投影到 $x^2+y^2\le R^2$：</p>
+        <div class="fbox"><div class="frow">$$\iint_{x^2+y^2\le R^2}\frac{R}{\sqrt{R^2-x^2}}\,\mathrm{d}\sigma=R\!\int_{-R}^{R}\frac{2\sqrt{R^2-x^2}}{\sqrt{R^2-x^2}}\,\mathrm{d}x=R\!\int_{-R}^{R}2\,\mathrm{d}x=4R^2.$$</div></div>
+        <p>这是 $z>0$ 的一片；该柱面上下两片共 $8R^2$，再乘 2（另一柱面）得 $S=16R^2$。</p>
+      </div>
+    </details>
+  </div>
+
+  <!-- 题4 -->
+  <div class="card">
+    <h3 id="q4">题 4　球面内部最大球冠面积 <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>$\Sigma:\ x^2+y^2+z^2=R^2$（$R>0$）。另有球心在 $\Sigma$ 上、半径为 $r$ 的球面 $\Sigma_1$。问 $r$ 取何值时，$\Sigma_1$ 落在 $\Sigma$ 内部的那部分面积最大？</p>
+
+    <div class="fig-wrap">
+      <svg viewBox="0 0 280 260" width="260" xmlns="http://www.w3.org/2000/svg">
+        <defs><clipPath id="clipBig"><circle cx="140" cy="170" r="80"/></clipPath></defs>
+        <!-- Σ -->
+        <circle cx="140" cy="170" r="80" fill="none" stroke="#185FA5" stroke-width="2"/>
+        <!-- Σ1 球心在 Σ 北极 (140,90) -->
+        <circle cx="140" cy="90" r="106" fill="rgba(216,90,48,0.12)" stroke="#993C1D" stroke-width="2"/>
+        <!-- 内部那部分（Σ1 与 Σ 的交，落在 Σ 内）：用 Σ 裁剪 Σ1 -->
+        <circle cx="140" cy="90" r="106" fill="rgba(216,90,48,0.35)" clip-path="url(#clipBig)"/>
+        <circle cx="140" cy="90" r="2.5" fill="#712B13"/>
+        <text x="146" y="86" font-size="11" fill="#712B13">Σ₁球心</text>
+        <text x="196" y="232" font-size="12" fill="#185FA5">Σ</text>
+        <text x="14" y="60" font-size="12" fill="#993C1D">Σ₁</text>
+        <text x="150" y="150" font-size="10.5" fill="#712B13">阴影=内部</text>
+      </svg>
+      <div class="fig-cap">$\Sigma_1$ 球心置于 $\Sigma$ 北极；深色为 $\Sigma_1$ 落在 $\Sigma$ 内部的球冠</div>
+    </div>
+
+    <div class="answer-box">
+      <p><strong>答案：</strong>当 $\;r=\dfrac{4R}{3}\;$ 时面积最大，最大面积 $S_{\max}=\dfrac{32\pi R^2}{27}$。</p>
+    </div>
+
+    <details>
+      <summary>解题要点</summary>
+      <div class="details-body">
+        <p>设 $\Sigma_1$ 球心在 $(0,0,R)$。两球面相减得交线平面 $z=R-\dfrac{r^2}{2R}$，故 $\Sigma_1$ 在 $\Sigma$ 内的球冠高 $h=r-\dfrac{r^2}{2R}$，面积</p>
+        <div class="fbox"><div class="frow">$$S(r)=2\pi r h=2\pi r^2-\frac{\pi r^3}{R}.$$</div></div>
+        <p>令 $S'(r)=4\pi r-\dfrac{3\pi r^2}{R}=0$ 得 $r=\dfrac{4R}{3}$；$S''\!\left(\tfrac{4R}{3}\right)=-4\pi<0$ 为极大。代回得 $S_{\max}=\dfrac{32\pi R^2}{27}$。</p>
+        <div class="callout tip" style="margin-top:10px;"><div class="callout-icon"></div><div class="callout-body"><strong>检验</strong><p>$r\to0$ 时 $S\to2\pi r^2$（半球，恰好一半在内），符合"球心在球面上"的直觉。</p></div></div>
+      </div>
+    </details>
+  </div>
+
+</div>
+</div>
+
+<!-- ===== 二、平面薄片的质心 ===== -->
+<div class="sec-coral" id="s2">
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">二</div>
+    <h2>平面薄片的质心（题 5）</h2>
+  </div>
+
+  <div class="callout note" style="margin:0 0 16px;">
+    <div class="callout-icon"></div>
+    <div class="callout-body">
+      <strong>用到的公式</strong>
+      <p>均匀薄片（密度常数）质心即形心：$\displaystyle\bar x=\frac{1}{A}\iint_D x\,\mathrm{d}\sigma,\quad \bar y=\frac{1}{A}\iint_D y\,\mathrm{d}\sigma$，其中 $A=\iint_D\mathrm{d}\sigma$ 为面积。对称轴上的坐标可直接由对称性判定。</p>
+    </div>
+  </div>
+
+  <!-- 题5(1) -->
+  <div class="card">
+    <h3 id="q5_1">题 5(1)　抛物线弓形的质心 <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>$D$ 由 $y=\sqrt{2px}$、$x=x_0$、$y=0$ 所围成（$p>0,\ x_0>0$）。</p>
+
+    <div class="fig-wrap">
+      <svg viewBox="0 0 300 190" width="280" xmlns="http://www.w3.org/2000/svg">
+        <line x1="40" y1="160" x2="285" y2="160" stroke="#8a8a84" stroke-width="1"/>
+        <line x1="40" y1="170" x2="40" y2="25" stroke="#8a8a84" stroke-width="1"/>
+        <path d="M40 160 Q 130 90 230 55" fill="none" stroke="#D85A30" stroke-width="2"/>
+        <path d="M40 160 Q 130 90 230 55 L 230 160 Z" fill="rgba(216,90,48,0.16)" stroke="none"/>
+        <line x1="230" y1="160" x2="230" y2="55" stroke="#993C1D" stroke-width="1.6" stroke-dasharray="4 3"/>
+        <text x="38" y="178" font-size="11" fill="#5a5a56">O</text>
+        <text x="276" y="155" font-size="12" fill="#5a5a56">x</text>
+        <text x="46" y="34" font-size="12" fill="#5a5a56">y</text>
+        <text x="150" y="78" font-size="11.5" fill="#993C1D">y=√(2px)</text>
+        <text x="216" y="178" font-size="11.5" fill="#993C1D">x=x₀</text>
+      </svg>
+      <div class="fig-cap">区域 $D$：$0\le x\le x_0,\ 0\le y\le\sqrt{2px}$</div>
+    </div>
+
+    <div class="answer-box">
+      <p><strong>答案：</strong>$\;\left(\bar x,\ \bar y\right)=\left(\dfrac{3}{5}x_0,\ \dfrac{3}{8}\sqrt{2px_0}\right)$</p>
+    </div>
+
+    <details>
+      <summary>解题要点</summary>
+      <div class="details-body">
+        <p>面积 $A=\displaystyle\int_0^{x_0}\sqrt{2px}\,\mathrm{d}x=\frac{2}{3}\sqrt{2p}\,x_0^{3/2}$。</p>
+        <div class="fbox">
+          <div class="frow">$$\bar x=\frac1A\int_0^{x_0}\!x\sqrt{2px}\,\mathrm{d}x=\frac{\frac25\sqrt{2p}\,x_0^{5/2}}{\frac23\sqrt{2p}\,x_0^{3/2}}=\frac{3}{5}x_0,$$</div>
+          <div class="frow">$$\bar y=\frac1A\int_0^{x_0}\!\frac{(\sqrt{2px})^2}{2}\,\mathrm{d}x=\frac{1}{A}\!\int_0^{x_0}\!px\,\mathrm{d}x=\frac{3}{8}\sqrt{2px_0}.$$</div>
+        </div>
+        <p>注意 $\sqrt{2px_0}$ 正是 $x=x_0$ 处弓形的高，故 $\bar y$ 等于该高的 $\tfrac38$。</p>
+      </div>
+    </details>
+  </div>
+
+  <!-- 题5(3) -->
+  <div class="card">
+    <h3 id="q5_3">题 5(3)　两圆之间区域的质心 <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>$D$ 是介于两圆 $\rho=a\cos\theta$ 与 $\rho=b\cos\theta$（$0<a<b$）之间的闭区域。</p>
+
+    <div class="fig-wrap">
+      <svg viewBox="0 0 300 210" width="280" xmlns="http://www.w3.org/2000/svg">
+        <line x1="20" y1="105" x2="285" y2="105" stroke="#8a8a84" stroke-width="1"/>
+        <line x1="60" y1="15" x2="60" y2="195" stroke="#8a8a84" stroke-width="1"/>
+        <!-- 大圆 ρ=b cosθ：圆心(135,105) r=75，过原点(60,105) -->
+        <circle cx="135" cy="105" r="75" fill="rgba(216,90,48,0.30)" stroke="#993C1D" stroke-width="2"/>
+        <!-- 小圆 ρ=a cosθ：圆心(100,105) r=40，过原点 -->
+        <circle cx="100" cy="105" r="40" fill="var(--bg2)" stroke="#D85A30" stroke-width="2"/>
+        <circle cx="60" cy="105" r="2.5" fill="#1a1a18"/>
+        <text x="46" y="122" font-size="11" fill="#5a5a56">O</text>
+        <text x="195" y="60" font-size="11.5" fill="#993C1D">ρ=b cosθ</text>
+        <text x="80" y="108" font-size="10.5" fill="#D85A30">ρ=a cosθ</text>
+      </svg>
+      <div class="fig-cap">两圆都过原点、关于 $x$ 轴对称；阴影为环形区域，故 $\bar y=0$</div>
+    </div>
+
+    <div class="answer-box">
+      <p><strong>答案：</strong>$\;\left(\bar x,\ \bar y\right)=\left(\dfrac{a^2+ab+b^2}{2(a+b)},\ 0\right)$</p>
+    </div>
+
+    <details>
+      <summary>解题要点</summary>
+      <div class="details-body">
+        <p>关于 $x$ 轴对称 $\Rightarrow\bar y=0$。面积 $A=\dfrac{\pi}{4}(b^2-a^2)$。</p>
+        <div class="fbox"><div class="frow">$$\iint_D x\,\mathrm{d}\sigma=\int_{-\pi/2}^{\pi/2}\!\!\int_{a\cos\theta}^{b\cos\theta}\!\rho\cos\theta\cdot\rho\,\mathrm{d}\rho\,\mathrm{d}\theta=\frac{b^3-a^3}{3}\!\int_{-\pi/2}^{\pi/2}\!\cos^4\theta\,\mathrm{d}\theta=\frac{\pi(b^3-a^3)}{8}.$$</div></div>
+        <p>故 $\bar x=\dfrac{\pi(b^3-a^3)/8}{\pi(b^2-a^2)/4}=\dfrac{b^3-a^3}{2(b^2-a^2)}=\dfrac{a^2+ab+b^2}{2(a+b)}$。</p>
+      </div>
+    </details>
+  </div>
+
+</div>
+</div>
+
+<!-- ===== 三、转动惯量 ===== -->
+<div class="sec-amber" id="s3">
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">三</div>
+    <h2>平面薄片的转动惯量（题 10）</h2>
+  </div>
+
+  <div class="callout note" style="margin:0 0 16px;">
+    <div class="callout-icon"></div>
+    <div class="callout-body">
+      <strong>用到的公式（面密度 $=1$）</strong>
+      <p>$\displaystyle I_x=\iint_D y^2\,\mathrm{d}\sigma$（绕 $x$ 轴），$\displaystyle I_y=\iint_D x^2\,\mathrm{d}\sigma$（绕 $y$ 轴）。</p>
+    </div>
+  </div>
+
+  <!-- 题10(1) -->
+  <div class="card">
+    <h3 id="q10_1">题 10(1)　椭圆盘的 $I_y$ <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>$D=\left\{(x,y)\,\middle|\,\dfrac{x^2}{a^2}+\dfrac{y^2}{b^2}\le1\right\}$，求 $I_y$。</p>
+    <div class="answer-box"><p><strong>答案：</strong>$\;I_y=\dfrac{\pi a^3 b}{4}$</p></div>
+    <details>
+      <summary>解题要点</summary>
+      <div class="details-body">
+        <p>作广义极坐标 $x=a\rho\cos\theta,\ y=b\rho\sin\theta$，雅可比 $=ab\rho$，$\rho\in[0,1]$：</p>
+        <div class="fbox"><div class="frow">$$I_y=\int_0^{2\pi}\!\!\int_0^1(a\rho\cos\theta)^2\,ab\rho\,\mathrm{d}\rho\,\mathrm{d}\theta=a^3b\!\int_0^{2\pi}\!\cos^2\theta\,\mathrm{d}\theta\!\int_0^1\!\rho^3\,\mathrm{d}\rho=a^3b\cdot\pi\cdot\frac14=\frac{\pi a^3b}{4}.$$</div></div>
+      </div>
+    </details>
+  </div>
+
+  <!-- 题10(2) -->
+  <div class="card">
+    <h3 id="q10_2">题 10(2)　抛物线弓形的 $I_x,\,I_y$ <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>$D$ 由抛物线 $y^2=\dfrac{9}{2}x$ 与直线 $x=2$ 所围成。</p>
+    <div class="answer-box">
+      <p><strong>答案：</strong>$\;I_x=\dfrac{72}{5},\qquad I_y=\dfrac{96}{7}$</p>
+    </div>
+    <details>
+      <summary>解题要点</summary>
+      <div class="details-body">
+        <p>区域：$-3\le y\le3$，$\dfrac{2y^2}{9}\le x\le2$（因 $x=2$ 时 $y=\pm3$）。</p>
+        <div class="fbox">
+          <div class="frow">$$I_x=\int_{-3}^{3}\!y^2\!\left(2-\frac{2y^2}{9}\right)\mathrm{d}y=\frac{72}{5},$$</div>
+          <div class="frow">$$I_y=\int_{-3}^{3}\!\frac{1}{3}\!\left(8-\frac{8y^6}{729}\right)\mathrm{d}y=\frac{96}{7}.$$</div>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- 题10(3) -->
+  <div class="card">
+    <h3 id="q10_3">题 10(3)　矩形的 $I_x,\,I_y$ <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>$D=\{(x,y)\mid 0\le x\le a,\ 0\le y\le b\}$。</p>
+    <div class="answer-box">
+      <p><strong>答案：</strong>$\;I_x=\dfrac{ab^3}{3},\qquad I_y=\dfrac{a^3b}{3}$</p>
+    </div>
+    <details>
+      <summary>解题要点</summary>
+      <div class="details-body">
+        <div class="fbox">
+          <div class="frow">$$I_x=\int_0^a\!\mathrm{d}x\!\int_0^b\!y^2\,\mathrm{d}y=a\cdot\frac{b^3}{3}=\frac{ab^3}{3},\qquad I_y=\int_0^a\!x^2\,\mathrm{d}x\!\int_0^b\!\mathrm{d}y=\frac{a^3}{3}\cdot b=\frac{a^3b}{3}.$$</div>
+        </div>
+      </div>
+    </details>
+  </div>
+
+</div>
+</div>
+
+<!-- ===== 四、引力 ===== -->
+<div class="sec-blue" id="s4">
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">四</div>
+    <h2>引力（题 14）</h2>
+  </div>
+
+  <div class="card">
+    <h3 id="q14">题 14　半圆环薄片对质点的引力 <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>面密度为常量 $\mu$ 的均匀半圆环形薄片占有闭区域 $D=\{(x,y,0)\mid R_1\le\sqrt{x^2+y^2}\le R_2,\ x\ge0\}$，求它对位于 $z$ 轴上点 $M_0(0,0,a)$（$a>0$）处单位质量质点的引力 $\vec F$（$G$ 为引力常数）。</p>
+
+    <div class="fig-wrap">
+      <svg viewBox="0 0 300 220" width="280" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="rightHalf"><rect x="130" y="0" width="170" height="220"/></clipPath>
+          <marker id="arrF" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M1 1 L9 5 L1 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <line x1="20" y1="120" x2="285" y2="120" stroke="#8a8a84" stroke-width="1"/>
+        <line x1="130" y1="20" x2="130" y2="205" stroke="#8a8a84" stroke-width="1"/>
+        <!-- 右半环 -->
+        <g clip-path="url(#rightHalf)">
+          <circle cx="130" cy="120" r="85" fill="rgba(24,95,165,0.16)" stroke="#185FA5" stroke-width="2"/>
+          <circle cx="130" cy="120" r="40" fill="var(--bg2)" stroke="#378ADD" stroke-width="2"/>
+        </g>
+        <circle cx="130" cy="120" r="2.5" fill="#1a1a18"/>
+        <text x="112" y="136" font-size="11" fill="#5a5a56">O</text>
+        <text x="276" y="114" font-size="12" fill="#5a5a56">x</text>
+        <text x="136" y="32" font-size="12" fill="#5a5a56">y</text>
+        <text x="222" y="100" font-size="11" fill="#185FA5">R₂</text>
+        <text x="150" y="112" font-size="11" fill="#378ADD">R₁</text>
+        <!-- M0 与受力方向（示意：合力在 xz 平面，x 分量指向薄片） -->
+        <line x1="130" y1="120" x2="195" y2="120" stroke="#A32D2D" stroke-width="2" marker-end="url(#arrF)"/>
+        <text x="160" y="113" font-size="11" fill="#A32D2D">Fₓ&gt;0</text>
+        <text x="60" y="55" font-size="10.5" fill="#5a5a56">M₀(0,0,a) 在 z 轴上（纸面外）</text>
+      </svg>
+      <div class="fig-cap">俯视右半圆环 $D$；由对称性 $F_y=0$，合力在 $xz$ 平面内</div>
+    </div>
+
+    <div class="answer-box">
+      <p><strong>答案：</strong></p>
+      <p>$F_x = 2G\mu\left[\ \ln\dfrac{R_2+\sqrt{R_2^2+a^2}}{R_1+\sqrt{R_1^2+a^2}}+\dfrac{R_1}{\sqrt{R_1^2+a^2}}-\dfrac{R_2}{\sqrt{R_2^2+a^2}}\ \right]$</p>
+      <p>$F_y = 0$</p>
+      <p>$F_z = G\mu\pi a\left(\dfrac{1}{\sqrt{R_2^2+a^2}}-\dfrac{1}{\sqrt{R_1^2+a^2}}\right)\ (<0,\ \text{即指向薄片所在平面，}-z\text{ 方向})$</p>
+    </div>
+
+    <details>
+      <summary>解题要点</summary>
+      <div class="details-body">
+        <p>面元 $\mathrm{d}m=\mu\,\mathrm{d}\sigma$ 位于 $(x,y,0)$，到 $M_0$ 的矢量为 $(x,y,-a)$，$r=\sqrt{x^2+y^2+a^2}$，</p>
+        <div class="fbox"><div class="frow">$$\mathrm{d}\vec F=\frac{G\mu}{(x^2+y^2+a^2)^{3/2}}(x,\,y,\,-a)\,\mathrm{d}\sigma.$$</div></div>
+        <p>区域关于 $x$ 轴对称 $\Rightarrow F_y=0$。化极坐标（$\theta\in[-\tfrac\pi2,\tfrac\pi2],\ \rho\in[R_1,R_2]$）：</p>
+        <div class="fbox">
+          <div class="frow">$$F_x=G\mu\!\int_{-\pi/2}^{\pi/2}\!\!\cos\theta\,\mathrm{d}\theta\!\int_{R_1}^{R_2}\!\frac{\rho^2}{(\rho^2+a^2)^{3/2}}\mathrm{d}\rho=2G\mu\!\int_{R_1}^{R_2}\!\frac{\rho^2\,\mathrm{d}\rho}{(\rho^2+a^2)^{3/2}},$$</div>
+          <div class="frow">$$F_z=-G\mu a\!\int_{-\pi/2}^{\pi/2}\!\!\mathrm{d}\theta\!\int_{R_1}^{R_2}\!\frac{\rho\,\mathrm{d}\rho}{(\rho^2+a^2)^{3/2}}=-G\mu\pi a\Big[\tfrac{1}{\sqrt{R_1^2+a^2}}-\tfrac{1}{\sqrt{R_2^2+a^2}}\Big].$$</div>
+        </div>
+        <p>其中 $\displaystyle\int\frac{\rho^2\,\mathrm{d}\rho}{(\rho^2+a^2)^{3/2}}=\ln\!\big(\rho+\sqrt{\rho^2+a^2}\big)-\frac{\rho}{\sqrt{\rho^2+a^2}}$，代入即得 $F_x$。</p>
+      </div>
+    </details>
+  </div>
+
+</div>
+</div>
+
+<!-- ============ 第二部分：习题 10-5 ============ -->
+
+<!-- ===== 五、核心概念与三大工具 ===== -->
+<div class="sec-purple" id="s5">
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">五</div>
+    <h2>含参变量的积分：核心概念与三大工具</h2>
+  </div>
+
+  <div class="callout exam" style="margin:0 0 16px;">
+    <div class="callout-icon"></div>
+    <div class="callout-body">
+      <strong>这一节是 10-5 全部题目的"地基"</strong>
+      <p>你还没学这块，请先把本节四个小节读完——它只有三个核心工具加一组配套技巧。读懂之后，后面六到九节的每道题都只是这三个工具的直接套用。</p>
+    </div>
+  </div>
+
+  <!-- 5.0 概念 -->
+  <div class="card">
+    <h3 id="c0">5.0　什么是「含参变量的积分」</h3>
+
+    <div class="callout intuition">
+      <div class="callout-icon"></div>
+      <div class="callout-body">
+        <strong>一句话直觉</strong>
+        <p>普通定积分 $\int_c^d g(y)\,\mathrm{d}y$ 算出来是一个<strong>数</strong>。但如果被积函数里还藏着另一个字母 $x$，积分（对 $y$）做完后 $x$ 还在，结果就成了 <strong>$x$ 的函数</strong>。这个"旁观者"字母 $x$ 就叫<strong>参变量</strong>。于是"做积分"变成了"造一个新函数"。</p>
+      </div>
+    </div>
+
+    <div class="fbox">
+      <div class="flabel" style="color:var(--purple)">定义</div>
+      <div class="frow">$$\Phi(x)=\int_c^d f(x,y)\,\mathrm{d}y \qquad(\text{更一般：上下限也可随 }x\text{ 变}）\quad \Phi(x)=\int_{\alpha(x)}^{\beta(x)} f(x,y)\,\mathrm{d}y$$</div>
+      <div class="fnote">$y$ 是<strong>积分变量</strong>（积完就消失），$x$ 是<strong>参变量</strong>（积完仍保留）。本章研究的就是这个函数 $\Phi(x)$ 的极限、连续、求导。</div>
+    </div>
+
+    <p>本章解决三类问题，对应三大工具：</p>
+    <table>
+      <tr><th>要做什么</th><th>用哪个工具</th><th>对应习题</th></tr>
+      <tr><td>求 $\displaystyle\lim_{x\to x_0}\Phi(x)$</td><td>工具一：连续性（极限进积分号）</td><td>题 1</td></tr>
+      <tr><td>求 $\Phi'(x)$</td><td>工具二：莱布尼茨求导公式</td><td>题 2</td></tr>
+      <tr><td>算一个"硬"定积分</td><td>工具三：对参数微分法</td><td>题 4、5</td></tr>
+    </table>
+  </div>
+
+  <!-- 5.1 工具一 -->
+  <div class="card">
+    <h3 id="c1">5.1　工具一：连续性定理 → 求极限</h3>
+
+    <div class="callout intuition">
+      <div class="callout-icon"></div>
+      <div class="callout-body">
+        <strong>直觉</strong>
+        <p>被积函数连续 $\Rightarrow$ 积分出来的 $\Phi(x)$ 也连续。"连续"意味着<strong>求极限就是直接代入</strong>——把 $x\to x_0$ 的极限直接送进积分号里、令 $x=x_0$ 即可。</p>
+      </div>
+    </div>
+
+    <div class="fbox">
+      <div class="flabel" style="color:var(--purple)">连续性定理</div>
+      <div class="frow">$$f(x,y)\ \text{在}\ [a,b]\times[c,d]\ \text{上连续}\ \Longrightarrow\ \Phi(x)=\int_c^d f(x,y)\,\mathrm{d}y\ \text{在}\ [a,b]\ \text{上连续}.$$</div>
+      <div class="fnote">若上下限 $\alpha(x),\beta(x)$ 也连续，则 $\displaystyle\int_{\alpha(x)}^{\beta(x)}f(x,y)\,\mathrm{d}y$ 同样连续。</div>
+    </div>
+
+    <div class="big-formula highlight" style="border-color:rgba(83,74,183,0.5);background:var(--purple-light);">
+      $$\lim_{x\to x_0}\int_{\alpha(x)}^{\beta(x)}f(x,y)\,\mathrm{d}y=\int_{\alpha(x_0)}^{\beta(x_0)}f(x_0,y)\,\mathrm{d}y$$
+    </div>
+    <p style="text-align:center;color:var(--text2);font-size:13px;">（极限号与积分号可交换 —— 只要被积函数和上下限都连续）</p>
+
+    <div class="callout warn">
+      <div class="callout-icon"></div>
+      <div class="callout-body">
+        <strong>使用条件（别忘了检查）</strong>
+        <p>被积函数 $f(x,y)$ 在所考虑的闭矩形上<strong>连续</strong>、上下限函数<strong>连续</strong>。本章题目都满足，所以"直接代入"是合法的——但要写一句"由含参积分的连续性"作为依据。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5.2 工具二 -->
+  <div class="card">
+    <h3 id="c2">5.2　工具二：莱布尼茨求导公式（最常考）</h3>
+
+    <div class="callout intuition">
+      <div class="callout-icon"></div>
+      <div class="callout-body">
+        <strong>直觉</strong>
+        <p>$\Phi(x)=\int_{\alpha(x)}^{\beta(x)}f(x,y)\,\mathrm{d}y$ 里，$x$ 出现在<strong>三个地方</strong>：被积函数内部、上限、下限。求 $\Phi'(x)$ 就把这三处的"变化"分别算出来再相加——这正是链式法则。</p>
+      </div>
+    </div>
+
+    <div class="fbox">
+      <div class="flabel" style="color:var(--purple)">① 固定上下限</div>
+      <div class="frow">$$\frac{\mathrm{d}}{\mathrm{d}x}\int_c^d f(x,y)\,\mathrm{d}y=\int_c^d \frac{\partial f}{\partial x}(x,y)\,\mathrm{d}y$$</div>
+      <div class="fnote">条件：$f$ 与 $f_x$ 都连续。即"先求偏导再积分"＝"先积分再求导"。</div>
+    </div>
+
+    <div class="fbox">
+      <div class="flabel" style="color:var(--purple)">② 变上下限（一般莱布尼茨公式）</div>
+      <div class="frow">$$\frac{\mathrm{d}}{\mathrm{d}x}\int_{\alpha(x)}^{\beta(x)} f(x,y)\,\mathrm{d}y=\int_{\alpha(x)}^{\beta(x)} f_x(x,y)\,\mathrm{d}y\;+\;f\big(x,\beta(x)\big)\beta'(x)\;-\;f\big(x,\alpha(x)\big)\alpha'(x)$$</div>
+      <div class="fnote">三项依次是：<strong>内部偏导项</strong>＋<strong>上限项</strong>（代上限 $\times\beta'$）－<strong>下限项</strong>（代下限 $\times\alpha'$）。</div>
+    </div>
+
+    <details>
+      <summary>为什么是这个公式？（链式法则推导）</summary>
+      <div class="details-body">
+        <p>把上下限看成独立变量，令 $\displaystyle F(x,u,v)=\int_u^v f(x,y)\,\mathrm{d}y$，其中 $u=\alpha(x),\ v=\beta(x)$。由多元复合函数求导：</p>
+        <div class="fbox"><div class="frow">$$\frac{\mathrm{d}}{\mathrm{d}x}F=\frac{\partial F}{\partial x}+\frac{\partial F}{\partial v}\,\beta'(x)+\frac{\partial F}{\partial u}\,\alpha'(x).$$</div></div>
+        <p>三块分别为：</p>
+        <ul>
+          <li>$\dfrac{\partial F}{\partial x}=\displaystyle\int_u^v f_x(x,y)\,\mathrm{d}y$（固定限求导，即工具①）；</li>
+          <li>$\dfrac{\partial F}{\partial v}=f(x,v)$（积分对上限求导＝被积函数代上限）；</li>
+          <li>$\dfrac{\partial F}{\partial u}=-f(x,u)$（对下限求导带负号）。</li>
+        </ul>
+        <p>代回并把 $u=\alpha(x),v=\beta(x)$ 写回，即得②。</p>
+      </div>
+    </details>
+
+    <div class="callout mistake">
+      <div class="callout-icon"></div>
+      <div class="callout-body">
+        <strong>常见错误</strong>
+        <ul>
+          <li><strong>漏掉内部偏导项</strong>：当 $x$ 同时出现在上限和被积函数里（如题 2(2)、2(4)），只算上限项是错的，三项都要。</li>
+          <li><strong>下限项忘记负号</strong>：公式里下限项前面是"$-$"。</li>
+          <li><strong>把 $f(x,\beta(x))$ 写成 $f(\beta(x),\beta(x))$ 之外还漏乘 $\beta'(x)$</strong>：上限项必须乘上限的导数。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5.3 工具三 -->
+  <div class="card">
+    <h3 id="c3">5.3　工具三：对参数的微分法（算"硬"定积分的利器）</h3>
+
+    <div class="callout intuition">
+      <div class="callout-icon"></div>
+      <div class="callout-body">
+        <strong>直觉</strong>
+        <p>有些定积分直接算不出原函数，但如果它含一个参数 $a$，记 $I(a)$。对 $a$ 求导后，被积函数往往变简单（坏因子被求导消掉），$I'(a)$ 能算出来；再把 $I'(a)$ 对 $a$ 积分回去，并用一个已知的特殊值 $I(a_0)$ 定出常数，就得到了 $I(a)$。这就是著名的"费曼积分法"。</p>
+      </div>
+    </div>
+
+    <div class="fbox">
+      <div class="flabel" style="color:var(--purple)">四步法</div>
+      <div class="frow">$$\textbf{①}\ \text{记}\ I(a)=\!\int f(x,a)\,\mathrm{d}x \;\to\; \textbf{②}\ I'(a)=\!\int f_a(x,a)\,\mathrm{d}x\ (\text{在积分号下求导})$$</div>
+      <div class="frow">$$\textbf{③}\ \text{算出}\ I'(a)\ \text{后积分回去}\ I(a)=\!\int I'(a)\,\mathrm{d}a+C \;\to\; \textbf{④}\ \text{用已知 }I(a_0)\text{ 定 }C.$$</div>
+      <div class="fnote">关键在第④步：找一个使 $I(a_0)$ 一眼可知（常为 $0$）的特殊参数值。</div>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-icon"></div>
+      <div class="callout-body">
+        <strong>怎么找"特殊值" $a_0$</strong>
+        <p>让被积函数里的对数变成 $\ln 1=0$、或让整个积分显然为 $0$ 的那个 $a$。例如题 4(1) 取 $a=0$ 得 $I(0)=0$；题 4(2) 取 $a=1$ 得 $I(1)=0$；题 5 取参数 $=0$ 使 $\arctan 0=0$。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5.4 配套技巧 -->
+  <div class="card">
+    <h3 id="c4">5.4　常用配套技巧与"标准积分"</h3>
+
+    <h4>技巧 A：把难因子写成一个参数积分</h4>
+    <p>形如 $\dfrac{x^b-x^a}{\ln x}$ 的"麻烦因子"，可以"还原"成对参数的积分（题 5(2) 正是这招）：</p>
+    <div class="fbox"><div class="frow">$$\int_a^b x^{y}\,\mathrm{d}y=\frac{x^{y}}{\ln x}\Big|_{y=a}^{y=b}=\frac{x^{b}-x^{a}}{\ln x}.$$</div></div>
+    <p>这样原积分变成二重积分，再交换积分次序（Fubini）即可逐层算出。</p>
+
+    <h4>技巧 B：用 $t=\tan x$ 处理 $\sin^2,\cos^2$ 型</h4>
+    <p>形如 $\displaystyle\int_0^{\pi/2}\frac{\mathrm{d}x}{A\cos^2x+B\sin^2x}$ 的积分，令 $t=\tan x$ 化为有理积分：</p>
+    <div class="fbox"><div class="frow">$$\int_0^{+\infty}\frac{\mathrm{d}t}{A+B t^2}=\frac{\pi}{2\sqrt{AB}}\quad(A,B>0).$$</div></div>
+
+    <h4>技巧 C：两个会反复用到的"标准积分"</h4>
+    <div class="fbox">
+      <div class="frow">$$\int_0^{+\infty}\mathrm{e}^{-st}\sin t\,\mathrm{d}t=\frac{1}{s^2+1},\qquad \int_0^{+\infty}\mathrm{e}^{-st}\cos t\,\mathrm{d}t=\frac{s}{s^2+1}\quad(s>0).$$</div>
+    </div>
+
+    <div class="callout exam">
+      <div class="callout-icon"></div>
+      <div class="callout-body">
+        <strong>考试提示</strong>
+        <p>① 莱布尼茨公式（工具二）几乎是必考；记牢"内部偏导 + 上限项 − 下限项"。② 对参数微分法（工具三）的题，<strong>第一步"引入/识别参数"最关键</strong>——如果题目没有现成参数（题 5(1)），就自己造一个（把 $\arctan x$ 改成 $\arctan(ax)$）。③ 每做完一步，回头检查"求导/积分是否满足连续性条件"。</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ===== 六、求含参积分的极限（题 1）===== -->
+<div class="sec-green" id="s6">
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">六</div>
+    <h2>求含参积分的极限（题 1）</h2>
+  </div>
+
+  <div class="callout note" style="margin:0 0 16px;">
+    <div class="callout-icon"></div>
+    <div class="callout-body">
+      <strong>用工具一</strong>
+      <p>被积函数与上下限都连续，<strong>直接把 $x\to0$ 代进去</strong>即可（依据：含参积分的连续性，见 §5.1）。</p>
+    </div>
+  </div>
+
+  <!-- 题1(1) -->
+  <div class="card">
+    <h3 id="p1_1">题 1(1) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>求 $\displaystyle\lim_{x\to0}\int_{x}^{1+x}\frac{\mathrm{d}y}{1+x^2+y^2}$。</p>
+
+    <div class="answer-box"><p><strong>答案：</strong>$\;\dfrac{\pi}{4}$</p></div>
+
+    <details>
+      <summary>详细推导（点开）</summary>
+      <div class="details-body">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>判断可否直接代入。</strong>被积函数 $f(x,y)=\dfrac{1}{1+x^2+y^2}$ 处处连续；上、下限 $1+x$ 与 $x$ 都是 $x$ 的连续函数。由含参积分的连续性，极限号可移入积分号并令 $x=0$。</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>代入 $x=0$。</strong>
+          <div class="fbox"><div class="frow">$$\lim_{x\to0}\int_{x}^{1+x}\frac{\mathrm{d}y}{1+x^2+y^2}=\int_{0}^{1}\frac{\mathrm{d}y}{1+y^2}.$$</div></div>
+        </div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>算这个普通定积分。</strong>
+          <div class="fbox"><div class="frow">$$\int_0^1\frac{\mathrm{d}y}{1+y^2}=\arctan y\Big|_0^1=\frac{\pi}{4}-0=\frac{\pi}{4}.$$</div></div>
+        </div></div>
+        <div class="callout tip"><div class="callout-icon"></div><div class="callout-body"><strong>小结</strong><p>"求含参积分的极限"≈"先令参数取极限值，再算一个普通定积分"。</p></div></div>
+      </div>
+    </details>
+  </div>
+
+  <!-- 题1(3) -->
+  <div class="card">
+    <h3 id="p1_3">题 1(3) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>求 $\displaystyle\lim_{x\to0}\int_{0}^{2} y^2\cos(xy)\,\mathrm{d}y$。</p>
+
+    <div class="answer-box"><p><strong>答案：</strong>$\;\dfrac{8}{3}$</p></div>
+
+    <details>
+      <summary>详细推导（点开）</summary>
+      <div class="details-body">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>连续性 → 直接代入。</strong>$y^2\cos(xy)$ 连续，上下限为常数。令 $x=0$，注意 $\cos(0\cdot y)=\cos 0=1$：
+          <div class="fbox"><div class="frow">$$\lim_{x\to0}\int_0^2 y^2\cos(xy)\,\mathrm{d}y=\int_0^2 y^2\cdot1\,\mathrm{d}y.$$</div></div>
+        </div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>计算。</strong>
+          <div class="fbox"><div class="frow">$$\int_0^2 y^2\,\mathrm{d}y=\frac{y^3}{3}\Big|_0^2=\frac{8}{3}.$$</div></div>
+        </div></div>
+      </div>
+    </details>
+  </div>
+
+</div>
+</div>
+
+<!-- ===== 七、求含参积分的导数（题 2）===== -->
+<div class="sec-teal" id="s7">
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">七</div>
+    <h2>求含参积分的导数 · 莱布尼茨公式（题 2）</h2>
+  </div>
+
+  <div class="callout note" style="margin:0 0 16px;">
+    <div class="callout-icon"></div>
+    <div class="callout-body">
+      <strong>用工具二</strong>
+      <p>这两题里 $x$ 都<strong>同时</strong>出现在上限和被积函数中，必须用一般莱布尼茨公式：<strong>内部偏导项 ＋ 上限项 − 下限项</strong>（见 §5.2）。</p>
+    </div>
+  </div>
+
+  <!-- 题2(2) -->
+  <div class="card">
+    <h3 id="p2_2">题 2(2) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>设 $\displaystyle\varphi(x)=\int_{0}^{x}\frac{\ln(1+xy)}{y}\,\mathrm{d}y$，求 $\varphi'(x)$。</p>
+
+    <div class="answer-box"><p><strong>答案：</strong>$\;\varphi'(x)=\dfrac{2\ln(1+x^2)}{x}$</p></div>
+
+    <details>
+      <summary>详细推导（点开）</summary>
+      <div class="details-body">
+        <p><strong>识别：</strong>下限 $0$（常数），上限 $\beta(x)=x$，被积函数 $f(x,y)=\dfrac{\ln(1+xy)}{y}$ 中也含 $x$。套公式 $\varphi'(x)=\displaystyle\int_0^x f_x\,\mathrm{d}y+f(x,x)\cdot1-f(x,0)\cdot0$。</p>
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>上限项。</strong>把 $y=x$ 代入 $f$，再乘上限导数 $(x)'=1$：
+          <div class="fbox"><div class="frow">$$f(x,x)=\frac{\ln(1+x\cdot x)}{x}=\frac{\ln(1+x^2)}{x}.$$</div></div>
+        </div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>内部偏导项。</strong>对被积函数求 $x$ 的偏导（$y$ 视为常数）：
+          <div class="fbox"><div class="frow">$$\frac{\partial}{\partial x}\frac{\ln(1+xy)}{y}=\frac{1}{y}\cdot\frac{y}{1+xy}=\frac{1}{1+xy},$$</div>
+          <div class="frow">$$\int_0^x\frac{\mathrm{d}y}{1+xy}=\frac{1}{x}\ln(1+xy)\Big|_{0}^{x}=\frac{\ln(1+x^2)}{x}.$$</div></div>
+        </div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>下限项。</strong>下限为常数 $0$，其导数为 $0$，该项 $=0$。</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>三项相加。</strong>
+          <div class="fbox"><div class="frow">$$\varphi'(x)=\underbrace{\frac{\ln(1+x^2)}{x}}_{\text{内部项}}+\underbrace{\frac{\ln(1+x^2)}{x}}_{\text{上限项}}-0=\frac{2\ln(1+x^2)}{x}.$$</div></div>
+        </div></div>
+        <div class="callout mistake"><div class="callout-icon"></div><div class="callout-body"><strong>易错</strong><p>只写上限项 $\frac{\ln(1+x^2)}{x}$ 就交卷——漏了内部偏导项，结果会差一半。</p></div></div>
+      </div>
+    </details>
+  </div>
+
+  <!-- 题2(4) -->
+  <div class="card">
+    <h3 id="p2_4">题 2(4) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>设 $\displaystyle\varphi(x)=\int_{x}^{x^2} \mathrm{e}^{-xy^2}\,\mathrm{d}y$，求 $\varphi'(x)$。</p>
+
+    <div class="answer-box"><p><strong>答案：</strong>$\;\varphi'(x)=2x\,\mathrm{e}^{-x^5}-\mathrm{e}^{-x^3}-\displaystyle\int_{x}^{x^2}y^2\mathrm{e}^{-xy^2}\,\mathrm{d}y$</p></div>
+
+    <details>
+      <summary>详细推导（点开）</summary>
+      <div class="details-body">
+        <p><strong>识别：</strong>下限 $\alpha(x)=x$，上限 $\beta(x)=x^2$，被积函数 $f(x,y)=\mathrm{e}^{-xy^2}$ 含 $x$。三项齐全。</p>
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>上限项</strong> $f\big(x,\beta\big)\beta'$：代 $y=x^2$，$\beta'=(x^2)'=2x$：
+          <div class="fbox"><div class="frow">$$\mathrm{e}^{-x\,(x^2)^2}\cdot 2x=2x\,\mathrm{e}^{-x^{5}}.$$</div></div>
+        </div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>下限项</strong> $-f\big(x,\alpha\big)\alpha'$：代 $y=x$，$\alpha'=(x)'=1$：
+          <div class="fbox"><div class="frow">$$-\,\mathrm{e}^{-x\,(x)^2}\cdot 1=-\,\mathrm{e}^{-x^{3}}.$$</div></div>
+        </div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>内部偏导项</strong> $\displaystyle\int_\alpha^\beta f_x\,\mathrm{d}y$，其中 $f_x=\dfrac{\partial}{\partial x}\mathrm{e}^{-xy^2}=-y^2\mathrm{e}^{-xy^2}$：
+          <div class="fbox"><div class="frow">$$\int_{x}^{x^2}(-y^2)\,\mathrm{e}^{-xy^2}\,\mathrm{d}y=-\int_{x}^{x^2}y^2\mathrm{e}^{-xy^2}\,\mathrm{d}y.$$</div></div>
+        </div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>相加。</strong>
+          <div class="fbox"><div class="frow">$$\varphi'(x)=2x\,\mathrm{e}^{-x^5}-\mathrm{e}^{-x^3}-\int_{x}^{x^2}y^2\mathrm{e}^{-xy^2}\,\mathrm{d}y.$$</div></div>
+        </div></div>
+        <div class="callout note"><div class="callout-icon"></div><div class="callout-body"><strong>说明</strong><p>最后那个积分 $\int y^2\mathrm{e}^{-xy^2}\mathrm{d}y$ 没有初等原函数，<strong>保留积分形式即是标准答案</strong>，不必硬算。</p></div></div>
+      </div>
+    </details>
+  </div>
+
+</div>
+</div>
+
+<!-- ===== 八、对参数的微分法（题 4）===== -->
+<div class="sec-coral" id="s8">
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">八</div>
+    <h2>对参数的微分法计算积分（题 4）</h2>
+  </div>
+
+  <div class="callout note" style="margin:0 0 16px;">
+    <div class="callout-icon"></div>
+    <div class="callout-body">
+      <strong>用工具三（四步法）</strong>
+      <p>① 把含参积分记作 $I(a)$；② 对 $a$ 在积分号下求导得 $I'(a)$（变简单）；③ 算出 $I'(a)$ 后对 $a$ 积分回去；④ 用 $I(a_0)=0$ 定常数（见 §5.3）。</p>
+    </div>
+  </div>
+
+  <!-- 题4(1) -->
+  <div class="card">
+    <h3 id="p4_1">题 4(1) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>计算 $\displaystyle I(a)=\int_{0}^{\pi/2}\ln\frac{1+a\cos x}{1-a\cos x}\cdot\frac{\mathrm{d}x}{\cos x}\quad(|a|<1)$。</p>
+
+    <div class="answer-box"><p><strong>答案：</strong>$\;I=\pi\arcsin a$</p></div>
+
+    <details>
+      <summary>详细推导（点开）</summary>
+      <div class="details-body">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>取特殊值定基准。</strong>$a=0$ 时 $\ln\frac{1}{1}=0$，故 $I(0)=0$。</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>对 $a$ 求导（积分号下）。</strong>先把对数拆开 $\ln(1+a\cos x)-\ln(1-a\cos x)$，对 $a$ 求偏导：
+          <div class="fbox"><div class="frow">$$\frac{\partial}{\partial a}\Big[\cdots\Big]=\frac{\cos x}{1+a\cos x}+\frac{\cos x}{1-a\cos x}=\frac{2\cos x}{1-a^2\cos^2 x}.$$</div></div>
+          再除以原来的 $\cos x$（它在被积式里），$\cos x$ 约掉：
+          <div class="fbox"><div class="frow">$$I'(a)=\int_0^{\pi/2}\frac{2\cos x}{1-a^2\cos^2 x}\cdot\frac{1}{\cos x}\,\mathrm{d}x=\int_0^{\pi/2}\frac{2\,\mathrm{d}x}{1-a^2\cos^2 x}.$$</div></div>
+        </div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>算 $I'(a)$（技巧 B：$t=\tan x$）。</strong>
+          <div class="fbox"><div class="frow">$$\int_0^{\pi/2}\frac{\mathrm{d}x}{1-a^2\cos^2 x}=\int_0^{+\infty}\frac{\mathrm{d}t}{(1-a^2)+t^2}=\frac{1}{\sqrt{1-a^2}}\cdot\frac{\pi}{2},$$</div>
+          <div class="frow">$$\Rightarrow\quad I'(a)=2\cdot\frac{\pi}{2\sqrt{1-a^2}}=\frac{\pi}{\sqrt{1-a^2}}.$$</div></div>
+        </div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>积分回去 + 定常数。</strong>由 $I(0)=0$：
+          <div class="fbox"><div class="frow">$$I(a)=\int_0^a\frac{\pi}{\sqrt{1-t^2}}\,\mathrm{d}t=\pi\arcsin t\Big|_0^a=\pi\arcsin a.$$</div></div>
+        </div></div>
+        <div class="callout tip"><div class="callout-icon"></div><div class="callout-body"><strong>检验</strong><p>$a\to0$ 时 $I\to0$ ✓；数值取 $a=0.6$：左端数值积分 $\approx2.0216$，而 $\pi\arcsin0.6\approx2.0216$ ✓。</p></div></div>
+      </div>
+    </details>
+  </div>
+
+  <!-- 题4(2) -->
+  <div class="card">
+    <h3 id="p4_2">题 4(2) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>计算 $\displaystyle I(a)=\int_{0}^{\pi/2}\ln\!\big(\cos^2 x+a^2\sin^2 x\big)\,\mathrm{d}x\quad(a>0)$。</p>
+
+    <div class="answer-box"><p><strong>答案：</strong>$\;I=\pi\ln\dfrac{1+a}{2}$</p></div>
+
+    <details>
+      <summary>详细推导（点开）</summary>
+      <div class="details-body">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>取特殊值。</strong>$a=1$ 时 $\cos^2x+\sin^2x=1$，$\ln1=0$，故 $I(1)=0$。（这里基准点选 $a=1$ 而非 $0$。）</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>对 $a$ 求导。</strong>
+          <div class="fbox"><div class="frow">$$I'(a)=\int_0^{\pi/2}\frac{2a\sin^2 x}{\cos^2 x+a^2\sin^2 x}\,\mathrm{d}x.$$</div></div>
+        </div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>算这个积分（$t=\tan x$ + 部分分式）。</strong>核心是
+          <div class="fbox"><div class="frow">$$\int_0^{\pi/2}\frac{\sin^2 x}{\cos^2 x+a^2\sin^2 x}\,\mathrm{d}x=\frac{\pi}{2a(1+a)}.$$</div></div>
+          <details style="margin-top:8px;"><summary>这一步的细节</summary><div class="details-body">
+            <p>令 $t=\tan x$，则 $\sin^2x=\frac{t^2}{1+t^2},\ \cos^2x=\frac{1}{1+t^2},\ \mathrm{d}x=\frac{\mathrm{d}t}{1+t^2}$：</p>
+            <div class="fbox"><div class="frow">$$\int_0^{+\infty}\frac{t^2}{(1+t^2)(1+a^2t^2)}\,\mathrm{d}t.$$</div></div>
+            <p>对 $u=t^2$ 作部分分式：$\dfrac{u}{(1+u)(1+a^2u)}=\dfrac{1}{a^2-1}\cdot\dfrac{1}{1+u}+\dfrac{1}{1-a^2}\cdot\dfrac{1}{1+a^2u}$。利用 $\int_0^\infty\frac{\mathrm{d}t}{1+t^2}=\frac\pi2,\ \int_0^\infty\frac{\mathrm{d}t}{1+a^2t^2}=\frac{\pi}{2a}$，化简得 $\dfrac{\pi}{2a(1+a)}$。</p>
+          </div></details>
+          于是 $I'(a)=2a\cdot\dfrac{\pi}{2a(1+a)}=\dfrac{\pi}{1+a}.$
+        </div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>积分回去 + 用 $I(1)=0$ 定常数。</strong>
+          <div class="fbox"><div class="frow">$$I(a)=\int_1^a\frac{\pi}{1+t}\,\mathrm{d}t=\pi\ln(1+t)\Big|_1^a=\pi\big[\ln(1+a)-\ln 2\big]=\pi\ln\frac{1+a}{2}.$$</div></div>
+        </div></div>
+        <div class="callout tip"><div class="callout-icon"></div><div class="callout-body"><strong>检验</strong><p>$a=1$ 时 $\pi\ln1=0$ ✓；$a=2.3$ 数值 $\approx1.5732=\pi\ln\frac{3.3}{2}$ ✓。</p></div></div>
+      </div>
+    </details>
+  </div>
+
+</div>
+</div>
+
+<!-- ===== 九、综合计算（题 5）===== -->
+<div class="sec-red" id="s9">
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">九</div>
+    <h2>综合计算（题 5）</h2>
+  </div>
+
+  <div class="callout note" style="margin:0 0 16px;">
+    <div class="callout-icon"></div>
+    <div class="callout-body">
+      <strong>本节看点</strong>
+      <p>(1) 题目<strong>没有现成参数</strong>——要自己"造"一个；(2) 用技巧 A 把怪因子 $\frac{x^b-x^a}{\ln x}$ 还原成参数积分再换序。</p>
+    </div>
+  </div>
+
+  <!-- 题5(1) -->
+  <div class="card">
+    <h3 id="p5_1">题 5(1) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>计算 $\displaystyle\int_{0}^{1}\frac{\arctan x}{x}\cdot\frac{\mathrm{d}x}{\sqrt{1-x^2}}$。</p>
+
+    <div class="answer-box"><p><strong>答案：</strong>$\;\dfrac{\pi}{2}\ln\!\big(1+\sqrt{2}\big)$</p></div>
+
+    <details>
+      <summary>详细推导（点开）</summary>
+      <div class="details-body">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>造参数。</strong>把 $\arctan x$ 换成 $\arctan(ax)$，定义
+          <div class="fbox"><div class="frow">$$I(a)=\int_0^1\frac{\arctan(ax)}{x\sqrt{1-x^2}}\,\mathrm{d}x.$$</div></div>
+          则 $I(0)=0$（因 $\arctan 0=0$），所求为 $I(1)$。</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>对 $a$ 求导。</strong>$\dfrac{\partial}{\partial a}\arctan(ax)=\dfrac{x}{1+a^2x^2}$，与 $\dfrac1x$ 约掉一个 $x$：
+          <div class="fbox"><div class="frow">$$I'(a)=\int_0^1\frac{1}{x\sqrt{1-x^2}}\cdot\frac{x}{1+a^2x^2}\,\mathrm{d}x=\int_0^1\frac{\mathrm{d}x}{(1+a^2x^2)\sqrt{1-x^2}}.$$</div></div>
+        </div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>算 $I'(a)$（令 $x=\sin\theta$）。</strong>$\sqrt{1-x^2}=\cos\theta,\ \mathrm{d}x=\cos\theta\,\mathrm{d}\theta$：
+          <div class="fbox"><div class="frow">$$I'(a)=\int_0^{\pi/2}\frac{\mathrm{d}\theta}{1+a^2\sin^2\theta}=\frac{\pi}{2\sqrt{1+a^2}}.$$</div></div>
+          （末式同样由 $t=\tan\theta$ 得到，见技巧 B。）</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>积分回去。</strong>
+          <div class="fbox"><div class="frow">$$I(1)=\int_0^1\frac{\pi}{2\sqrt{1+a^2}}\,\mathrm{d}a=\frac{\pi}{2}\ln\!\big(a+\sqrt{1+a^2}\big)\Big|_0^1=\frac{\pi}{2}\ln\!\big(1+\sqrt 2\big).$$</div></div>
+        </div></div>
+        <div class="callout tip"><div class="callout-icon"></div><div class="callout-body"><strong>检验</strong><p>数值：原积分 $\approx1.3845$，$\frac\pi2\ln(1+\sqrt2)\approx1.3845$ ✓。</p></div></div>
+      </div>
+    </details>
+  </div>
+
+  <!-- 题5(2) -->
+  <div class="card">
+    <h3 id="p5_2">题 5(2) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <p>计算 $\displaystyle\int_{0}^{1}\sin\!\Big(\ln\frac{1}{x}\Big)\frac{x^{b}-x^{a}}{\ln x}\,\mathrm{d}x\quad(0<a<b)$。</p>
+
+    <div class="answer-box"><p><strong>答案：</strong>$\;\arctan(b+1)-\arctan(a+1)$</p></div>
+
+    <details>
+      <summary>详细推导（点开）</summary>
+      <div class="details-body">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>把怪因子还原成参数积分（技巧 A）。</strong>
+          <div class="fbox"><div class="frow">$$\frac{x^{b}-x^{a}}{\ln x}=\int_a^b x^{y}\,\mathrm{d}y.$$</div></div>
+        </div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>代入并交换积分次序（Fubini）。</strong>
+          <div class="fbox"><div class="frow">$$I=\int_0^1\sin\!\Big(\ln\tfrac1x\Big)\!\left(\int_a^b x^{y}\,\mathrm{d}y\right)\mathrm{d}x=\int_a^b\!\left(\int_0^1 x^{y}\sin\!\Big(\ln\tfrac1x\Big)\mathrm{d}x\right)\mathrm{d}y.$$</div></div>
+        </div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>算内层（令 $x=\mathrm{e}^{-t}$，则 $\ln\frac1x=t$，$\mathrm{d}x=-\mathrm{e}^{-t}\mathrm{d}t$）。</strong>
+          <div class="fbox"><div class="frow">$$\int_0^1 x^{y}\sin\!\Big(\ln\tfrac1x\Big)\mathrm{d}x=\int_0^{+\infty}\mathrm{e}^{-(y+1)t}\sin t\,\mathrm{d}t=\frac{1}{(y+1)^2+1}.$$</div></div>
+          （用了技巧 C 的标准积分，$s=y+1$。）</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>对 $y$ 积分。</strong>
+          <div class="fbox"><div class="frow">$$I=\int_a^b\frac{\mathrm{d}y}{(y+1)^2+1}=\arctan(y+1)\Big|_a^b=\arctan(b+1)-\arctan(a+1).$$</div></div>
+        </div></div>
+        <div class="callout tip"><div class="callout-icon"></div><div class="callout-body"><strong>检验</strong><p>取 $a=0.5,b=2$：原积分数值 $\approx0.2663$，$\arctan 3-\arctan1.5\approx0.2663$ ✓。</p></div></div>
+      </div>
+    </details>
+  </div>
+
+  <!-- 自测卡 -->
+  <div class="card">
+    <h3>本章习题自测（考点速览）</h3>
+    <table>
+      <tr><th>题号</th><th>考点</th><th>结论</th></tr>
+      <tr><td>1(1)(3)</td><td>含参积分连续性 → 求极限</td><td>$\frac\pi4$；$\frac83$</td></tr>
+      <tr><td>2(2)</td><td>莱布尼茨公式（上限+内部项）</td><td>$\frac{2\ln(1+x^2)}{x}$</td></tr>
+      <tr><td>2(4)</td><td>莱布尼茨公式（变上下限，三项全）</td><td>$2x\mathrm{e}^{-x^5}-\mathrm{e}^{-x^3}-\int_x^{x^2}\!y^2\mathrm{e}^{-xy^2}\mathrm{d}y$</td></tr>
+      <tr><td>4(1)</td><td>对参数微分法（$t=\tan x$）</td><td>$\pi\arcsin a$</td></tr>
+      <tr><td>4(2)</td><td>对参数微分法（部分分式）</td><td>$\pi\ln\frac{1+a}{2}$</td></tr>
+      <tr><td>5(1)</td><td>自造参数 + 对参数微分法</td><td>$\frac\pi2\ln(1+\sqrt2)$</td></tr>
+      <tr><td>5(2)</td><td>因子化参数积分 + 换序</td><td>$\arctan(b+1)-\arctan(a+1)$</td></tr>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<div style="text-align:center;color:var(--text3);font-size:12px;padding:24px 0 8px;border-top:1px solid var(--border);margin-top:20px;">
+  同济《高等数学》第十章 · 习题 10-4 &amp; 10-5 · 作业解答与学习笔记 · 全部结果经 SymPy/mpmath 核验
+</div>
+
+</div><!-- closes .page -->
+
+<!-- ── Floating section navigator ── -->
+<button id="nav-btn" title="章节导航" aria-label="章节导航">≡</button>
+<div id="nav-panel" role="navigation" aria-label="章节列表">
+  <div class="nav-title">章节导航</div>
+  <div id="nav-list"></div>
+</div>
+
+<script>
+(function(){
+  var SK = 'sp:' + location.pathname;
+  function doRestore(y, tries){
+    if(tries <= 0) return;
+    if(document.body.scrollHeight >= y + window.innerHeight * 0.5){
+      if(location.hash) history.replaceState(null, '', location.pathname + location.search);
+      window.scrollTo({top: y, behavior:'instant'});
+    } else { setTimeout(function(){ doRestore(y, tries - 1); }, 120); }
+  }
+  function tryRestore(){
+    var raw = localStorage.getItem(SK);
+    if(raw !== null && +raw > 0) doRestore(+raw, 20);
+  }
+  if(window.__katexDone) tryRestore();
+  else window.addEventListener('katexdone', tryRestore, {once:true});
+  window.addEventListener('load', function(){ setTimeout(tryRestore, 80); });
+  window.addEventListener('pageshow', function(e){ if(e.persisted) setTimeout(tryRestore, 80); });
+  var saving = false;
+  window.addEventListener('scroll', function(){
+    if(!saving){ saving = true;
+      requestAnimationFrame(function(){
+        if(window.scrollY > 0) localStorage.setItem(SK, window.scrollY);
+        saving = false;
+      });
+    }
+  }, {passive:true});
+
+  var COLORS = {
+    purple:'#534AB7', teal:'#0F6E56', coral:'#993C1D',
+    amber:'#BA7517',  blue:'#185FA5', green:'#3B6D11', red:'#A32D2D'
+  };
+  if(window.matchMedia('(prefers-color-scheme:dark)').matches) COLORS = {
+    purple:'#AFA9EC', teal:'#5DCAA5', coral:'#F0997B',
+    amber:'#EF9F27',  blue:'#85B7EB', green:'#97C459', red:'#F09595'
+  };
+  var list  = document.getElementById('nav-list');
+  var btn   = document.getElementById('nav-btn');
+  var panel = document.getElementById('nav-panel');
+  if(!list || !btn || !panel) return;
+  var anchors = [];
+  var secs = document.querySelectorAll(
+    '[id].sec-purple,[id].sec-teal,[id].sec-coral,[id].sec-amber,[id].sec-blue,[id].sec-green,[id].sec-red'
+  );
+  secs.forEach(function(sec){
+    var hdr = sec.querySelector('.section-header');
+    if(!hdr) return;
+    var num   = (hdr.querySelector('.section-num')||{}).textContent || '';
+    var ttl   = (hdr.querySelector('h2')||{}).textContent || '';
+    var cls   = (sec.className||'').match(/sec-(\w+)/);
+    var color = cls ? (COLORS[cls[1]] || '#888') : '#888';
+    var row = document.createElement('a');
+    row.href = '#' + sec.id;
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 14px 5px;'+
+      'font-size:13px;font-weight:600;color:inherit;text-decoration:none;'+
+      'transition:background 0.1s;margin-top:2px;';
+    var badge = document.createElement('span');
+    badge.textContent = num;
+    badge.style.cssText = 'min-width:22px;height:20px;border-radius:4px;font-size:10px;font-weight:700;'+
+      'display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;padding:0 3px;'+
+      'background:'+color+';color:#fff;';
+    var lbl = document.createElement('span');
+    lbl.textContent = ttl;
+    lbl.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+    row.appendChild(badge); row.appendChild(lbl);
+    row.addEventListener('click', function(){ panel.classList.remove('open'); });
+    list.appendChild(row);
+    anchors.push({el: hdr, link: row, level: 0, color: color});
+    sec.querySelectorAll('.card h3').forEach(function(h3, i){
+      if(!h3.id) h3.id = sec.id + '-s' + i;
+    });
+    sec.querySelectorAll('.card h3[id]').forEach(function(h3){
+      var sub = document.createElement('a');
+      sub.href = '#' + h3.id;
+      sub.style.cssText = 'display:flex;align-items:center;gap:7px;'+
+        'padding:3px 14px 3px 32px;font-size:12px;color:var(--text2,#a8a69e);'+
+        'text-decoration:none;transition:background 0.1s,color 0.1s;'+
+        'border-left:2px solid transparent;margin-left:0;';
+      var dot = document.createElement('span');
+      dot.style.cssText = 'width:4px;height:4px;border-radius:50%;background:'+color+';'+
+        'flex-shrink:0;opacity:0.5;transition:opacity 0.1s;';
+      var slbl = document.createElement('span');
+      slbl.textContent = h3.textContent.replace(/\s*已核验[\s\S]*/, '').replace(/^\s*[\d§.]+\s*/, '');
+      slbl.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+      sub.appendChild(dot); sub.appendChild(slbl);
+      sub.addEventListener('click', function(){ panel.classList.remove('open'); });
+      list.appendChild(sub);
+      anchors.push({el: h3, link: sub, level: 1, dot: dot, color: color});
+    });
+  });
+  var active = null;
+  function setActive(a){
+    if(active === a) return;
+    if(active){
+      active.link.style.background = '';
+      if(active.level === 0){ active.link.style.fontWeight = '600'; active.link.style.color = ''; }
+      else { active.link.style.color = 'var(--text2,#a8a69e)'; active.link.style.borderLeftColor = 'transparent'; if(active.dot) active.dot.style.opacity = '0.5'; }
+    }
+    active = a;
+    if(!a) return;
+    a.link.style.background = 'var(--bg3,#2c2c2a)';
+    if(a.level === 0){ a.link.style.fontWeight = '700'; a.link.style.color = 'var(--text,#e8e6de)'; }
+    else { a.link.style.color = 'var(--text,#e8e6de)'; a.link.style.borderLeftColor = a.color || '#378ADD'; if(a.dot) a.dot.style.opacity = '1'; }
+    if(panel.classList.contains('open')) a.link.scrollIntoView({block:'nearest'});
+  }
+  function updateActive(){
+    var threshold = window.innerHeight * 0.30;
+    var best = null;
+    for(var i = 0; i < anchors.length; i++){
+      var rect = anchors[i].el.getBoundingClientRect();
+      if(rect.top <= threshold) best = anchors[i]; else break;
+    }
+    if(!best && anchors.length) best = anchors[0];
+    setActive(best);
+  }
+  var ticking = false;
+  window.addEventListener('scroll', function(){
+    if(!ticking){ ticking = true; requestAnimationFrame(function(){ updateActive(); ticking = false; }); }
+  }, {passive:true});
+  setTimeout(updateActive, 300);
+  window.addEventListener('katexdone', function(){ setTimeout(updateActive, 150); }, {once:true});
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    panel.classList.toggle('open');
+    if(panel.classList.contains('open') && active) setTimeout(function(){ active.link.scrollIntoView({block:'nearest'}); }, 160);
+  });
+  document.addEventListener('click', function(e){
+    if(!panel.contains(e.target) && e.target !== btn) panel.classList.remove('open');
+  });
+})();</script>
+
+</body>
+</html>
