@@ -261,7 +261,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <strong>怎么用这份材料</strong>
     <p><strong>习题 10-4（你已学过）：</strong>答案直接写在绿色「答案」框里，方便快速核对；若某题对不上，点开「解题要点」看简要步骤定位错误。</p>
     <p><strong>习题 10-5（你还没学）：</strong>先读第 5 节<strong>「核心概念与三大工具」</strong>把方法学会，再做后面 6–9 节的题目；每题的完整推导藏在「详细解答」里，建议先自己动手、再点开对照。</p>
-    <p>所有结果均已用 <strong>SymPy / mpmath 独立数值与符号双重验证</strong>（标注 <span class="badge b-green">已核验 ✓</span>）。</p>
+    <p>每道题标题旁的绿色 <strong>已核验 ✓</strong> 不是自评，而是由一段可执行的 <code>&lt;script type="text/x-verify"&gt;</code> 块背书：<code>verify_solutions.py</code> 用 <strong>SymPy</strong> 从题目<strong>给定量</strong>重新积分 / 求导，再与印出的答案逐一比对，只有重算结果一致（PASS）才放行。</p>
   </div>
 </div>
 
@@ -371,6 +371,13 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题1 -->
   <div class="card">
     <h3 id="q1">题 1　球面在圆柱面内部的面积 <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题1 球面在柱内面积">
+a = sp.symbols('a', positive=True)
+rho, th = sp.symbols('rho theta', positive=True)
+inner = sp.integrate(a*rho/sp.sqrt(a**2 - rho**2), (rho, 0, a*sp.cos(th)))
+S = 2 * 2 * sp.integrate(inner, (th, 0, sp.pi/2))   # 上下两片 ×2，θ偶对称 ×2
+check_equal(S, 2*a**2*(sp.pi - 2), name="题1 S=2a^2(pi-2)")
+    </script>
     <p>求球面 $x^2+y^2+z^2=a^2$ 含在圆柱面 $x^2+y^2=ax$ 内部的那部分面积（$a>0$）。</p>
 
     <div class="fig-wrap">
@@ -410,6 +417,14 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题3 -->
   <div class="card">
     <h3 id="q3">题 3　两直交圆柱面所围立体的表面积 <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题3 牟合方盖表面积">
+R, x, y = sp.symbols('R x y', positive=True)
+# 一片柱面 (z>0) 落在另一柱体内的面积：投影到 x^2+y^2<=R^2
+A1 = sp.integrate(sp.integrate(R/sp.sqrt(R**2 - x**2),
+                  (y, -sp.sqrt(R**2 - x**2), sp.sqrt(R**2 - x**2))), (x, -R, R))
+check_equal(A1, 4*R**2, name="题3 单片积分=4R^2")
+check_equal(4*A1, 16*R**2, name="题3 总表面积 S=16R^2 (×2上下 ×2两柱)")
+    </script>
     <p>求底圆半径相等的两个直交圆柱面 $x^2+y^2=R^2$ 及 $x^2+z^2=R^2$ 所围立体（牟合方盖 / Steinmetz 立体）的表面积。</p>
 
     <div class="fig-wrap">
@@ -445,6 +460,16 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题4 -->
   <div class="card">
     <h3 id="q4">题 4　球面内部最大球冠面积 <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题4 球冠最大面积">
+R, r = sp.symbols('R r', positive=True)
+h = r - r**2/(2*R)            # 球冠高（由两球面相减得交线平面）
+S = 2*sp.pi*r*h               # 球冠面积 2*pi*r*h
+crit = sp.solve(sp.diff(S, r), r)
+rmax = [c for c in crit if c != 0][0]
+check_equal(rmax, sp.Rational(4,3)*R, name="题4 r*=4R/3")
+assert sp.diff(S, r, 2).subs(r, rmax) < 0
+check_equal(S.subs(r, rmax), sp.Rational(32,27)*sp.pi*R**2, name="题4 Smax=32piR^2/27")
+    </script>
     <p>$\Sigma:\ x^2+y^2+z^2=R^2$（$R>0$）。另有球心在 $\Sigma$ 上、半径为 $r$ 的球面 $\Sigma_1$。问 $r$ 取何值时，$\Sigma_1$ 落在 $\Sigma$ 内部的那部分面积最大？</p>
 
     <div class="fig-wrap">
@@ -502,6 +527,14 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题5(1) -->
   <div class="card">
     <h3 id="q5_1">题 5(1)　抛物线弓形的质心 <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题5(1) 抛物弓形质心">
+p, x0, x = sp.symbols('p x0 x', positive=True)
+A  = sp.integrate(sp.sqrt(2*p*x), (x, 0, x0))
+xb = sp.integrate(x*sp.sqrt(2*p*x), (x, 0, x0)) / A
+yb = sp.integrate((sp.sqrt(2*p*x))**2/2, (x, 0, x0)) / A
+check_equal(xb, sp.Rational(3,5)*x0, name="题5(1) xbar=3x0/5")
+check_equal(yb, sp.Rational(3,8)*sp.sqrt(2*p*x0), name="题5(1) ybar=3/8 sqrt(2 p x0)")
+    </script>
     <p>$D$ 由 $y=\sqrt{2px}$、$x=x_0$、$y=0$ 所围成（$p>0,\ x_0>0$）。</p>
 
     <div class="fig-wrap">
@@ -540,6 +573,15 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题5(3) -->
   <div class="card">
     <h3 id="q5_3">题 5(3)　两圆之间区域的质心 <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题5(3) 两圆间质心">
+a, b = sp.symbols('a b', positive=True)
+rho, th = sp.symbols('rho theta')
+A  = sp.pi*(b**2 - a**2)/4
+Mx = sp.integrate(sp.integrate(rho*sp.cos(th)*rho, (rho, a*sp.cos(th), b*sp.cos(th))),
+                  (th, -sp.pi/2, sp.pi/2))
+xb = sp.simplify(Mx/A)
+check_equal(xb, (a**2 + a*b + b**2)/(2*(a + b)), name="题5(3) xbar")
+    </script>
     <p>$D$ 是介于两圆 $\rho=a\cos\theta$ 与 $\rho=b\cos\theta$（$0<a<b$）之间的闭区域。</p>
 
     <div class="fig-wrap">
@@ -594,6 +636,13 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题10(1) -->
   <div class="card">
     <h3 id="q10_1">题 10(1)　椭圆盘的 $I_y$ <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题10(1) 椭圆盘 Iy">
+a, b = sp.symbols('a b', positive=True)
+rho, th = sp.symbols('rho theta', positive=True)
+Iy = sp.integrate(sp.integrate((a*rho*sp.cos(th))**2 * a*b*rho, (rho, 0, 1)),
+                  (th, 0, 2*sp.pi))
+check_equal(Iy, sp.pi*a**3*b/4, name="题10(1) Iy=pi a^3 b/4")
+    </script>
     <p>$D=\left\{(x,y)\,\middle|\,\dfrac{x^2}{a^2}+\dfrac{y^2}{b^2}\le1\right\}$，求 $I_y$。</p>
     <div class="answer-box"><p><strong>答案：</strong>$\;I_y=\dfrac{\pi a^3 b}{4}$</p></div>
     <details>
@@ -608,6 +657,13 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题10(2) -->
   <div class="card">
     <h3 id="q10_2">题 10(2)　抛物线弓形的 $I_x,\,I_y$ <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题10(2) 抛物弓形 Ix Iy">
+x, y = sp.symbols('x y')
+Ix = sp.integrate(y**2*(2 - 2*y**2/9), (y, -3, 3))
+Iy = sp.integrate(sp.integrate(x**2, (x, 2*y**2/9, 2)), (y, -3, 3))
+check_equal(Ix, sp.Rational(72,5), name="题10(2) Ix=72/5")
+check_equal(Iy, sp.Rational(96,7), name="题10(2) Iy=96/7")
+    </script>
     <p>$D$ 由抛物线 $y^2=\dfrac{9}{2}x$ 与直线 $x=2$ 所围成。</p>
     <div class="answer-box">
       <p><strong>答案：</strong>$\;I_x=\dfrac{72}{5},\qquad I_y=\dfrac{96}{7}$</p>
@@ -627,6 +683,13 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题10(3) -->
   <div class="card">
     <h3 id="q10_3">题 10(3)　矩形的 $I_x,\,I_y$ <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题10(3) 矩形 Ix Iy">
+a, b, x, y = sp.symbols('a b x y', positive=True)
+Ix = sp.integrate(sp.integrate(y**2, (y, 0, b)), (x, 0, a))
+Iy = sp.integrate(sp.integrate(x**2, (x, 0, a)), (y, 0, b))
+check_equal(Ix, a*b**3/3, name="题10(3) Ix=ab^3/3")
+check_equal(Iy, a**3*b/3, name="题10(3) Iy=a^3 b/3")
+    </script>
     <p>$D=\{(x,y)\mid 0\le x\le a,\ 0\le y\le b\}$。</p>
     <div class="answer-box">
       <p><strong>答案：</strong>$\;I_x=\dfrac{ab^3}{3},\qquad I_y=\dfrac{a^3b}{3}$</p>
@@ -654,6 +717,19 @@ details[open] summary::before{transform:rotate(90deg);}
 
   <div class="card">
     <h3 id="q14">题 14　半圆环薄片对质点的引力 <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题14 半圆环引力">
+R1, R2, a, rho = sp.symbols('R1 R2 a rho', positive=True)
+G, mu = sp.symbols('G mu', positive=True)
+Ix = sp.integrate(rho**2/(rho**2 + a**2)**sp.Rational(3,2), (rho, R1, R2))
+Iz = sp.integrate(rho/(rho**2 + a**2)**sp.Rational(3,2), (rho, R1, R2))
+Fx = (2*G*mu*Ix).rewrite(sp.log)
+Fz = -G*mu*sp.pi*a*Iz
+Fx_claim = 2*G*mu*(sp.log((R2 + sp.sqrt(R2**2+a**2))/(R1 + sp.sqrt(R1**2+a**2)))
+                   + R1/sp.sqrt(R1**2+a**2) - R2/sp.sqrt(R2**2+a**2))
+Fz_claim = G*mu*sp.pi*a*(1/sp.sqrt(R2**2+a**2) - 1/sp.sqrt(R1**2+a**2))
+check_equal(sp.logcombine(sp.expand(Fx - Fx_claim), force=True), 0, name="题14 Fx")
+check_equal(Fz, Fz_claim, name="题14 Fz")
+    </script>
     <p>面密度为常量 $\mu$ 的均匀半圆环形薄片占有闭区域 $D=\{(x,y,0)\mid R_1\le\sqrt{x^2+y^2}\le R_2,\ x\ge0\}$，求它对位于 $z$ 轴上点 $M_0(0,0,a)$（$a>0$）处单位质量质点的引力 $\vec F$（$G$ 为引力常数）。</p>
 
     <div class="fig-wrap">
@@ -916,6 +992,11 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题1(1) -->
   <div class="card">
     <h3 id="p1_1">题 1(1) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题1(1) 含参积分极限">
+x, y = sp.symbols('x y', real=True)
+Phi = sp.integrate(1/(1 + x**2 + y**2), (y, x, 1 + x))
+check_limit(Phi, x, 0, sp.pi/4, name="题1(1) lim=pi/4")
+    </script>
     <p>求 $\displaystyle\lim_{x\to0}\int_{x}^{1+x}\frac{\mathrm{d}y}{1+x^2+y^2}$。</p>
 
     <div class="answer-box"><p><strong>答案：</strong>$\;\dfrac{\pi}{4}$</p></div>
@@ -938,6 +1019,11 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题1(3) -->
   <div class="card">
     <h3 id="p1_3">题 1(3) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题1(3) 含参积分极限">
+x, y = sp.symbols('x y', real=True)
+Phi = sp.integrate(y**2*sp.cos(x*y), (y, 0, 2))
+check_limit(Phi, x, 0, sp.Rational(8,3), name="题1(3) lim=8/3")
+    </script>
     <p>求 $\displaystyle\lim_{x\to0}\int_{0}^{2} y^2\cos(xy)\,\mathrm{d}y$。</p>
 
     <div class="answer-box"><p><strong>答案：</strong>$\;\dfrac{8}{3}$</p></div>
@@ -977,6 +1063,14 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题2(2) -->
   <div class="card">
     <h3 id="p2_2">题 2(2) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题2(2) 莱布尼茨求导">
+x, y = sp.symbols('x y', positive=True)
+f = sp.log(1 + x*y)/y
+internal = sp.integrate(sp.diff(f, x), (y, 0, x))      # 内部偏导项
+boundary = f.subs(y, x) * sp.diff(x, x)                # 上限项 f(x,x)*1
+phi_p = sp.simplify(internal + boundary)
+check_equal(phi_p, 2*sp.log(1 + x**2)/x, name="题2(2) phi'=2ln(1+x^2)/x")
+    </script>
     <p>设 $\displaystyle\varphi(x)=\int_{0}^{x}\frac{\ln(1+xy)}{y}\,\mathrm{d}y$，求 $\varphi'(x)$。</p>
 
     <div class="answer-box"><p><strong>答案：</strong>$\;\varphi'(x)=\dfrac{2\ln(1+x^2)}{x}$</p></div>
@@ -1004,6 +1098,15 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题2(4) -->
   <div class="card">
     <h3 id="p2_4">题 2(4) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题2(4) 莱布尼茨求导">
+x, y = sp.symbols('x y', positive=True)
+f = sp.exp(-x*y**2)
+up = f.subs(y, x**2) * sp.diff(x**2, x)     # 上限项
+lo = -f.subs(y, x) * sp.diff(x, x)          # 下限项
+check_equal(up, 2*x*sp.exp(-x**5), name="题2(4) 上限项=2x e^{-x^5}")
+check_equal(lo, -sp.exp(-x**3), name="题2(4) 下限项=-e^{-x^3}")
+check_equal(sp.diff(f, x), -y**2*sp.exp(-x*y**2), name="题2(4) 内部被积=-y^2 e^{-xy^2}")
+    </script>
     <p>设 $\displaystyle\varphi(x)=\int_{x}^{x^2} \mathrm{e}^{-xy^2}\,\mathrm{d}y$，求 $\varphi'(x)$。</p>
 
     <div class="answer-box"><p><strong>答案：</strong>$\;\varphi'(x)=2x\,\mathrm{e}^{-x^5}-\mathrm{e}^{-x^3}-\displaystyle\int_{x}^{x^2}y^2\mathrm{e}^{-xy^2}\,\mathrm{d}y$</p></div>
@@ -1051,6 +1154,21 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题4(1) -->
   <div class="card">
     <h3 id="p4_1">题 4(1) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题4(1) 对参数微分法">
+a, x = sp.symbols('a x', positive=True)
+g = sp.log((1 + a*sp.cos(x))/(1 - a*sp.cos(x)))/sp.cos(x)
+integrand = sp.simplify(sp.diff(g, a))                 # = 2/(1 - a^2 cos^2 x)
+t, c = sp.symbols('t c', positive=True)
+# 技巧B：t=tan x 把被积式精确化成 2/((1-a^2)+t^2)，先验证代换等价
+lhs = integrand.subs(x, sp.atan(t)) * (1/(1 + t**2))
+check_equal(sp.simplify(lhs - 2/((1 - a**2) + t**2)), 0, name="题4(1) tan代换被积式一致")
+J = sp.integrate(2/(c + t**2), (t, 0, sp.oo))          # = pi/sqrt(c)
+Iprime = J.subs(c, 1 - a**2)
+check_equal(Iprime, sp.pi/sp.sqrt(1 - a**2), name="题4(1) I'(a)=pi/sqrt(1-a^2)")
+ans = sp.pi*sp.asin(a)
+check_equal(sp.diff(ans, a), Iprime, name="题4(1) d/da(pi*asin a)=I'(a)")
+check_equal(ans.subs(a, 0), 0, name="题4(1) I(0)=0")
+    </script>
     <p>计算 $\displaystyle I(a)=\int_{0}^{\pi/2}\ln\frac{1+a\cos x}{1-a\cos x}\cdot\frac{\mathrm{d}x}{\cos x}\quad(|a|<1)$。</p>
 
     <div class="answer-box"><p><strong>答案：</strong>$\;I=\pi\arcsin a$</p></div>
@@ -1079,6 +1197,17 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题4(2) -->
   <div class="card">
     <h3 id="p4_2">题 4(2) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题4(2) 对参数微分法">
+a, x = sp.symbols('a x', positive=True)
+F = sp.log(sp.cos(x)**2 + a**2*sp.sin(x)**2)
+integrand = sp.simplify(sp.diff(F, a))
+Iprime = sp.integrate(integrand, (x, 0, sp.pi/2), conds='none')
+Iprime = sp.simplify(Iprime)
+check_equal(Iprime, sp.pi/(1 + a), name="题4(2) I'(a)=pi/(1+a)")
+ans = sp.pi*sp.log((1 + a)/2)
+check_equal(sp.diff(ans, a), Iprime, name="题4(2) d/da ans=I'(a)")
+check_equal(ans.subs(a, 1), 0, name="题4(2) I(1)=0")
+    </script>
     <p>计算 $\displaystyle I(a)=\int_{0}^{\pi/2}\ln\!\big(\cos^2 x+a^2\sin^2 x\big)\,\mathrm{d}x\quad(a>0)$。</p>
 
     <div class="answer-box"><p><strong>答案：</strong>$\;I=\pi\ln\dfrac{1+a}{2}$</p></div>
@@ -1129,6 +1258,20 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题5(1) -->
   <div class="card">
     <h3 id="p5_1">题 5(1) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题5(1) 综合 费曼">
+a, th = sp.symbols('a theta', positive=True)
+t = sp.symbols('t', positive=True)
+# I'(a)=∫_0^1 dx/((1+a^2x^2)sqrt(1-x^2))，x=sinθ -> ∫_0^{pi/2} dθ/(1+a^2 sin^2θ)
+integrand = 1/(1 + a**2*sp.sin(th)**2)
+# 再用 t=tanθ 化为有理式 ∫_0^∞ dt/(1+(1+a^2)t^2)，先验证代换等价
+lhs = integrand.subs(th, sp.atan(t)) * (1/(1 + t**2))
+check_equal(sp.simplify(lhs - 1/(1 + (1 + a**2)*t**2)), 0, name="题5(1) tan代换被积式一致")
+Iprime = sp.integrate(1/(1 + (1 + a**2)*t**2), (t, 0, sp.oo), conds='none')
+Iprime = sp.simplify(Iprime)
+check_equal(Iprime, sp.pi/(2*sp.sqrt(1 + a**2)), name="题5(1) I'(a)=pi/(2 sqrt(1+a^2))")
+I1 = sp.integrate(sp.pi/(2*sp.sqrt(1 + a**2)), (a, 0, 1))
+check_equal(I1, sp.pi/2*sp.log(1 + sp.sqrt(2)), name="题5(1) I(1)=pi/2 ln(1+sqrt2)")
+    </script>
     <p>计算 $\displaystyle\int_{0}^{1}\frac{\arctan x}{x}\cdot\frac{\mathrm{d}x}{\sqrt{1-x^2}}$。</p>
 
     <div class="answer-box"><p><strong>答案：</strong>$\;\dfrac{\pi}{2}\ln\!\big(1+\sqrt{2}\big)$</p></div>
@@ -1156,6 +1299,18 @@ details[open] summary::before{transform:rotate(90deg);}
   <!-- 题5(2) -->
   <div class="card">
     <h3 id="p5_2">题 5(2) <span class="badge b-green" style="font-weight:700;">已核验 ✓</span></h3>
+    <script type="text/x-verify" data-for="题5(2) 综合 换序">
+a, b, x, y, t, s = sp.symbols('a b x y t s', positive=True)
+# 技巧A：怪因子 (x^b-x^a)/ln x 还原成参数积分
+ident = sp.integrate(x**y, (y, a, b), conds='none')
+check_equal(ident, (x**b - x**a)/sp.log(x), name="题5(2) (x^b-x^a)/ln x = ∫x^y dy")
+# 内层：x=e^{-t} 后即 sin t 的拉普拉斯变换在 s=y+1 处
+L = sp.laplace_transform(sp.sin(t), t, s, noconds=True)   # = 1/(s^2+1)
+inner = L.subs(s, y + 1)
+check_equal(inner, 1/((y + 1)**2 + 1), name="题5(2) 内层=1/((y+1)^2+1)")
+I = sp.integrate(1/((y + 1)**2 + 1), (y, a, b), conds='none')
+check_equal(I, sp.atan(b + 1) - sp.atan(a + 1), name="题5(2) I=atan(b+1)-atan(a+1)")
+    </script>
     <p>计算 $\displaystyle\int_{0}^{1}\sin\!\Big(\ln\frac{1}{x}\Big)\frac{x^{b}-x^{a}}{\ln x}\,\mathrm{d}x\quad(0<a<b)$。</p>
 
     <div class="answer-box"><p><strong>答案：</strong>$\;\arctan(b+1)-\arctan(a+1)$</p></div>

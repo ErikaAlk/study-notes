@@ -113,7 +113,15 @@ def check_forbidden(html):
 # This STATIC check only confirms an artifact EXISTS (badges <= artifacts). It does NOT prove the
 # artifact is true — that is verify_solutions.py's job (it executes form 1 and gates the badge).
 # Root cause it addresses: "wrong answer still stamped 已核验".
-VERIFY_BADGE_RE = re.compile(r"已核验")
+#
+# Count only the badge ELEMENT — a `<span class="badge …">已核验 …</span>` pill — NOT every
+# occurrence of the characters 已核验. The old bare `re.compile("已核验")` also counted prose
+# ("所有解答都做了独立核验（已核验 ✓）"), a CSS/JS comment that merely names the badge, and a
+# legend that shows what the pill looks like — inflating the count so an honest file FAILed with
+# "N badges but 0 artifacts". The pill carries class="badge …"; prose/comments do not. Keep this
+# regex byte-identical to verify_solutions.BADGE_RE so the two gates agree on what a badge is.
+VERIFY_BADGE_RE = re.compile(
+    r'<span\b[^>]*\bclass\s*=\s*["\'][^"\']*\bbadge\b[^"\']*["\'][^>]*>\s*已核验')
 VERIFY_NOTE_RE = re.compile(
     r"<!--\s*verify:|<script[^>]*\btype\s*=\s*[\"']text/x-verify[\"']", re.IGNORECASE)
 

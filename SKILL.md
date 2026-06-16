@@ -371,6 +371,12 @@ every one must be backed by the recorded check, placed right next to the answer:
 python3 scripts/build_and_check.py check <file>.html   # FAILs on any 已核验 without a verify artifact
 ```
 
+The counter matches only the **badge element** — a `<span class="badge …">已核验 …</span>` pill — so
+explanatory prose ("所有解答都做了独立核验"), a legend showing what the pill looks like, and code/CSS
+comments that merely name it do **not** inflate the count. Conversely, every reader-visible "已核验"
+claim must BE that pill (don't fake-verify with an ad-hoc `<span style="…">已核验</span>` that escapes
+the gate). The honest abstention is the matching pill `<span class="badge b-unverified">未自动核验</span>`.
+
 If a badge has no artifact, either it was never truly re-verified → **remove the badge** (a false
 `已核验` is worse than none, exactly like a fabricated `.src-ref` page number), or you did verify
 but didn't write it down → **add the `<!-- verify: -->` comment** carrying the sympy/numeric result.

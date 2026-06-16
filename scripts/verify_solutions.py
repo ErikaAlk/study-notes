@@ -54,8 +54,14 @@ BLOCK_RE = re.compile(
     re.DOTALL | re.IGNORECASE,
 )
 DATA_FOR_RE = re.compile(r'data-for\s*=\s*["\']([^"\']*)["\']', re.IGNORECASE)
-BADGE_RE = re.compile(r"已核验")
-ABSTAIN_RE = re.compile(r"未自动核验")
+# Count only the badge ELEMENT (a `<span class="badge …">已核验/未自动核验</span>` pill), not every
+# mention of the characters in prose, a comment, or a legend. Kept byte-identical to
+# build_and_check.VERIFY_BADGE_RE so the static gate and this executable gate agree on the count —
+# otherwise a file can pass one and fail the other on the same badges.
+BADGE_RE = re.compile(
+    r'<span\b[^>]*\bclass\s*=\s*["\'][^"\']*\bbadge\b[^"\']*["\'][^>]*>\s*已核验')
+ABSTAIN_RE = re.compile(
+    r'<span\b[^>]*\bclass\s*=\s*["\'][^"\']*\bbadge\b[^"\']*["\'][^>]*>\s*未自动核验')
 
 # Header injected before every block so the check_* helpers and sympy are available, and a block
 # that ran no checks is rejected at the end.
