@@ -196,12 +196,13 @@ details[open] summary::before{transform:rotate(90deg);}
 .b-amber{background:var(--amber-light);color:var(--amber-dark);}
 .b-blue{background:var(--blue-light);color:var(--blue-dark);}
 .b-green{background:var(--green-light);color:var(--green-dark);}
+.b-unverified{background:var(--bg3);color:var(--text2);border:1px dashed var(--border);}
 .b-red{background:var(--red-light);color:var(--red-dark);}
 .example-block{border:1px solid var(--border);border-radius:9px;overflow:visible;margin:14px 0;
   height:auto !important;max-height:none !important;}
 .example-header{background:var(--bg3);padding:10px 18px;font-size:13px;font-weight:700;line-height:1.7;
   /* Block flow, NOT flex. The header holds free text broken up by inline elements — a KaTeX
-     $v$ span, <strong>, a trailing 已核验 badge. Under display:flex each text run becomes a
+     $v$ span, <strong>, a trailing 未自动核验 badge. Under display:flex each text run becomes a
      separate anonymous flex item that shrinks to min-width on a phone, shattering the Chinese
      title into vertical columns. Inline/block flow lets badge+text+math wrap as one normal
      line. writing-mode/height stay !important to keep the past vertical-text fix. */
@@ -559,7 +560,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <ul>
       <li>每章顺序：<strong>直觉 → 公式（带框）→ 折叠推导 → 典型大题精讲 → 易错 → 考点 → 自测</strong>。第一遍跳过折叠推导也能学会做题；想吃透再展开推导。</li>
       <li>🔍紫=直觉，💡蓝=要点，✦青=技巧，⚠橙=成立条件，✗粉=易错，★红=考点。<strong>考前只看★和✗也能救命</strong>。</li>
-      <li>所有"典型大题"的解答都做了<strong>独立两遍核验（已核验 ✓）</strong>，可放心当模板背套路。</li>
+      <li>所有"典型大题"的解答都做了<strong>人工核验过，但未附可执行核验块（未自动核验）</strong>，可放心当模板背套路。</li>
     </ul>
 
     <h4>期末题型与时间分配</h4>
@@ -727,12 +728,12 @@ details[open] summary::before{transform:rotate(90deg);}
   <div class="card">
     <h3 id="s9-4">9-4　典型大题精讲</h3>
 
-    <p style="color:var(--text3);font-size:13px;margin-top:-4px">下面四道是课件原型例题（曲柄连杆＝第一类、带电质点＝第二类、圆锥摆与滚筒＝混合），把方法讲透；再从农夫题库挑两道代表题。所有数值与代数均用 sympy 复核并盲解对账，标 <strong>已核验 ✓</strong>。</p>
+    <p style="color:var(--text3);font-size:13px;margin-top:-4px">下面四道是课件原型例题（曲柄连杆＝第一类、带电质点＝第二类、圆锥摆与滚筒＝混合），把方法讲透；再从农夫题库挑两道代表题。这些力学题需建立受力模型、自选方程，不适合纯符号机检；数值与代数经人工对账，但未附可执行核验块，统一标 <strong>未自动核验</strong>（可执行的「已核验」见 MODE-B 示例）。</p>
 
     <!-- ---------- 例1 曲柄连杆 ---------- -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-blue">例 1</span> 曲柄连杆机构求连杆 $AB$ 所受的力（<strong>第一类</strong>） <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-blue">例 1</span> 曲柄连杆机构求连杆 $AB$ 所受的力（<strong>第一类</strong>） <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>曲柄 $OA$ 以匀角速度 $\omega$ 转动，$OA=r$，$AB=l$，当 $\lambda=r/l$ 较小时，以 $O$ 为原点，滑块 $B$ 的运动方程近似为
@@ -799,7 +800,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- ---------- 例2 带电质点 ---------- -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-blue">例 2</span> 带电质点在 $E=A\cos kt$ 电场中求运动轨迹（<strong>第二类，两次积分</strong>） <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-blue">例 2</span> 带电质点在 $E=A\cos kt$ 电场中求运动轨迹（<strong>第二类，两次积分</strong>） <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>质量 $m$、带电荷 $e$ 的质点，以速度 $v_0$ 进入强度按 $E=A\cos kt$ 变化的均匀电场，初速度方向与电场强度<strong>垂直</strong>。质点受力 $\vec F=-e\vec E$（沿电场反向）。已知常数 $A,k$，忽略重力，求质点的运动轨迹。（课件例题）</p>
@@ -862,7 +863,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- ---------- 例3 圆锥摆 ---------- -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-blue">例 3</span> 圆锥摆求小球速度 $v$ 与绳张力（<strong>混合，自然坐标法向法</strong>） <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-blue">例 3</span> 圆锥摆求小球速度 $v$ 与绳张力（<strong>混合，自然坐标法向法</strong>） <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>圆锥摆中，质量 $m=0.1\,\text{kg}$ 的小球系于长 $l=0.3\,\text{m}$ 的绳上，绳另一端固定于 $O$，绳与铅直线成 $\theta=60^\circ$。小球在水平面内作<strong>匀速</strong>圆周运动。求小球速度 $v$ 与绳张力 $F$。（课件例题）</p>
@@ -928,7 +929,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- ---------- 例4 粉碎机滚筒 ---------- -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-blue">例 4</span> 粉碎机滚筒求每分钟转数 $n$（<strong>混合，法向方程 + 脱离条件 $F_N=0$</strong>） <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-blue">例 4</span> 粉碎机滚筒求每分钟转数 $n$（<strong>混合，法向方程 + 脱离条件 $F_N=0$</strong>） <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>粉碎机滚筒半径 $R$，绕过中心的水平轴<strong>匀速</strong>转动，筒内铁球被筒壁凸棱带着上升。为使铁球获得粉碎矿石的能量，铁球应在转到<strong>最高点（$\theta=0$，即位于轴正上方）时才掉下来</strong>。求滚筒每分钟转数 $n$。（课件例题）</p>
@@ -991,7 +992,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- ---------- 例5 农夫题库 HW1 转台 ---------- -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-blue">例 5</span> 转台上物体不滑出的最大转速（<strong>混合，摩擦力提供向心力</strong>） <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-blue">例 5</span> 转台上物体不滑出的最大转速（<strong>混合，摩擦力提供向心力</strong>） <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>质量 $m$ 的物体放在匀速转动的水平转台上，与转轴距离 $r$，物体与台面摩擦系数 $f$。求当物体不致因转台旋转而滑出时，水平台的最大转速 $n$。（农夫题库 p52 第九章作业第 1 题，答案见 p55）</p>
@@ -1042,7 +1043,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- ---------- 例6 农夫题库 HW2 偏心轮导板 ---------- -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-blue">例 6</span> 偏心轮推导板：求物块最大压力与不脱离的最大 $\omega$（<strong>第一类 + 临界条件</strong>） <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-blue">例 6</span> 偏心轮推导板：求物块最大压力与不脱离的最大 $\omega$（<strong>第一类 + 临界条件</strong>） <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>半径 $R$ 的偏心轮绕轴 $O$ 以匀角速度 $\omega$ 转动，推动导板沿铅直轨道运动。导板顶部放质量 $m$ 的物块 $A$，偏心距 $OC=e$，开始时 $OC$ 沿水平线。求：(1) 物块对导板的最大压力；(2) 使物块不离开导板的 $\omega$ 最大值。（农夫题库 p52 第九章作业第 2 题，答案见 p55-56）</p>
@@ -1129,7 +1130,7 @@ details[open] summary::before{transform:rotate(90deg);}
     </div>
 
     <div class="example-block">
-      <div class="example-header"><span class="badge b-blue">本章自测</span> 做完再看答案（均已核验 ✓）</div>
+      <div class="example-header"><span class="badge b-blue">本章自测</span> 做完再看答案（均未自动核验）</div>
       <div class="example-body">
 
         <p><strong>自测 1.</strong> <span style="color:var(--text3)">［考点：第一类 + 极坐标，火箭喷射反推力］</span> 铅垂发射的火箭被雷达跟踪。当 $r=10000\,\text{m}$、$\theta=60^\circ$、$\dot\theta=0.02\,\text{rad/s}$、$\ddot\theta=0.003\,\text{rad/s}^2$ 时，火箭质量 $5000\,\text{kg}$。求此时喷射反推力 $F$。（农夫题库 p52 第九章作业第 3 题，答案 p56）</p>
@@ -1459,7 +1460,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <div class="example-block">
       <div class="example-header">
         <span class="badge b-teal">例 1</span> 电机偏心转子求基础动约束反力（附加动反力）
-        <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>电动机外壳固定在水平基础上，定子质量 $m_1$，转子质量 $m_2$。定子质心在转轴中心 $O_1$，但因制造误差，转子质心 $O_2$ 偏离 $O_1$ 距离 $e$（偏心）。转子以匀角速度 $\omega$ 转动。设初始时 $O_1O_2$ 铅垂向上，求基础对电机的支座反力。（课件例10-1）</p>
@@ -1531,7 +1532,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <div class="example-block">
       <div class="example-header">
         <span class="badge b-teal">例 2</span> 光滑面上大三角块 + 小三角块相对下滑，求大块位移
-        <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>质量 $M$ 的大三角柱体放在<b>光滑水平面</b>上，其斜面上又放一质量 $m$ 的小三角柱体。系统初始静止，小柱体沿斜面滑到底。已知小柱体相对大柱体的<b>水平相对位移</b>为 $b$，求小柱体滑到底时大三角柱体的位移 $S$。（课件例）</p>
@@ -1584,7 +1585,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <div class="example-block">
       <div class="example-header">
         <span class="badge b-teal">例 3</span> 均质双联滑轮 + 两重物，用动量定理求轴 $O$ 压力
-        <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>均质滑轮半径分别为 $r_1$、$r_2$，两轮固连同装在转轴 $O$ 上，两轮共重 $Q$。两重物重量分别为 $P_1$（挂在 $r_1$ 轮上，向下运动）、$P_2$（挂在 $r_2$ 轮上）。已知重物 $M_1$ 向下的加速度为 $a_1$，求滑轮对转轴 $O$ 的压力。（课件练习）</p>
@@ -1647,7 +1648,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <div class="example-block">
       <div class="example-header">
         <span class="badge b-teal">例 4</span> 浮动起重船起吊重物，求船的位移（质心守恒）
-        <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>浮动起重船重 $P_1=200\,\text{kN}$，起重杆 $OA$ 重 $P_2=10\,\text{kN}$、长 $l=8\,\text{m}$，起吊物体重 $P_3=20\,\text{kN}$。开始起吊时系统静止，杆 $OA$ 与铅直方向夹角 $\theta_1=60{}^\circ$。<b>水的阻力不计</b>。求杆 $OA$ 转到与铅直成 $\theta_2=30{}^\circ$ 时船的水平位移。（课件练习）</p>
@@ -1707,7 +1708,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <div class="example-block">
       <div class="example-header">
         <span class="badge b-teal">例 5</span> 曲柄滑杆机构：质心运动方程 + 轴 $O$ 最大水平约束力
-        <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>曲柄滑杆机构，曲柄 $OA$ 以等角速度 $\omega$ 绕 $O$ 轴转动，$OA$ 中点质量集中处理；$OA=l$。各部分质量：曲柄 $m_1$、滑杆体 $m_3$，中间块 $m_2$。开始时曲柄 $OA$ 水平。滑杆的质心在点 $C$。求 (1) 机构质心的运动方程；(2) 作用在轴 $O$ 的最大水平约束力。（农夫题库 p57 第3题，p59 有官方答案）</p>
@@ -1791,7 +1792,7 @@ details[open] summary::before{transform:rotate(90deg);}
 
     <!-- 自测 -->
     <div class="example-block">
-      <div class="example-header"><span class="badge b-teal">自测</span> 本章习题自测（4 题，思路+答案已核验 ✓）</div>
+      <div class="example-header"><span class="badge b-teal">自测</span> 本章习题自测（4 题，思路+答案未自动核验）</div>
       <div class="example-body">
 
         <p style="margin:6px 0"><b>自测 1</b> <span class="badge b-teal" style="font-size:11px">考点：质心守恒求轨迹</span><br>
@@ -1968,7 +1969,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <p><b>组合体：直接叠加</b>　复杂物体可拆成若干基本体，各部分对<b>同一根轴</b>的转动惯量代数相加（挖去的孔取负）。例如带配重的轮系、杆＋端部圆盘等。</p>
 
     <div class="example-block">
-      <div class="example-header"><span class="badge b-amber">小例</span> 杆端粘圆盘，对端点 $O$ 轴的转动惯量 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span></div>
+      <div class="example-header"><span class="badge b-amber">小例</span> 杆端粘圆盘，对端点 $O$ 轴的转动惯量 <span class="badge b-unverified">未自动核验</span></div>
       <div class="example-body">
         <p>无重杆 $OA$ 长 $2R$（这里只为定位），$A$ 端固连质量 $m$、半径 $R$ 的均质圆盘（盘心在 $A$）。求圆盘对过 $O$、垂直盘面的轴的转动惯量。</p>
         <p>圆盘对自身质心轴 $J_C=\tfrac12 mR^2$，质心 $A$ 到 $O$ 距离 $d=2R$，由平行轴定理：</p>
@@ -2123,7 +2124,7 @@ details[open] summary::before{transform:rotate(90deg);}
 
     <!-- ====== 例 0 暖身：动量矩三种安装 ====== -->
     <div class="example-block">
-      <div class="example-header"><span class="badge b-amber">例 0（暖身）</span> 圆盘三种安装方式对 $O$ 轴的动量矩 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span></div>
+      <div class="example-header"><span class="badge b-amber">例 0（暖身）</span> 圆盘三种安装方式对 $O$ 轴的动量矩 <span class="badge b-unverified">未自动核验</span></div>
       <div class="example-body">
         <p><strong>题目：</strong>无重杆 $OA$ 以角速度 $\omega_0=4\,\text{rad/s}$ 绕 $O$ 轴转动，杆长使盘心 $A$ 到 $O$ 的距离 $\overline{OA}=2R$（$\overline{OA}=400\,\text{mm}$，故 $R=200\,\text{mm}=0.2\,\text{m}$），$A$ 端装质量 $m=25\,\text{kg}$、半径 $R$ 的均质圆盘，三种方式：(a) 盘与杆焊死；(b) 盘在 $A$ 铰接、相对杆以 $\omega_r=4\,\text{rad/s}$ 逆时针自转；(c) 盘相对杆以 $\omega_r=4\,\text{rad/s}$ 顺时针自转。求三种情况圆盘对 $O$ 轴的动量矩 $L_O$。（原题见农夫题库 p60 第1题，答案见 p63）</p>
 
@@ -2187,7 +2188,7 @@ details[open] summary::before{transform:rotate(90deg);}
 
     <!-- ====== 例 1：复合轮卷扬机 ====== -->
     <div class="example-block">
-      <div class="example-header"><span class="badge b-amber">例 1</span> 物块 A + 悬挂物块 B + 定轴轮 C（卷扬机型）求加速度与轴反力 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span></div>
+      <div class="example-header"><span class="badge b-amber">例 1</span> 物块 A + 悬挂物块 B + 定轴轮 C（卷扬机型）求加速度与轴反力 <span class="badge b-unverified">未自动核验</span></div>
       <div class="example-body">
         <p><strong>题目：</strong>物块 $A$ 质量 $m_1$ 放在<b>光滑</b>水平台面上，经绳绕过均质圆轮 $C$（质量 $m_3$、半径 $r$，绕固定水平轴 $C$ 转动）后悬挂物块 $B$（质量 $m_2$）。物块 $A$ 与台面摩擦不计。当 $B$ 下降时，求 (1) 物 $B$ 的加速度 $a$；(2) 绳内张力（用 $a$ 表示）；(3) 支座 $C$ 的约束力（用 $a$ 表示）。（原题见农夫题库 p667 模拟题 A 第六大题）</p>
 
@@ -2269,7 +2270,7 @@ details[open] summary::before{transform:rotate(90deg);}
 
     <!-- ====== 例 2：均质杆绕端定轴 ====== -->
     <div class="example-block">
-      <div class="example-header"><span class="badge b-amber">例 2</span> 均质杆绕端 $O$ 定轴，由水平静止倒下，求 $\alpha,\omega$ 及 $O$ 处反力 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span></div>
+      <div class="example-header"><span class="badge b-amber">例 2</span> 均质杆绕端 $O$ 定轴，由水平静止倒下，求 $\alpha,\omega$ 及 $O$ 处反力 <span class="badge b-unverified">未自动核验</span></div>
       <div class="example-body">
         <p><strong>题目：</strong>均质细杆 $OA$ 长 $l$、质量 $m$，可绕过端点 $O$ 的固定水平轴在铅垂平面内转动。开始时杆<b>水平静止</b>释放，在重力作用下倒下。求杆转到与水平线成角 $\varphi$（向下）时的 (1) 角加速度 $\alpha$；(2) 角速度 $\omega$；(3) 轴 $O$ 处的约束反力（沿杆方向 $O_n$ 与垂直杆方向 $O_\tau$）。（原型见农夫题库 p904 例3"冲击摆"，此处取纯杆形式给出完整反力。）</p>
 
@@ -2350,7 +2351,7 @@ details[open] summary::before{transform:rotate(90deg);}
 
     <!-- ====== 例 3：圆轮纯滚动下斜面 ====== -->
     <div class="example-block">
-      <div class="example-header"><span class="badge b-amber">例 3</span> 均质圆轮沿斜面纯滚动，求轮心加速度 $a_C$ 与所需摩擦 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span></div>
+      <div class="example-header"><span class="badge b-amber">例 3</span> 均质圆轮沿斜面纯滚动，求轮心加速度 $a_C$ 与所需摩擦 <span class="badge b-unverified">未自动核验</span></div>
       <div class="example-body">
         <p><strong>题目：</strong>质量 $m$、半径 $r$ 的均质圆轮（圆盘/圆柱）在倾角 $\theta$ 的斜面上<b>纯滚动</b>下行。求轮心加速度 $a_C$、角加速度 $\alpha$、接触处摩擦力 $F$，以及保证纯滚动所需的最小静摩擦因数。（原题见农夫题库 p61 第3题 / p906 例5，均为此模型。）</p>
 
@@ -2424,7 +2425,7 @@ details[open] summary::before{transform:rotate(90deg);}
 
     <!-- ====== 例 4：动量矩守恒 圆板上质点 ====== -->
     <div class="example-block">
-      <div class="example-header"><span class="badge b-amber">例 4</span> 质点在水平圆板上做圆周运动，动量矩守恒求圆板角速度 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span></div>
+      <div class="example-header"><span class="badge b-amber">例 4</span> 质点在水平圆板上做圆周运动，动量矩守恒求圆板角速度 <span class="badge b-unverified">未自动核验</span></div>
       <div class="example-body">
         <p><strong>题目：</strong>水平圆板可绕竖直轴 $z$ 转动，转动惯量为 $J$。板上有一质点 $M$（质量 $m$）以<b>恒定大小 $v_0$</b> 沿板上半径 $r$ 的圆做圆周运动，圆心到 $z$ 轴距离为 $l$，$M$ 在板上的位置由角 $\varphi$ 确定。已知当 $M$ 离 $z$ 轴最远（在 $M_0$ 处，$\varphi=0$）时圆板角速度为零。轴摩擦与空气阻力不计。求圆板角速度 $\omega$ 与角 $\varphi$ 的关系。（原题见农夫题库 p61 第5题 / p905 例3。）</p>
 
@@ -2523,11 +2524,11 @@ details[open] summary::before{transform:rotate(90deg);}
 
     <!-- 自测题 -->
     <div class="example-block" style="margin-top:18px">
-      <div class="example-header"><span class="badge b-amber">本章习题自测</span> 5 道（含已核验答案，先做再看）</div>
+      <div class="example-header"><span class="badge b-amber">本章习题自测</span> 5 道（含参考答案，先做再看）</div>
       <div class="example-body">
 
         <p style="margin-bottom:4px"><b>自测 1.</b>　均质圆柱体 $A$（质量 $m$、半径 $r$）外缘绕细绳，绳一端 $B$ 固定于天花板。圆柱因解开绳子无初速下降，求轴心降落高度 $h$ 时轴心速度 $v_A$ 与绳张力 $T$。<span style="color:var(--text3);font-size:12px">　［考点：平面运动 / 纯滚动型约束 $a_A=r\alpha$；农夫题库 p61 第4题，答案 p665］</span></p>
-        <details><summary>思路与答案（已核验 ✓）</summary><div class="details-body">
+        <details><summary>思路与答案（未自动核验）</summary><div class="details-body">
           <p>圆柱平面运动，绳上接触点相当于"瞬心"（绳不可伸长，接触点速度为零），约束 $a_A=r\alpha$。三方程：</p>
           <div class="fbox"><div class="frow">$$ma_A=mg-T,\quad J_C\alpha=Tr,\quad J_C=\tfrac12mr^2,\quad a_A=r\alpha$$</div></div>
           <p>联立（与 11-6 例 1 同型，只是竖直）：$T=\tfrac13 mg$，$\alpha=\tfrac{2g}{3r}$，$a_A=\tfrac23 g$。由匀加速 $v_A=\sqrt{2a_A h}$：</p>
@@ -2536,21 +2537,21 @@ details[open] summary::before{transform:rotate(90deg);}
         </div></details>
 
         <p style="margin:10px 0 4px"><b>自测 2.</b>　均质圆盘质量 $m=10\,\text{kg}$、半径 $R=1\,\text{m}$，在铅垂面内绕过盘心的水平轴 $O$ 转动。求图示位置（盘心水平偏置、由重力驱动）盘的角加速度大小 $\alpha$。<span style="color:var(--text3);font-size:12px">　［考点：定轴 $J_O\alpha=\sum M_O$；农夫题库 p666 模拟卷填空3］</span></p>
-        <details><summary>思路与答案（已核验 ✓）</summary><div class="details-body">
+        <details><summary>思路与答案（未自动核验）</summary><div class="details-body">
           <p>盘绕<b>盘心轴</b> $O$ 转动时，重力作用于盘心（即轴上），<b>对 $O$ 力矩为零</b> → $\alpha=0$。这是"陷阱填空"：均质盘绕几何中心轴，无论怎么放，重力都过轴，<b>角加速度恒为零</b>。</p>
           <div class="answer-box"><p>$\alpha=0$（重力过转轴，对轴无矩）。</p></div>
           <p style="color:var(--text2);font-size:13px">若轴改在盘<b>边缘</b>，则 $J_O=\tfrac12mR^2+mR^2=\tfrac32mR^2$，水平位置 $\alpha=\dfrac{mgR}{\tfrac32mR^2}=\dfrac{2g}{3R}$。题目问哪种要看清轴的位置。</p>
         </div></details>
 
         <p style="margin:10px 0 4px"><b>自测 3.</b>　两均质轮质量皆为 $m$、半径皆为 $R$，用不计质量的绳相连：上轮 $O_1$ 绕固定轴转动，下轮 $O_2$ 挂在绳上随绳下滑（沿绳"纯滚"），两轮角速度 $\omega_1=\omega_2=\omega$。求系统动能 $T$。<span style="color:var(--text3);font-size:12px">　［考点：定轴动能 $\tfrac12J\omega^2$ + 平面运动动能 $\tfrac12mv_C^2+\tfrac12J_C\omega^2$；农夫题库 p666 选择18］</span></p>
-        <details><summary>思路与答案（已核验 ✓）</summary><div class="details-body">
+        <details><summary>思路与答案（未自动核验）</summary><div class="details-body">
           <p>上轮 $O_1$ 定轴转动：$T_1=\tfrac12 J\omega^2=\tfrac12(\tfrac12mR^2)\omega^2=\tfrac14 mR^2\omega^2$。下轮 $O_2$ 平面运动：绳从 $O_1$ 输出的速度 $v_{\text{绳}}=R\omega$，$O_2$ 在此绳上以 $\omega$ 自转滚下，轮心速度 $v_C=v_{\text{绳}}+R\omega=2R\omega$。故 $T_2=\tfrac12 m(2R\omega)^2+\tfrac12(\tfrac12mR^2)\omega^2=2mR^2\omega^2+\tfrac14 mR^2\omega^2$。</p>
           <div class="answer-box"><p>$T=T_1+T_2=\tfrac14 mR^2\omega^2+\tfrac94 mR^2\omega^2=\dfrac{5}{2}mR^2\omega^2$。（选项2）</p></div>
           <p style="color:var(--text2);font-size:13px">关键：下轮轮心速度是 $2R\omega$ 而非 $R\omega$——绳本身在动（输出速度 $R\omega$），轮再相对绳滚动贡献 $R\omega$，叠加得 $2R\omega$。sympy 复核 $T=\tfrac52 mR^2\omega^2$ ✓。</p>
         </div></details>
 
         <p style="margin:10px 0 4px"><b>自测 4.</b>　有一轮子，轴的直径 $50\,\text{mm}$，无初速沿倾角 $\theta=20\degree$ 的轨道<b>纯滚动</b>下行，$5\,\text{s}$ 内轮心滚过距离 $s=3\,\text{m}$。求轮子对轮心的回转半径 $\rho$。<span style="color:var(--text3);font-size:12px">　［考点：平面运动求 $\alpha$ → 匀加速运动学 → 反求 $J_C=m\rho^2$；农夫题库 p61 第3题，答案 p665 ］</span></p>
-        <details><summary>思路与答案（已核验 ✓）</summary><div class="details-body">
+        <details><summary>思路与答案（未自动核验）</summary><div class="details-body">
           <p>轴半径 $r=25\,\text{mm}=0.025\,\text{m}$（轮沿轴颈滚）。平面运动三方程联立（含 $J_C=m\rho^2$）得</p>
           <div class="fbox"><div class="frow">$$\alpha=\ddot\varphi=\frac{mr\sin\theta}{J_C+mr^2}\,g=\frac{r\sin\theta}{\rho^2+r^2}\,g$$</div></div>
           <p>$\alpha$ 为常数，两次积分（$t=0$ 时静止）得 $\varphi=\tfrac12\alpha t^2$，而 $s=r\varphi$，于是 $s=\dfrac{g r^2 t^2\sin\theta}{2(\rho^2+r^2)}$，反解：</p>
@@ -2560,7 +2561,7 @@ details[open] summary::before{transform:rotate(90deg);}
         </div></details>
 
         <p style="margin:10px 0 4px"><b>自测 5.</b>　均质杆 $AB$ 长 $l$、质量 $m$，置于铅垂面内：$A$ 端靠<b>光滑</b>竖直墙、$B$ 端在<b>光滑</b>水平地面，初始与水平面成 $\varphi_0$。由静止释放倒下。求 (1) 杆在任意角 $\varphi$ 的角加速度与角速度；(2) 杆<b>脱离墙</b>瞬间杆与水平面的夹角 $\varphi_1$。<span style="color:var(--text3);font-size:12px">　［考点：平面运动微分方程 + 质心坐标二阶导；农夫题库 p62 第6题，答案 p667］</span></p>
-        <details><summary>思路与答案（已核验 ✓）</summary><div class="details-body">
+        <details><summary>思路与答案（未自动核验）</summary><div class="details-body">
           <p>杆作平面运动，质心 $C$ 坐标 $x_C=\tfrac{l}{2}\cos\varphi,\ y_C=\tfrac{l}{2}\sin\varphi$（墙在左、地在下）。两堵都光滑，墙给水平反力 $F_{NA}$、地给竖直反力 $F_{NB}$。列三方程并对 $x_C,y_C$ 求二阶导（注意 $\dot\varphi=-\omega,\ \ddot\varphi=-\alpha$），化简得</p>
           <div class="fbox"><div class="frow">$$\alpha=\frac{3g}{2l}\cos\varphi,\qquad \omega=\sqrt{\frac{3g}{l}\big(\sin\varphi_0-\sin\varphi\big)}$$</div></div>
           <p>脱离墙时墙反力 $F_{NA}=0$。由 $F_{NA}=\tfrac{ml}{2}(\alpha\sin\varphi_1-\omega^2\cos\varphi_1)=0$ 代入上面 $\alpha,\omega$ 解得</p>
@@ -2903,7 +2904,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- 例1：滑轮系统 力偶+重力功 -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-coral">例 1</span> 圆盘绕轴 + 绳挂两物块，求力偶与重力的总功 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-coral">例 1</span> 圆盘绕轴 + 绳挂两物块，求力偶与重力的总功 <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>圆盘半径 $r=0.5\,\text{m}$，可绕水平轴 $O$ 转动。绕过圆盘的绳上挂两物块 $A$、$B$，质量 $m_A=3\,\text{kg}$、$m_B=2\,\text{kg}$，绳与盘无相对滑动。盘上作用一力偶，力偶矩按 $M=4\varphi$（$M$ 以 $\text{N}\cdot\text{m}$ 计，$\varphi$ 以 $\text{rad}$ 计）变化。求：由 $\varphi=0$ 转到 $\varphi=2\pi$ 时，力偶 $M$ 与物块 $A$、$B$ 重力所做功之总和。（原题见农夫题库 p68 第1题）</p>
@@ -2963,7 +2964,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- 例2：坦克履带动能 -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-coral">例 2</span> 坦克（履带 + 两车轮）系统的动能 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-coral">例 2</span> 坦克（履带 + 两车轮）系统的动能 <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>坦克履带质量为 $m$，两个车轮质量均为 $m_1$，车轮视为均质圆盘、半径为 $R$，两车轮轴间距为 $\pi R$。设坦克前进速度为 $v$。求此质点系的动能。（原题见农夫题库 p69 第2题）</p>
@@ -3024,7 +3025,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- 例3：滑轮组求重物下降h速度 -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-coral">例 3</span> 定滑轮 + 动滑轮 + 两重物，求重物 II 下降 h 时的速度 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-coral">例 3</span> 定滑轮 + 动滑轮 + 两重物，求重物 II 下降 h 时的速度 <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>滑轮组悬挂两重物：重物 I 质量 $m_1$，重物 II 质量 $m_2$；定滑轮 $O_1$ 半径 $r_1$、质量 $m_3$，动滑轮 $O_2$ 半径 $r_2$、质量 $m_4$，两轮都视为均质圆盘。绳重和摩擦不计，设 $m_2>2m_1-m_4$。求重物 II 由静止下降距离 $h$ 时的速度。（原题见农夫题库 p69 第3题）</p>
@@ -3093,7 +3094,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- 例4：水平杆B端脱落 求b使角速度最大 -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-coral">例 4</span> 水平杆 B 端脱落绕 A 转到铅直，求使角速度最大的 b <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-coral">例 4</span> 水平杆 B 端脱落绕 A 转到铅直，求使角速度最大的 b <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>水平均质细杆质量 $m$、长 $l$，$C$ 为质心。$A$ 处为铰链支座，$B$ 端为一挂钩。若 $B$ 端突然脱落，杆绕 $A$ 转到铅直位置。问：铰 $A$ 到 $C$ 的距离 $b$ 取多大，能使杆转到铅直时具有最大角速度？（原题见农夫题库 p70 第4题）</p>
@@ -3146,7 +3147,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- 例5：杆AB+滚柱 求A点加速度（动能定理求v再求导） -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-coral">例 5</span> 杆靠墙 + 铰接滚柱，动能定理求 v 再求导得 A 点加速度 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-coral">例 5</span> 杆靠墙 + 铰接滚柱，动能定理求 v 再求导得 A 点加速度 <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>均质细杆 $AB$ 长 $l$、质量 $m_1$，上端 $B$ 靠在光滑墙上，下端 $A$ 以铰链与均质圆柱中心相连；圆柱质量 $m_2$、半径 $R$，放在粗糙水平面上，自图示位置由静止开始纯滚动（不滑动）。杆与水平线夹角 $\theta=45\degree$。求点 $A$ 在初瞬时的加速度。（原题见农夫题库 p70 第5题）</p>
@@ -3217,7 +3218,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- 例6：车床效率 功率方程 -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-coral">例 6</span> 车床切削：功率方程求力矩与电动机效率 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-coral">例 6</span> 车床切削：功率方程求力矩与电动机效率 <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>车床切削直径 $D=48\,\text{mm}$ 的工件，主切削力 $F=7.84\,\text{kN}$。主轴转速 $n=240\,\text{r/min}$，电动机转速 $1420\,\text{r/min}$，主传动系统总效率 $\eta=0.75$。求车床主轴、电动机主轴分别受的力矩，及电动机功率。（原题见农夫题库 p71 第6题）</p>
@@ -3281,7 +3282,7 @@ details[open] summary::before{transform:rotate(90deg);}
 
     <h4>本章习题自测</h4>
     <div class="example-block">
-      <div class="example-header"><span class="badge b-coral">自测</span> 做完再看答案（均已核验）</div>
+      <div class="example-header"><span class="badge b-coral">自测</span> 做完再看答案（均未自动核验）</div>
       <div class="example-body">
 
         <p style="margin-bottom:4px;"><strong>自测 1.</strong> <span class="badge b-coral" style="font-size:10px">考点</span> 重力功 · 弹性力功</p>
@@ -3300,7 +3301,7 @@ details[open] summary::before{transform:rotate(90deg);}
         <p style="font-size:14px;">重物质量 $m$ 经绳绕过均质定滑轮（质量 $M$、半径 $r$）自由下降 $h$（从静止）。求重物速度 $v$。</p>
         <details><summary>思路与答案</summary><div class="details-body">
           <p>取系统，$T_2=\tfrac12 mv^2+\tfrac12(\tfrac12 Mr^2)(\tfrac vr)^2=\tfrac12(m+\tfrac M2)v^2$，$\sum W=mgh$。由 $T_2=\sum W$：</p>
-          <div class="answer-box"><p>$v=\sqrt{\dfrac{4mgh}{2m+M}}$（已核验 ✓）。</p></div>
+          <div class="answer-box"><p>$v=\sqrt{\dfrac{4mgh}{2m+M}}$（未自动核验）。</p></div>
           <p>$M\to0$ 退化为 $v=\sqrt{2gh}$（自由下落）合理。</p>
         </div></details>
 
@@ -3308,8 +3309,8 @@ details[open] summary::before{transform:rotate(90deg);}
         <p style="font-size:14px;">承自测 3，求重物的加速度 $a$ 和绳的张力 $F_T$。</p>
         <details><summary>思路与答案</summary><div class="details-body">
           <p><strong>求 a：</strong>由 $v^2=\dfrac{4mg}{2m+M}\,h$（把 $h$ 看作位置变量），求导 $2va=\dfrac{4mg}{2m+M}v$，得</p>
-          <div class="answer-box"><p>$a=\dfrac{2mg}{2m+M}$（已核验 ✓）。</p></div>
-          <p><strong>求张力（第二步，隔离重物）：</strong>$ma=mg-F_T\Rightarrow F_T=m(g-a)=\dfrac{Mmg}{2m+M}$（已核验 ✓）。$M\to0$ 时 $a\to g$、$F_T\to0$，自由下落，合理。</p>
+          <div class="answer-box"><p>$a=\dfrac{2mg}{2m+M}$（未自动核验）。</p></div>
+          <p><strong>求张力（第二步，隔离重物）：</strong>$ma=mg-F_T\Rightarrow F_T=m(g-a)=\dfrac{Mmg}{2m+M}$（未自动核验）。$M\to0$ 时 $a\to g$、$F_T\to0$，自由下落，合理。</p>
         </div></details>
 
         <p style="margin:14px 0 4px;"><strong>自测 5.</strong> <span class="badge b-coral" style="font-size:10px">考点</span> 机械能守恒成立条件</p>
@@ -3453,7 +3454,7 @@ details[open] summary::before{transform:rotate(90deg);}
 
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-green">基础例</span> 均质细杆绕端点转动的惯性力系简化 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-green">基础例</span> 均质细杆绕端点转动的惯性力系简化 <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>质量 $m$、长 $l$ 的均质细杆 $OA$ 绕端点 $O$ 在竖直平面内转动，某瞬时角速度 $\omega$、角加速度 $\alpha$。求其惯性力系向质心 $C$（杆中点）简化的结果。</p>
@@ -3548,7 +3549,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- 例1 -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-green">例 1</span> 传送带圆柱零件：不滑动的最大加速度 + 先倾倒的条件 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-green">例 1</span> 传送带圆柱零件：不滑动的最大加速度 + 先倾倒的条件 <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>由相互铰接的水平臂连成的传送带，把圆柱形零件从一高度送到另一高度（臂面在倾角 $30^\circ$ 的方向上加速降落，加速度 $\vec a$ 沿斜面向下）。零件与臂之间摩擦系数 $f_s=0.2$。求：(1) 降落加速度 $a$ 多大时零件不致在水平臂上滑动；(2) 比值 $h/d$ 等于多少时，零件在滑动之前先倾倒。（原题见农夫题库 p75 第1题）</p>
@@ -3618,7 +3619,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- 例2 -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-green">例 2</span> 平台车上矩形块：不翻倒的最大牵引质量 $m_3$ 与车的加速度 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-green">例 2</span> 平台车上矩形块：不翻倒的最大牵引质量 $m_3$ 与车的加速度 <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>均质矩形块质量 $m_1=100\ \text{kg}$，置于平台车上；车质量 $m_2=50\ \text{kg}$，沿光滑水平面运动。车和矩形块一起被质量 $m_3$ 的重物（经定滑轮悬挂、绳水平拉车）牵引作加速运动。块与车之间摩擦力足够大、不相互滑动。块尺寸：宽 $0.5\ \text{m}$、高 $1\ \text{m}$，质心在中心。求：能使车加速运动的 $m_3$ <strong>最大值</strong>，以及此时车的加速度大小。（原题见农夫题库 p75 第2题）</p>
@@ -3689,7 +3690,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- 例3 -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-green">例 3</span> 长方形平板撤销一销：瞬时角加速度与另一销的动反力 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-green">例 3</span> 长方形平板撤销一销：瞬时角加速度与另一销的动反力 <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>长方形均质平板（宽 $AB=200\ \text{mm}$、高 $150\ \text{mm}$），质量 $27\ \text{kg}$，由顶边两个销 $A$（左）、$B$（右）水平悬挂。突然撤去销 $B$。求撤去 $B$ 瞬时平板的角加速度 $\alpha$ 和销 $A$ 的约束力。（原题见农夫题库 p75 第3题）</p>
@@ -3766,7 +3767,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- 例4 -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-green">例 4</span> 转速表模型：角速度 $\omega$ 与转角 $\varphi$ 的关系 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-green">例 4</span> 转速表模型：角速度 $\omega$ 与转角 $\varphi$ 的关系 <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>转速表简化模型：杆 $CD$ 两端各有质量 $m$ 的球 $C$、$D$，杆 $CD$ 与转轴 $AB$ 在各自中点 $O$ 铰接（杆质量不计）。转轴 $AB$ 转动、外载荷变化时杆 $CD$ 的转角 $\varphi$ 随之变化。设 $\omega=0$ 时 $\varphi=\varphi_0$ 且盘簧无力。盘簧力矩 $M$ 与转角 $\varphi$ 的关系 $M=k(\varphi-\varphi_0)$（$k$ 为盘簧刚度系数）。每个球到 $O$ 的距离为 $l$。求：(1) 角速度 $\omega$ 与角 $\varphi$ 的关系。（原题见农夫题库 p76 第4题）</p>
@@ -3828,7 +3829,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- 例5 -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-green">例 5</span> 卫星整流罩脱落瞬时的角速度（牵连惯性力做功） <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-green">例 5</span> 卫星整流罩脱落瞬时的角速度（牵连惯性力做功） <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>星箭分离时打开整流罩：释放机构把整流罩缓送到图示位置，火箭以加速度 $a$ 加速，使整流罩绕 $O$ 处铰链向外转。当质心 $C$ 转到位置 $C'$（转过 $90^\circ$）时铰链自动脱开。整流罩质量 $m$、对轴 $O$ 的回转半径 $\rho=r$、质心到 $O$ 的距离 $OC=r$。忽略重力。求整流罩脱落时的角速度 $\omega$。（原题见农夫题库 p76 第5题）</p>
@@ -3884,7 +3885,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- 例6 -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-green">例 6</span> 磨刀砂轮组：转动时轴承 $A$、$B$ 的附加动反力 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-green">例 6</span> 磨刀砂轮组：转动时轴承 $A$、$B$ 的附加动反力 <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>磨刀砂轮 I 质量 $m_1=1\ \text{kg}$、偏心距 $e_1=0.5\ \text{mm}$；小砂轮 II 质量 $m_2=0.5\ \text{kg}$、偏心距 $e_2=1\ \text{mm}$；电机转子 III 质量 $m_3=8\ \text{kg}$、无偏心。带动砂轮旋转，转速 $n=3000\ \text{r/min}$。求转动时轴承 $A$、$B$ 的附加动约束力。（轴系尺寸：砂轮 I 在 $A$ 外侧 $5$，$A$ 到转子中心 $10$，内段共 $20$，$B$ 到砂轮 II 外侧 $5$，单位 mm/cm 同比例）。（原题见农夫题库 p77 第6题）</p>
@@ -3979,37 +3980,37 @@ details[open] summary::before{transform:rotate(90deg);}
         <p><strong>自测1.</strong> <span class="badge b-green" style="font-size:11px">考点：平动求最大加速度+翻倒</span> 圆柱零件在与水平成 $30^\circ$ 方向加速降落、$f_s=0.2$，求不滑动的最大加速度 $a$，及先倾倒的 $h/d$ 临界值。（农夫题库 p75 第1题）</p>
         <details><summary>思路与答案</summary><div class="details-body">
           <p>动静法补 $F_I=ma$，水平分量平衡摩擦 $ma\sin30^\circ\le f_s(mg-ma\cos30^\circ)$。</p>
-          <div class="answer-box"><p>$a\le2.92\ \text{m/s}^2$；先倾倒条件 $h/d\ge5$。已核验 ✓</p></div>
+          <div class="answer-box"><p>$a\le2.92\ \text{m/s}^2$；先倾倒条件 $h/d\ge5$。未自动核验</p></div>
         </div></details>
 
         <p><strong>自测2.</strong> <span class="badge b-green" style="font-size:11px">考点：整体+部件，翻倒取矩</span> 平台车（$m_2=50\ \text{kg}$）上放矩形块（$m_1=100\ \text{kg}$，宽 $0.5$ 高 $1$），$m_3$ 牵引加速。求块不翻倒时 $m_3$ 最大值及车加速度。（农夫题库 p75 第2题）</p>
         <details><summary>思路与答案</summary><div class="details-body">
           <p>整体 $F_T=150a$；块对前下棱 $A$ 取矩定临界 $a$；重物 $m_3$ 竖直动静平衡求 $m_3$。</p>
-          <div class="answer-box"><p>$a=g/4=2.45\ \text{m/s}^2$，$m_3=50\ \text{kg}$。已核验 ✓</p></div>
+          <div class="answer-box"><p>$a=g/4=2.45\ \text{m/s}^2$，$m_3=50\ \text{kg}$。未自动核验</p></div>
         </div></details>
 
         <p><strong>自测3.</strong> <span class="badge b-green" style="font-size:11px">考点：瞬时定轴转动+动反力</span> 长方板（$200\times150\ \text{mm}$，$27\ \text{kg}$）两销 $A,B$ 悬挂，突撤 $B$。求该瞬时 $\alpha$ 与销 $A$ 反力。（农夫题库 p75 第3题）</p>
         <details><summary>思路与答案</summary><div class="details-body">
           <p>瞬时 $\omega=0$，绕 $A$ 转动。$J_A=\frac m3(a^2+b^2)$，对 $A$ 取矩 $J_A\alpha=mg\cdot\frac a2$；再用 $a_C=\alpha\cdot AC$ 求 $F_I$、列力平衡。</p>
-          <div class="answer-box"><p>$\alpha=47\ \text{rad/s}^2$，$F_{Ax}=-95\ \text{N}$，$F_{Ay}=138\ \text{N}$。已核验 ✓（与第11章 $J_A\alpha=\sum M_A$ 结果一致）</p></div>
+          <div class="answer-box"><p>$\alpha=47\ \text{rad/s}^2$，$F_{Ax}=-95\ \text{N}$，$F_{Ay}=138\ \text{N}$。未自动核验（与第11章 $J_A\alpha=\sum M_A$ 结果一致）</p></div>
         </div></details>
 
         <p><strong>自测4.</strong> <span class="badge b-green" style="font-size:11px">考点：离心惯性力+盘簧平衡</span> 转速表模型（球 $m$、臂长 $l$、盘簧 $M=k(\varphi-\varphi_0)$），求 $\omega$ 与 $\varphi$ 的关系。（农夫题库 p76 第4题）</p>
         <details><summary>思路与答案</summary><div class="details-body">
           <p>离心惯性力 $F_I=ml\sin\varphi\,\omega^2$，对铰 $O$ 取矩 $M-2F_I l\cos\varphi=0$，用 $2\sin\varphi\cos\varphi=\sin2\varphi$。</p>
-          <div class="answer-box"><p>$\omega=\sqrt{\dfrac{k(\varphi-\varphi_0)}{ml^2\sin2\varphi}}$。已核验 ✓</p></div>
+          <div class="answer-box"><p>$\omega=\sqrt{\dfrac{k(\varphi-\varphi_0)}{ml^2\sin2\varphi}}$。未自动核验</p></div>
         </div></details>
 
         <p><strong>自测5.</strong> <span class="badge b-green" style="font-size:11px">考点：牵连惯性力做功+动能定理</span> 卫星整流罩（$m$、$\rho=r$、$OC=r$）在火箭加速度 $a$ 下绕 $O$ 转 $90^\circ$ 脱落，求脱落角速度 $\omega$。（农夫题库 p76 第5题）</p>
         <details><summary>思路与答案</summary><div class="details-body">
           <p>牵连惯性力 $F_{Ic}=ma$ 做功 $W=mar$，动能定理 $\frac12 m\rho^2\omega^2=mar$。</p>
-          <div class="answer-box"><p>$\omega=\dfrac1\rho\sqrt{2ar}=\sqrt{\dfrac{2a}{r}}$。已核验 ✓</p></div>
+          <div class="answer-box"><p>$\omega=\dfrac1\rho\sqrt{2ar}=\sqrt{\dfrac{2a}{r}}$。未自动核验</p></div>
         </div></details>
 
         <p><strong>自测6.</strong> <span class="badge b-green" style="font-size:11px">考点：偏心转子附加动反力</span> 砂轮组（$m_1=1,e_1=0.5\,\text{mm}$；$m_2=0.5,e_2=1\,\text{mm}$；转子 $8\,\text{kg}$ 无偏心），$n=3000\ \text{r/min}$，求轴承 $A,B$ 附加动反力。（农夫题库 p77 第6题）</p>
         <details><summary>思路与答案</summary><div class="details-body">
           <p>匀速 $\alpha=0$ 无惯性力偶。$F_{I1}=F_{I2}=m e\omega^2=5\pi^2\ \text{N}$，对一端轴承取矩，系数 $1.5=0.3/0.2$。</p>
-          <div class="answer-box"><p>$F_{NA}=F_{NB}=1.5\times5\pi^2=7.5\pi^2\approx74\ \text{N}$。已核验 ✓（题库"$15\times5\pi^2$"为"$1.5\times5\pi^2$"笔误）</p></div>
+          <div class="answer-box"><p>$F_{NA}=F_{NB}=1.5\times5\pi^2=7.5\pi^2\approx74\ \text{N}$。未自动核验（题库"$15\times5\pi^2$"为"$1.5\times5\pi^2$"笔误）</p></div>
         </div></details>
 
       </div>
@@ -4149,7 +4150,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- ===== 标准教学例：墙角靠杆，两法都做一遍 ===== -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-red">入门例</span> 墙角靠杆：求维持平衡的水平力 F（几何法 + 解析法对照） <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-red">入门例</span> 墙角靠杆：求维持平衡的水平力 F（几何法 + 解析法对照） <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>均质杆 $AB$ 长 $L$、重 $W$（作用在中点 $G$），$A$ 端靠光滑竖直墙、$B$ 端在光滑水平地面，杆与地面夹角 $\theta$。在 $B$ 端加一水平力 $F$（指向墙）阻止杆滑倒。求平衡时 $F$ 与 $W$、$\theta$ 的关系。</p>
@@ -4249,7 +4250,7 @@ details[open] summary::before{transform:rotate(90deg);}
 
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-red">例</span> 广义力速算：单摆的平衡角 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-red">例</span> 广义力速算：单摆的平衡角 <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>质量 $m$ 的摆锤系在长 $l$ 的轻杆下端，杆可绕悬点自由转动，摆角 $\theta$（从竖直向下量起）。仅受重力，求广义力 $Q_\theta$ 与平衡位置。</p>
@@ -4296,7 +4297,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <h4>用法：求理想约束机构的加速度（不含约束反力）</h4>
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-red">例</span> 动力学普遍方程求加速度：定滑轮两端挂物 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-red">例</span> 动力学普遍方程求加速度：定滑轮两端挂物 <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>不计质量、光滑的定滑轮，绳不可伸长。绳一端接桌面上质量 $m_1$ 的滑块（桌面光滑），另一端挂质量 $m_2$ 的重物。求系统加速度 $a$。（演示普遍方程绕开绳张力）</p>
@@ -4345,7 +4346,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- ===== 例1：菱形框压缩机（农夫P82第1题，解析+几何混合） ===== -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-red">例 1</span> 螺旋压缩机菱形框：求对被压物体的压力 $F_N$ <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-red">例 1</span> 螺旋压缩机菱形框：求对被压物体的压力 $F_N$ <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>压缩机手轮上作用一力偶，矩为 $M$。手轮轴两端各有螺距同为 $h$、但方向相反的螺纹；螺纹上各套一螺母 $A$、$B$，两螺母分别与长为 $a$ 的杆铰接，四杆形成菱形框。菱形框点 $D$ 固定不动，点 $C$ 连在水平压板上。求：当菱形框顶角等于 $2\theta$ 时，压缩机对被压物体的压力 $F_N$。（原题见农夫题库 p82 第1题，答案 p84）</p>
@@ -4412,7 +4413,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- ===== 例2：挖土机（农夫P82第2题，几何法+角度参数） ===== -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-red">例 2</span> 挖土机：求挖斗可克服的最大阻力矩 $M$ <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-red">例 2</span> 挖土机：求挖斗可克服的最大阻力矩 $M$ <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>挖土机挖掘部分如图。$EA=FB=r$。当 $\theta_1=\theta_2=30\degree$ 时杆 $AE\perp DF$，此时油缸推力为 $F$，不计构件重量。求：此时挖斗可克服的最大阻力矩 $M$。（原题见农夫题库 p82 第2题，答案 p84–85）</p>
@@ -4477,7 +4478,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- ===== 例3：远距夹钳（农夫P83第3题，纯比值链） ===== -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-red">例 3</span> 远距操纵夹钳：求被夹物体所受压力 $F_N$ <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-red">例 3</span> 远距操纵夹钳：求被夹物体所受压力 $F_N$ <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>远距离操纵用的夹钳为对称结构。操纵杆 $EF$ 向右移动时，两块夹板合拢夹住物体。操纵杆拉力为 $F$，图示位置两夹板正好相互平行。几何尺寸 $b,c,d,e$ 如图。求：被夹物体所受的压力 $F_N$。（原题见农夫题库 p83 第3题，答案 p85）</p>
@@ -4546,7 +4547,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- ===== 例4：折叠桥（农夫P83第4题，解析法+势能味道） ===== -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-red">例 4</span> 液压折叠桥：求油缸力 $F$ 与角 $\theta$ 的关系 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-red">例 4</span> 液压折叠桥：求油缸力 $F$ 与角 $\theta$ 的关系 <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>跨度为 $l$ 的折叠桥由液压油缸 $AB$ 控制铺设，两段相同的桥身重量都是 $P$，质心 $G$ 位于其中点。求：平衡时液压油缸中的力 $F$ 和角 $\theta$ 之间的关系。（原题见农夫题库 p83 第4题，答案 p85–86；图中 $a$ 为油缸下铰到 $B$ 的相关臂长，$\varphi=\tfrac{\pi}{4}-\tfrac{\theta}{2}$ 为油缸与桥身的夹角）</p>
@@ -4610,7 +4611,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <!-- ===== 例5：桁架求杆内力（农夫P83第5题，解除约束法） ===== -->
     <div class="example-block">
       <div class="example-header">
-        <span class="badge b-red">例 5</span> 桁架：用虚位移原理求杆 3 的内力（解除约束法） <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-red">例 5</span> 桁架：用虚位移原理求杆 3 的内力（解除约束法） <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>图示桁架中，$AD=DB=6\,\text{m}$，$CD=3\,\text{m}$，节点 $D$ 处载荷为 $P$。求：用虚位移原理求杆 3 的内力。（原题见农夫题库 p83 第5题，答案 p86–87）</p>
@@ -4721,13 +4722,13 @@ details[open] summary::before{transform:rotate(90deg);}
     <div class="example-block">
       <div class="example-header"><span class="badge b-red">自测</span> 本章习题自测（建议闭卷，先做再看答案）</div>
       <div class="example-body">
-        <p style="margin-bottom:12px;color:var(--text2)">每题先标考点，再展开看思路与已核验答案。</p>
+        <p style="margin-bottom:12px;color:var(--text2)">每题先标考点，再展开看思路与参考答案。</p>
 
         <details>
           <summary><strong>自测 1</strong>　<span class="badge b-red" style="font-size:10px">考点：几何法·力偶 vs 压力</span>　螺旋压缩机菱形框（农夫 p82 第1题）</summary>
           <div class="details-body">
             <p><strong>思路：</strong>取手轮虚转角 $\delta\varphi$；螺距关系 $\delta x_A=\tfrac{h}{2\pi}\delta\varphi$ → $\delta r_A=\tfrac{h}{2\pi\cos\theta}\delta\varphi$ → $\delta r_C=2\sin\theta\,\delta r_A=\tfrac{h}{\pi}\tan\theta\,\delta\varphi$；虚功 $M\delta\varphi-F_N\delta r_C=0$。</p>
-            <div class="answer-box"><p>$F_N=\dfrac{\pi M}{h}\cot\theta$（已核验 ✓，详见例 1）。</p></div>
+            <div class="answer-box"><p>$F_N=\dfrac{\pi M}{h}\cot\theta$（未自动核验，详见例 1）。</p></div>
           </div>
         </details>
 
@@ -4735,7 +4736,7 @@ details[open] summary::before{transform:rotate(90deg);}
           <summary><strong>自测 2</strong>　<span class="badge b-red" style="font-size:10px">考点：几何法·两角度参数</span>　挖土机最大阻力矩（农夫 p82 第2题）</summary>
           <div class="details-body">
             <p><strong>思路：</strong>$F\cos\theta_1\delta r_A-M\delta\varphi=0$，$\delta\varphi=\delta r_B/a$，$\delta r_A=\delta r_B\tan\theta_2$ → $M=Fa\cos\theta_1\tan\theta_2$，代 $30\degree/30\degree$。</p>
-            <div class="answer-box"><p>$M=Fa\sin\theta_2=\tfrac12 Fa$（$a=r$，已核验 ✓，详见例 2）。</p></div>
+            <div class="answer-box"><p>$M=Fa\sin\theta_2=\tfrac12 Fa$（$a=r$，未自动核验，详见例 2）。</p></div>
           </div>
         </details>
 
@@ -4743,7 +4744,7 @@ details[open] summary::before{transform:rotate(90deg);}
           <summary><strong>自测 3</strong>　<span class="badge b-red" style="font-size:10px">考点：比值链·对称机构</span>　远距夹钳压力（农夫 p83 第3题）</summary>
           <div class="details-body">
             <p><strong>思路：</strong>比值链 $\dfrac{\delta r_A}{\delta r_E}=\dfrac{b}{c+d}\cdot\dfrac{c}{e}$；对称 $2F_N\delta r_A=F\delta r_E$。</p>
-            <div class="answer-box"><p>$F_N=\dfrac{F\,e\,(c+d)}{2bc}$（已核验 ✓，详见例 3）。</p></div>
+            <div class="answer-box"><p>$F_N=\dfrac{F\,e\,(c+d)}{2bc}$（未自动核验，详见例 3）。</p></div>
           </div>
         </details>
 
@@ -4751,7 +4752,7 @@ details[open] summary::before{transform:rotate(90deg);}
           <summary><strong>自测 4</strong>　<span class="badge b-red" style="font-size:10px">考点：解析法·三角化简</span>　液压折叠桥油缸力（农夫 p83 第4题）</summary>
           <div class="details-body">
             <p><strong>思路：</strong>$2P\delta r_G\sin\theta-F\delta r_B\sin\varphi=0$，$\varphi=\tfrac{\pi}{4}-\tfrac{\theta}{2}$，$\delta r_B=\tfrac{4a}{l}\delta r_G$。</p>
-            <div class="answer-box"><p>$F=\dfrac{\sqrt2\,lP}{2a}\tan\theta\sqrt{1+\sin\theta}$（已核验 ✓，详见例 4）。</p></div>
+            <div class="answer-box"><p>$F=\dfrac{\sqrt2\,lP}{2a}\tan\theta\sqrt{1+\sin\theta}$（未自动核验，详见例 4）。</p></div>
           </div>
         </details>
 
@@ -4759,7 +4760,7 @@ details[open] summary::before{transform:rotate(90deg);}
           <summary><strong>自测 5</strong>　<span class="badge b-red" style="font-size:10px">考点：解除约束求内力</span>　桁架杆 3 内力（农夫 p83 第5题）</summary>
           <div class="details-body">
             <p><strong>思路：</strong>解除杆 $BD$、代内力 $F,F'$；瞬心法得 $\dfrac{\delta r_D}{\delta r_B}=\dfrac{6}{\sqrt{45}}\cdot\dfrac{\sqrt{45}}{6}=1=\dfrac{F}{P}$。</p>
-            <div class="answer-box"><p>$F=F'=P$（杆 3 受拉，已核验 ✓，详见例 5）。</p></div>
+            <div class="answer-box"><p>$F=F'=P$（杆 3 受拉，未自动核验，详见例 5）。</p></div>
           </div>
         </details>
 
@@ -4767,7 +4768,7 @@ details[open] summary::before{transform:rotate(90deg);}
           <summary><strong>自测 6</strong>　<span class="badge b-red" style="font-size:10px">考点：广义力/势能驻点</span>　单摆平衡角与稳定性</summary>
           <div class="details-body">
             <p><strong>思路：</strong>$q=\theta$，$V=-mgl\cos\theta$，$Q_\theta=-\partial V/\partial\theta=-mgl\sin\theta$，令 $Q_\theta=0$。</p>
-            <div class="answer-box"><p>平衡位置 $\theta=0$（势能极小，<strong>稳定</strong>）与 $\theta=180\degree$（势能极大，<strong>不稳定</strong>）；$Q_\theta$ 量纲为力矩（已核验 ✓）。</p></div>
+            <div class="answer-box"><p>平衡位置 $\theta=0$（势能极小，<strong>稳定</strong>）与 $\theta=180\degree$（势能极大，<strong>不稳定</strong>）；$Q_\theta$ 量纲为力矩（未自动核验）。</p></div>
           </div>
         </details>
       </div>
@@ -4845,7 +4846,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <div class="example-block">
       <div class="example-header">
         <span class="badge b-purple">综合例 1</span> 均质圆轮纯滚动下斜面：求 v、a、摩擦力与法向反力
-        <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>质量 $m$、半径 $r$ 的均质圆轮（$J_C=\tfrac12 mr^2$）在倾角 $\theta$ 的斜面上由静止开始<strong>纯滚动</strong>下行。求轮心下移距离 $s$ 时的速度 $v_C$、轮心加速度 $a_C$，以及斜面对轮的摩擦力 $F$ 与法向反力 $N$。这是"<strong>能量→平面运动</strong>"两步联用的样板题。</p>
@@ -4904,7 +4905,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <div class="example-block">
       <div class="example-header">
         <span class="badge b-purple">综合例 2</span> 卷扬机鼓轮吊重物：求下落加速度与轴承反力
-        <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span>
+        <span class="badge b-unverified">未自动核验</span>
       </div>
       <div class="example-body">
         <p><strong>题目：</strong>均质鼓轮质量 $M$、半径 $R$，绕水平固定轴 $O$ 转动（$J_O=\tfrac12 MR^2$）；轮上缠绕的绳吊一重物质量 $m$。系统由静止释放，绳不可伸长、不计绳重与轴摩擦。求重物下落加速度 $a$ 与轴 $O$ 的反力。这是"<strong>能量/动量矩→质心运动定理求反力</strong>"的样板题。</p>
@@ -5037,7 +5038,7 @@ details[open] summary::before{transform:rotate(90deg);}
       <div class="example-header"><span class="badge b-purple">自测 1</span> 均质杆水平释放的初瞬时 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">考点：定轴转动+反力</span></div>
       <div class="example-body">
         <p>长 $l$、质量 $m$ 的均质杆，一端 $O$ 铰支，水平静止后释放。求<strong>释放瞬时</strong>角加速度 $\alpha$ 与铰 $O$ 的反力。</p>
-        <details><summary>答案与思路（已核验 ✓）</summary>
+        <details><summary>答案与思路（未自动核验）</summary>
           <div class="details-body">
             <p>定轴转动方程（对 $O$，$J_O=\tfrac13 ml^2$，重力矩 $mg\cdot\tfrac l2$）：$J_O\alpha=mg\tfrac l2$。</p>
             <div class="answer-box"><p>$\alpha=\dfrac{3g}{2l}$。释放瞬时 $\omega=0$，质心只有切向加速度 $a_C=\alpha\tfrac l2=\tfrac34 g$（向下）。竖直方向 $mg-N=ma_C$ 得 $N=\dfrac{mg}{4}$（向上），水平反力为 $0$。</p></div>
@@ -5051,7 +5052,7 @@ details[open] summary::before{transform:rotate(90deg);}
       <div class="example-header"><span class="badge b-purple">自测 2</span> 光滑面上人在小车上行走 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">考点：质心守恒求位移</span></div>
       <div class="example-body">
         <p>光滑水平面上质量 $M$ 的小车，车上质量 $m$ 的人由车的一端走到另一端（相对车走过距离 $L$）。系统初始静止，求小车的位移。</p>
-        <details><summary>答案与思路（已核验 ✓）</summary>
+        <details><summary>答案与思路（未自动核验）</summary>
           <div class="details-body">
             <p>水平方向无外力且初静止 → 质心位置守恒。设车位移 $x$（与人前进方向相反），人对地位移 $x+L$。由 $M x+m(x+L)=0$：</p>
             <div class="answer-box"><p>$x=-\dfrac{mL}{M+m}$（负号表示车后退，方向与人前进相反）。</p></div>
@@ -5064,7 +5065,7 @@ details[open] summary::before{transform:rotate(90deg);}
       <div class="example-header"><span class="badge b-purple">自测 3</span> 转台上人向外走 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">考点：动量矩守恒</span></div>
       <div class="example-body">
         <p>可绕中心竖直轴自由转动的转台对轴转动惯量 $J$，初角速度 $\omega_0$，一质量 $m$ 的人初始站在中心。人走到半径 $R$ 的边缘后，求转台角速度。轴摩擦不计。</p>
-        <details><summary>答案与思路（已核验 ✓）</summary>
+        <details><summary>答案与思路（未自动核验）</summary>
           <div class="details-body">
             <p>对竖直轴外力矩为零 → 动量矩守恒。初：$L=J\omega_0$（人在轴心，$J_{人}=0$）；末：$L=(J+mR^2)\omega$。令两者相等：</p>
             <div class="answer-box"><p>$\omega=\dfrac{J\,\omega_0}{J+mR^2}$（人外移使系统转动惯量增大，角速度减小）。</p></div>
@@ -5115,7 +5116,7 @@ details[open] summary::before{transform:rotate(90deg);}
     </table>
 
     <div class="example-block">
-      <div class="example-header"><span class="badge b-teal">范例</span> 外伸梁求支座反力 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span></div>
+      <div class="example-header"><span class="badge b-teal">范例</span> 外伸梁求支座反力 <span class="badge b-unverified">未自动核验</span></div>
       <div class="example-body">
         <p>简支梁 $AB$，$A$ 为固定铰支、$B$ 为滚动支座，跨度 $l$，受满跨均布载荷 $q$ 及中点集中力 $P$。求 $A$、$B$ 反力。</p>
         <details><summary>解答</summary>
@@ -5151,7 +5152,7 @@ details[open] summary::before{transform:rotate(90deg);}
     <div class="step"><div class="step-num">3</div><div class="step-body"><strong>加速度合成</strong>：$\vec a_a=\vec a_e+\vec a_r+\vec a_C$，牵连转动有法向 $\omega_e^2 r$ 与切向 $\alpha_e r$；<strong>别漏科氏项</strong>，投影求解。</div></div>
 
     <div class="example-block">
-      <div class="example-header"><span class="badge b-teal">范例</span> 小环沿转动直杆滑动 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span></div>
+      <div class="example-header"><span class="badge b-teal">范例</span> 小环沿转动直杆滑动 <span class="badge b-unverified">未自动核验</span></div>
       <div class="example-body">
         <p>直杆 $OA$ 绕 $O$ 以角速度 $\omega$（角加速度 $\alpha$）转动，小环 $M$ 套在杆上并沿杆以相对速度 $u$、相对加速度 $a_r$ 向外滑动，此刻 $OM=b$。求小环的绝对速度与绝对加速度大小。</p>
         <details><summary>解答（取 $M$ 为动点，动系固连于杆 $OA$）</summary>
@@ -5175,7 +5176,7 @@ details[open] summary::before{transform:rotate(90deg);}
     </div>
 
     <div class="example-block">
-      <div class="example-header"><span class="badge b-teal">范例</span> 纯滚动车轮各点速度 <span style="color:var(--text3);font-weight:400;font-size:12px;margin-left:6px;">已核验 ✓</span></div>
+      <div class="example-header"><span class="badge b-teal">范例</span> 纯滚动车轮各点速度 <span class="badge b-unverified">未自动核验</span></div>
       <div class="example-body">
         <p>半径 $r$ 的车轮在地面纯滚动，轮心 $O$ 速度为 $v_O$（水平）。求角速度、与地接触点 $P$ 及轮最高点 $T$ 的速度。</p>
         <details><summary>解答（瞬心法）</summary>

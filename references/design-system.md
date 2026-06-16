@@ -1443,6 +1443,15 @@ block for real and gates the badge:
 - `已核验` is allowed **only** on a solution with a PASSING block; more badges than passing checks → FAIL;
 - anything not machine-verifiable (a proof, a conceptual answer) is tagged **`未自动核验`** (abstain), **never** `已核验`.
 
+**What counts as a badge.** Both gates count only the badge **element** — a `<span class="badge …">已核验 …</span>`
+pill (regex `<span … class="…badge…" …>已核验`, identical in `build_and_check.py` and `verify_solutions.py`).
+Prose that *describes* verification ("所有解答都做了独立核验"), a CSS/JS comment that names the badge, and a
+**legend** that demonstrates the pill are NOT badges and must not inflate the count — so write a legend with
+`<strong>已核验 ✓</strong>` (or `<code></code>`), never a real `<span class="badge …">` pill, or it reads as one
+more unbacked badge. The flip side: never present a reader-visible "已核验" as an ad-hoc `<span style="…">已核验</span>`
+that has the look of a badge but escapes the `class="badge"` counter — that is a silent false claim the gate can't
+see. Earned → the `badge b-green` pill + a passing x-verify block; not earned → the `badge b-unverified` pill.
+
 ### The x-verify block (invisible; executed by `verify_solutions.py`)
 
 ```html

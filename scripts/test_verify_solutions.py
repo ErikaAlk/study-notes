@@ -64,7 +64,14 @@ def run():
     ab = '<div class="card"><h3>ex <span class="badge">未自动核验</span></h3><p>概念题，无符号可算。</p></div>'
     assert v.run_checks(ab) is True, "honest 未自动核验 abstention must be allowed"
 
-    print("OK  verify_solutions regression tests passed (8/8)")
+    # 9. prose / comment / JS that only MENTIONS 已核验 is NOT a badge pill -> no phantom badge,
+    #    nothing to verify (ok). The old bare /已核验/ regex made these files FAIL with a badge
+    #    it never had (the MODE-A/B examples tripped exactly this).
+    prose = ('<p>所有解答都做了独立核验（已核验 ✓）。</p>\n'
+             '<!-- 标 已核验 ✓ -->\n<script>x.replace(/已核验/, "")</script>')
+    assert v.run_checks(prose) is True, "prose-only 已核验 must not be treated as a badge"
+
+    print("OK  verify_solutions regression tests passed (9/9)")
 
 
 if __name__ == "__main__":
