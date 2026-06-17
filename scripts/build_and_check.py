@@ -113,7 +113,15 @@ def check_forbidden(html):
 # This STATIC check only confirms an artifact EXISTS (badges <= artifacts). It does NOT prove the
 # artifact is true — that is verify_solutions.py's job (it executes form 1 and gates the badge).
 # Root cause it addresses: "wrong answer still stamped 已核验".
-VERIFY_BADGE_RE = re.compile(r"已核验")
+#
+# Count only the badge ELEMENT — a `<span class="badge …">已核验 …</span>` pill — NOT every
+# occurrence of the characters 已核验. The old bare `re.compile("已核验")` also counted prose
+# ("所有解答都做了独立核验（已核验 ✓）"), a CSS/JS comment that merely names the badge, and a
+# legend that shows what the pill looks like — inflating the count so an honest file FAILed with
+# "N badges but 0 artifacts". The pill carries class="badge …"; prose/comments do not. Keep this
+# regex byte-identical to verify_solutions.BADGE_RE so the two gates agree on what a badge is.
+VERIFY_BADGE_RE = re.compile(
+    r'<span\b[^>]*\bclass\s*=\s*["\'][^"\']*\bbadge\b[^"\']*["\'][^>]*>\s*已核验')
 VERIFY_NOTE_RE = re.compile(
     r"<!--\s*verify:|<script[^>]*\btype\s*=\s*[\"']text/x-verify[\"']", re.IGNORECASE)
 
@@ -140,6 +148,24 @@ BROKEN_MACRO_RE = re.compile(r""":\s*(['"])\{\\\\(?:boldsymbol|,\\\\text)\}\1"""
 def check_broken_macros(html):
     """Lines where a macro body brace-wraps an argument-taking command (\\bm / \\unit pattern)."""
     return [line_of(html, m.start()) for m in BROKEN_MACRO_RE.finditer(html)]
+
+
+# A prime ' immediately after a TeX spacing command (\, \; \: \! \ ) makes KaTeX throw
+# "Got group of unknown type: 'internal'" — the prime tries to superscript the spacing node, which
+# is not a real group. Another SILENT failure: no .katex-error in the static HTML, only at render.
+# Caught in MODE-C q7 ($\vec r\,'(0)$, where \,' broke). The fix is to put the prime on a symbol,
+# not on the space, e.g.  (\vec r\,)'(0).  Scanned only inside math spans.
+PRIME_AFTER_SPACE_RE = re.compile(r"\\[,;:!\s]\s*'")
+
+
+def check_prime_after_space(html):
+    """Lines where a prime ' follows a TeX spacing command inside math (KaTeX 'internal' error)."""
+    hits = []
+    for m in MATH_RE.finditer(html):
+        for _ in PRIME_AFTER_SPACE_RE.finditer(m.group()):
+            hits.append((line_of(html, m.start()), m.group()[:70].replace("\n", " ")))
+            break
+    return hits
 
 
 # SVG safe-subset offset risks (WARN-level — like \boxed, does NOT fail the build). Flags the few
@@ -276,6 +302,17 @@ def run_checks(path):
         print(r"       \unit -> \,\text (no wrapping braces).")
     else:
         print("[ok]  no silently-broken macro definitions")
+
+    pas = check_prime_after_space(html)
+    if pas:
+        fails += 1
+        print(f"\n[FAIL] {len(pas)} prime ' right after a TeX space inside math "
+              "(KaTeX \"unknown group 'internal'\" render error):")
+        for ln, ctx in pas[:20]:
+            print(f"  line {ln}: …{ctx}…")
+        print(r"       Put the prime on a symbol, not the space, e.g.  \vec r\,'  ->  (\vec r\,)'.")
+    else:
+        print("[ok]  no prime-after-space KaTeX traps")
 
     opens, closes, page_open = check_div_balance(html)
     if opens != closes:

@@ -54,8 +54,14 @@ BLOCK_RE = re.compile(
     re.DOTALL | re.IGNORECASE,
 )
 DATA_FOR_RE = re.compile(r'data-for\s*=\s*["\']([^"\']*)["\']', re.IGNORECASE)
-BADGE_RE = re.compile(r"已核验")
-ABSTAIN_RE = re.compile(r"未自动核验")
+# Count only the badge ELEMENT (a `<span class="badge …">已核验/未自动核验</span>` pill), not every
+# mention of the characters in prose, a comment, or a legend. Kept byte-identical to
+# build_and_check.VERIFY_BADGE_RE so the static gate and this executable gate agree on the count —
+# otherwise a file can pass one and fail the other on the same badges.
+BADGE_RE = re.compile(
+    r'<span\b[^>]*\bclass\s*=\s*["\'][^"\']*\bbadge\b[^"\']*["\'][^>]*>\s*已核验')
+ABSTAIN_RE = re.compile(
+    r'<span\b[^>]*\bclass\s*=\s*["\'][^"\']*\bbadge\b[^"\']*["\'][^>]*>\s*未自动核验')
 
 # Header injected before every block so the check_* helpers and sympy are available, and a block
 # that ran no checks is rejected at the end.
@@ -89,8 +95,13 @@ def run_block(code, timeout=20):
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             f.write(src)
         try:
+            # Force UTF-8 for the child's stdout AND decode it as UTF-8, so a check name with a
+            # non-ASCII math symbol (²  √  π  ω …) can't crash the run on a non-UTF-8 locale
+            # (e.g. Windows GBK): without this the child raises UnicodeEncodeError on print and the
+            # block looks "failed". errors='replace' is a final guard so a stray byte never throws.
+            env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
             r = subprocess.run([sys.executable, path], capture_output=True, text=True,
-                               timeout=timeout)
+                               timeout=timeout, encoding="utf-8", errors="replace", env=env)
         except subprocess.TimeoutExpired:
             return False, f"TIMEOUT after {timeout}s"
         out = (r.stdout or "") + (r.stderr or "")

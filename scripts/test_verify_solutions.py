@@ -64,7 +64,19 @@ def run():
     ab = '<div class="card"><h3>ex <span class="badge">未自动核验</span></h3><p>概念题，无符号可算。</p></div>'
     assert v.run_checks(ab) is True, "honest 未自动核验 abstention must be allowed"
 
-    print("OK  verify_solutions regression tests passed (8/8)")
+    # 9. prose / comment / JS that only MENTIONS 已核验 is NOT a badge pill -> no phantom badge,
+    #    nothing to verify (ok). The old bare /已核验/ regex made these files FAIL with a badge
+    #    it never had (the MODE-A/B examples tripped exactly this).
+    prose = ('<p>所有解答都做了独立核验（已核验 ✓）。</p>\n'
+             '<!-- 标 已核验 ✓ -->\n<script>x.replace(/已核验/, "")</script>')
+    assert v.run_checks(prose) is True, "prose-only 已核验 must not be treated as a badge"
+
+    # 10. a check name with non-ASCII math symbols (²√πω) must run on any locale (utf-8 child I/O),
+    #     not crash with UnicodeEncodeError on a GBK/CP-936 console.
+    ok, out = v.run_block('check_equal(sp.Integer(2)**2, 4, name="面积 x² = √π·ω 验证")')
+    assert ok, f"unicode-named check must run under forced utf-8 child I/O, got:\n{out}"
+
+    print("OK  verify_solutions regression tests passed (10/10)")
 
 
 if __name__ == "__main__":

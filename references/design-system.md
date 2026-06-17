@@ -141,6 +141,14 @@ table{overflow-x:auto;display:block;}
 
 /* ── Cards ── */
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px 26px;margin-bottom:16px;}
+/* ── Perf on huge notes (1000s of formulas) ──
+   content-visibility:auto lets the browser SKIP layout + paint of off-screen blocks, so opening a
+   <details> (or any reflow) no longer forces the whole tall page to re-layout/repaint — that whole-
+   page repaint on a 100k+ node page is what makes opening a solution jank for seconds. contain-
+   intrinsic-size is an estimated off-screen height; the 'auto' keyword caches the real size once a
+   block has rendered. Trade-off: scrollbar position and scroll-memory restore are approximate on
+   very long notes until scrolled through once (the doRestore retry below copes) — well worth it. */
+.card,.example-block{content-visibility:auto;contain-intrinsic-size:auto 600px;}
 
 /* Level 1 card title: prominent, full-width bottom rule */
 .card h3{font-size:17px;font-weight:700;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--border);}
@@ -267,8 +275,11 @@ details[open] summary::before{transform:rotate(90deg);}
 .b-blue{background:var(--blue-light);color:var(--blue-dark);}
 .b-green{background:var(--green-light);color:var(--green-dark);}
 .b-red{background:var(--red-light);color:var(--red-dark);}
-/* abstention badge — 未自动核验：muted dashed pill, used when a solution cannot be machine-verified */
-.b-unverified{background:var(--bg3);color:var(--text2);border:1px dashed var(--border);}
+/* Verification badges (boxed highlight). b-verified = a solution whose executable x-verify block
+   PASSED (green box). b-unverified = 未自动核验, an honest abstention — not machine-verified, may
+   still be correct (amber "heads-up" box, deliberately NOT red so it doesn't read as "wrong"). */
+.b-verified{background:var(--green-light);color:var(--green-dark);border:1px solid var(--green);font-weight:700;}
+.b-unverified{background:var(--amber-light);color:var(--amber-dark);border:1px solid var(--amber);}
 
 /* Example blocks — no fixed height, no max-height, no writing-mode.
    The header is a horizontal strip at the top; content expands to fit.
@@ -381,6 +392,7 @@ details[open] summary::before{transform:rotate(90deg);}
         {left:'$',  right:'$',  display:false}
       ],
       throwOnError: false,
+      output: 'html',  // skip KaTeX's hidden MathML twin: ~halves DOM nodes and drops MathML layout-on-reveal — a real perf win on notes with thousands of formulas
       macros: {
         /* Inexact differential (đ, not a state function) */
         '\\dj':      '{\\text{đ}}',
@@ -567,16 +579,20 @@ details[open] summary::before{transform:rotate(90deg);}
   /* ── Scroll position memory ── */
   function doRestore(y, tries){
     if(tries <= 0) return;
-    if(document.body.scrollHeight >= y + window.innerHeight * 0.5){
-      if(location.hash) history.replaceState(null, '', location.pathname + location.search);
-      window.scrollTo({top: y, behavior:'instant'});
-    } else {
-      setTimeout(function(){ doRestore(y, tries - 1); }, 120);
-    }
+    var prev = window.scrollY;
+    window.scrollTo({top: y, behavior:'instant'});
+    /* content-visibility:auto leaves the page height ESTIMATED until a region is scrolled into, so a
+       deep target clamps short; each scrollTo renders more (height grows), so retry on the next frame
+       until we reach y — or stop making progress (clamped at the true end, prev unchanged). */
+    if(Math.abs(window.scrollY - y) > 4 && window.scrollY !== prev)
+      requestAnimationFrame(function(){ doRestore(y, tries - 1); });
   }
   function tryRestore(){
     var raw = localStorage.getItem(SK);
-    if(raw !== null && +raw > 0) doRestore(+raw, 20);
+    if(raw !== null && +raw > 0){
+      if(location.hash) history.replaceState(null, '', location.pathname + location.search);
+      doRestore(+raw, 60);
+    }
   }
   if(window.__katexDone) tryRestore();
   else window.addEventListener('katexdone', tryRestore, {once:true});
@@ -852,6 +868,8 @@ Reserve `.big-formula.highlight` (bordered, colored background) for the single m
 ---
 
 ## SVG Diagram Rules (CRITICAL — do not skip)
+
+**Before drawing: should this be an SVG at all?** If the problem/source already came with a figure, **embed the ORIGINAL image instead of redrawing it** — even if it looks simple (decision rule: `problem-solutions.md` §3). A redraw of a figure you already have only risks dropping an element or misplacing labels. These rules are for the *other* case: a diagram you must draw because there is no source figure.
 
 These rules fix three recurring problems: oversized arrows that obscure labels, unreadable proportions, and **mysterious offset** — elements that each look right on their own but no longer line up because several coordinate mechanisms (viewBox mapping, percentage lengths, CSS transforms, text baselines, marker reference points) got mixed. Stay inside the safe-subset below and the offset stops happening; the arrow/label rules after it handle the other two.
 
@@ -1443,11 +1461,20 @@ block for real and gates the badge:
 - `已核验` is allowed **only** on a solution with a PASSING block; more badges than passing checks → FAIL;
 - anything not machine-verifiable (a proof, a conceptual answer) is tagged **`未自动核验`** (abstain), **never** `已核验`.
 
+**What counts as a badge.** Both gates count only the badge **element** — a `<span class="badge …">已核验 …</span>`
+pill (regex `<span … class="…badge…" …>已核验`, identical in `build_and_check.py` and `verify_solutions.py`).
+Prose that *describes* verification ("所有解答都做了独立核验"), a CSS/JS comment that names the badge, and a
+**legend** that demonstrates the pill are NOT badges and must not inflate the count — so write a legend with
+`<strong>已核验 ✓</strong>` (or `<code></code>`), never a real `<span class="badge …">` pill, or it reads as one
+more unbacked badge. The flip side: never present a reader-visible "已核验" as an ad-hoc `<span style="…">已核验</span>`
+that has the look of a badge but escapes the `class="badge"` counter — that is a silent false claim the gate can't
+see. Earned → the `badge b-verified` pill (green box) + a passing x-verify block; not earned → the `badge b-unverified` pill (amber box).
+
 ### The x-verify block (invisible; executed by `verify_solutions.py`)
 
 ```html
 <div class="card">
-  <h3>例 1　曲柄连杆求滑块加速度 <span class="badge b-green">已核验 ✓</span></h3>
+  <h3>例 1　曲柄连杆求滑块加速度 <span class="badge b-verified">已核验 ✓</span></h3>
   <!-- ... statement + steps + .answer-box with the printed answer ... -->
 
   <!-- Invisible (a non-JS <script> never renders). Recompute from the GIVEN data; the helper
@@ -1470,13 +1497,21 @@ double-solve made executable) · `check_limit(expr,var,point,expected)` (极限 
 `check_numeric(expr,subs,expected)` (数值代入 sanity). Put 2–3 checks per problem when possible
 (e.g. one `check_derivative` + one `check_limit`), so the badge reflects more than one angle.
 
+`name=` strings may contain any Unicode (`²`, `√`, `π`, `ω`, Chinese …): `verify_solutions.run_block`
+forces the child subprocess to UTF-8 stdio, so the gate behaves identically on a UTF-8 or a
+GBK/CP-936 (Windows) console — a non-ASCII check name can no longer crash a block with
+`UnicodeEncodeError`. **A conceptual MCQ is still verifiable**: recompute the *decisive quantity*
+that fixes the keyed option (a limit / derivative / discriminant / tangent vector …) and refute the
+distractors with *computed* counterexamples — never by asserting the answer.
+
 ### Abstention badge (when you cannot machine-verify)
 
 ```css
-.b-unverified{background:var(--bg3);color:var(--text2);border:1px dashed var(--border);}
+.b-verified{background:var(--green-light);color:var(--green-dark);border:1px solid var(--green);font-weight:700;}  /* 已核验 — green box */
+.b-unverified{background:var(--amber-light);color:var(--amber-dark);border:1px solid var(--amber);}  /* 未自动核验 — amber box */
 ```
 
-Usage: `<span class="badge b-unverified">未自动核验</span>`. This is the honest default whenever a
+Usage: `<span class="badge b-verified">已核验 ✓</span>` (passed the gate) / `<span class="badge b-unverified">未自动核验</span>` (abstain). This is the honest default whenever a
 problem has no clean symbolic check (proofs, "解释/讨论"类, experiment design). A `未自动核验`
 solution may still be correct — it just was not auto-checked, so it does not claim to be.
 

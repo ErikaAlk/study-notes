@@ -27,6 +27,19 @@ BADGE_OK = (
 )
 BADGE_BARE = "<span class=\"badge\">已核验 ✓</span> with no artifact recorded"
 NO_BADGE = "<div class=\"answer-box\"><p>$x=5$</p></div>"  # no claim -> no requirement
+# Prose / CSS-comment / JS that merely MENTIONS 已核验 is NOT a badge pill -> must not be counted
+# (the old bare /已核验/ regex counted these and FAILed honest files; see the MODE-A/B examples).
+PROSE_MENTION = (
+    "<!-- a trailing 已核验 badge -->\n"
+    "<p>所有解答都做了独立核验（已核验 ✓），可放心套用。</p>\n"
+    "<script>label.replace(/已核验/, '')</script>"
+)
+# A real badge pill with extra attrs/whitespace (as the examples write it) IS counted.
+BADGE_STYLED = "<span class=\"badge b-green\" style=\"font-weight:700;\">已核验 ✓</span>"
+
+# Prime ' right after a TeX space inside math -> KaTeX "unknown group 'internal'" (MODE-C q7 trap).
+PRIME_BAD = "<div class=\"fbox\">$\\vec r\\,'(0)=(1,0,3)$</div>"
+PRIME_OK = "<div class=\"fbox\">$(\\vec r\\,)'(0)$ and $f'(x)$ and $a\\,b$</div>"  # fixed + normal primes
 
 # Silently-broken macro definitions: the brace-wrapped forms render as KaTeX "Extra }" errors.
 # As in the real HTML, each LaTeX backslash is doubled by the JS string literal.
@@ -85,6 +98,21 @@ def run():
     badges, notes = b.check_verified_badges(NO_BADGE)
     assert (badges, notes) == (0, 0), f"no-badge file should be (0,0), got {(badges, notes)}"
 
+    # 7a. prose / comment / JS that only MENTIONS 已核验 is not a badge pill -> (0,0), never FAILs
+    badges, notes = b.check_verified_badges(PROSE_MENTION)
+    assert (badges, notes) == (0, 0), f"prose mention must not count, got {(badges, notes)}"
+
+    # 7b. a styled badge pill (class=\"badge …\" + extra attrs) IS counted exactly once
+    badges, _ = b.check_verified_badges(BADGE_STYLED)
+    assert badges == 1, f"styled badge pill should count once, got {badges}"
+
+    # 7c. a prime ' right after \\, inside math is caught (the KaTeX 'internal' render trap)
+    assert b.check_prime_after_space(PRIME_BAD), "prime-after-space must be caught"
+
+    # 7d. the fixed form (prime on a symbol) and ordinary primes are NOT flagged
+    assert b.check_prime_after_space(PRIME_OK) == [], \
+        f"clean primes wrongly flagged: {b.check_prime_after_space(PRIME_OK)}"
+
     # 8. brace-wrapped \bm / \unit macro bodies are flagged as silently-broken
     assert b.check_broken_macros(BROKEN_BM), "broken \\bm '{\\boldsymbol}' must be caught"
     assert b.check_broken_macros(BROKEN_UNIT), "broken \\unit '{\\,\\text}' must be caught"
@@ -121,7 +149,7 @@ def run():
     assert b.check_svg_offset_risks(ATTR_OK) == [], \
         f"SVG transform attribute wrongly flagged: {b.check_svg_offset_risks(ATTR_OK)}"
 
-    print("OK  build_and_check regression tests passed (16/16)")
+    print("OK  build_and_check regression tests passed (20/20)")
 
 
 if __name__ == "__main__":
