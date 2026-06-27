@@ -348,10 +348,21 @@ details[open] summary::before{transform:rotate(90deg);}
   background:var(--bg);border:1px solid var(--border);border-radius:10px;
   box-shadow:0 4px 20px rgba(0,0,0,0.18);
   width:240px;max-height:65vh;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--text2) transparent;  /* Firefox: thin themed bar */
   padding:8px 0;
   opacity:0;transform:translateY(8px) scale(0.97);
   pointer-events:none;transition:opacity 0.15s,transform 0.15s;
 }
+/* WebKit: the panel scrolls vertically when the list is long. Without this it falls back to the
+   OS-native scrollbar, whose light track shows as an ugly white strip down the dark panel.
+   Give it the same thin themed bar as .katex-display/table; the 2px transparent border +
+   padding-box clip insets the thumb so it clears the panel's 10px corner radius. */
+#nav-panel::-webkit-scrollbar{width:8px;}
+#nav-panel::-webkit-scrollbar-track{background:transparent;}
+#nav-panel::-webkit-scrollbar-thumb{background:var(--text2);border-radius:5px;
+  border:2px solid transparent;background-clip:padding-box;}
+#nav-panel:hover::-webkit-scrollbar-thumb{background:var(--text);background-clip:padding-box;}
+#nav-panel::-webkit-scrollbar-button{display:none;width:0;height:0;}
 #nav-panel.open{opacity:1;transform:none;pointer-events:auto;}
 #nav-panel a{
   display:flex;align-items:center;gap:9px;
