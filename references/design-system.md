@@ -246,8 +246,15 @@ details[open] summary::before{transform:rotate(90deg);}
 .step-num{width:28px;height:28px;border-radius:50%;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
 .step-body{flex:1 1 0;min-width:0;font-size:14px;line-height:1.75;}
 .step>.fbox,.step>.callout,.step>.answer-box,.step>.big-formula,.step>p{flex:0 0 100%;width:100%;box-sizing:border-box;margin-top:0;}
-/* Step title: direct-child strong only */
-.step-body > strong{display:block;margin-bottom:4px;}
+/* Bold has exactly TWO levels in a step, and only the FIRST gets a line of its own:
+   • Step title = the first direct-child <strong> → display:block (its own line).
+   • In-text emphasis = any LATER <strong>, including one written directly under .step-body
+     because the model didn't wrap the prose in <p> → must stay INLINE.
+   The old rule block-ified EVERY direct-child <strong>, so each bold term in the running text
+   shattered onto its own line and the title/emphasis hierarchy collapsed into one flat level.
+   :first-of-type (not :first-child) finds the title even if a badge/icon precedes it. */
+.step-body > strong{display:inline;font-weight:700;}
+.step-body > strong:first-of-type{display:block;margin-bottom:4px;}
 .step-body p strong,.step-body li strong{display:inline;font-weight:700;}
 
 /* Section color accents — apply to wrapper div, e.g. <div class="sec-purple"> */
