@@ -133,7 +133,9 @@ Place each problem's **verified** solution as a collapsible worked-example card 
 section that teaches its concept (see `references/problem-solutions.md` §5). The solution should
 point back to the concept just taught ("用刚才 §2.3 的动量守恒"). Add a small `已核验 ✓` marker
 in the card **only if** it carries its `<!-- verify: -->` artifact (the build check enforces the
-1:1 pairing). Figures follow the figure rule (SVG for simple, embed original for complex/photo).
+1:1 pairing). Figures follow the figure rule (`problem-solutions.md` §3): the problem came with a
+figure → **embed the original** (PPT 课件 → `extract_pdf.py topdf` first); SVG only for text-only
+problems.
 
 **Phase 5 — Self-test card + assemble.**
 End with the `本章习题自测` card (each 作业题 + one-line 考点 tag + link to its worked example).
