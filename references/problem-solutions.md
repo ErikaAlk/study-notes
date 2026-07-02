@@ -18,6 +18,12 @@ Homework arrives as: pasted text, photos of a worksheet, or a PDF.
 
 - **Text / pasted**: use it directly.
 - **Photo / screenshot (PNG/JPG)**: open it with the Read tool and transcribe the problem text faithfully. Keep the figure for embedding (Section 4).
+- **PPT/PPTX 课件**: convert to PDF **first**, then treat it as a PDF (text extraction, locate, autocrop all work on the converted file):
+
+```bash
+python3 scripts/extract_pdf.py topdf 课件第10章.pptx        # → 课件第10章.pdf (tries LibreOffice soffice, then PowerPoint COM on Windows)
+```
+
 - **PDF worksheet**: extract text + render pages, then crop each problem's figure:
 
 ```bash
@@ -127,9 +133,11 @@ Decision:
 
 The HTML must remain a single self-contained file, so embed images as base64 data-URIs (no external `src`).
 
-**Option A — crop straight from a PDF page** (best when the source is a PDF). A **scanned textbook has no text layer**, so first OCR-**locate** the page, then **autocrop** the figure by its caption — the bbox is *detected* (column gutters + the figure's own 图X.Y caption + tighten-to-ink), never hand-typed:
+**Option A — crop straight from a PDF page** (best when the source is a PDF; a **PPT/PPTX 课件 converts to PDF first** with `extract_pdf.py topdf`, then follows this same path). A **scanned textbook has no text layer**, so first OCR-**locate** the page, then **autocrop** the figure by its caption — the bbox is *detected* (column gutters + the figure's own 图X.Y caption + tighten-to-ink), never hand-typed:
 
 ```bash
+# 0. PPT source? convert once, then work on the PDF:
+python3 scripts/extract_pdf.py topdf 课件第10章.pptx       # → 课件第10章.pdf
 # 1. find which page the problem is on (a scanned book can't be grepped):
 python3 scripts/extract_pdf.py locate textbook.pdf 劳埃德 洛埃 --pages 2-40
 # 2. list the figures on that page, then auto-crop one by its caption:

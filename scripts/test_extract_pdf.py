@@ -80,6 +80,31 @@ def column_of_separates_two_columns():
 
 
 @test
+def topdf_out_path_defaults_alongside_input():
+    src = os.path.join("C:\\课件", "第10章.pptx") if os.name == "nt" else "/课件/第10章.pptx"
+    assert E._topdf_out_path(src) == os.path.abspath(os.path.splitext(src)[0] + ".pdf")
+    assert E._topdf_out_path(src, "out/x.pdf") == os.path.abspath("out/x.pdf")
+
+
+@test
+def topdf_soffice_cmd_shape():
+    cmd = E._soffice_cmd("soffice", "a b.pptx", "outdir")
+    # list form (no shell) so a path with spaces survives; --headless + --convert-to pdf + --outdir
+    assert cmd[0] == "soffice" and "--headless" in cmd and "pdf" in cmd
+    assert cmd[cmd.index("--outdir") + 1] == "outdir" and cmd[-1] == "a b.pptx"
+
+
+@test
+def topdf_ps_script_quotes_and_savefmt():
+    s = E._powerpoint_ps_script("C:\\课件\\it's.pptx", "C:\\课件\\it's.pdf")
+    # embedded single quotes must be doubled for a PS single-quoted literal
+    assert "'C:\\课件\\it''s.pptx'" in s and "'C:\\课件\\it''s.pdf'" in s
+    assert ",32)" in s                      # 32 = ppSaveAsPDF
+    assert "$true,$false,$false" in s       # Open(ReadOnly, Untitled, WithWindow=hidden)
+    assert "$app.Quit()" in s               # PowerPoint never left running
+
+
+@test
 def figure_top_uses_wide_textline_not_narrow_label():
     cap = box(150, 600, 350, 630)
     res = [

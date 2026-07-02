@@ -76,6 +76,16 @@ STEP_OK_NESTED = ("<div class=\"step\"><div class=\"step-num\">1</div><div class
 STEP_OK_AFTER = ("<div class=\"step\"><div class=\"step-num\">1</div><div class=\"step-body\">文字</div></div>"
                  "<div class=\"fbox\"><div class=\"frow\">$x=1$</div></div>")  # fbox AFTER step closes
 
+# Content-link CSS (WARN): a page WITH links needs a bare a{color:...} rule, or body links render
+# in the UA default #0000EE — near-invisible on the dark background. Qualified selectors like
+# .toc-l2 a{} / .toc-l1>a{} only style their own component and must NOT satisfy the check.
+LINKS_NO_RULE = ("<style>.toc-l1>a{display:flex;color:var(--text);}\n"
+                 ".toc-l2 a{color:var(--blue);}\n.lead a{color:var(--blue);}</style>\n"
+                 "<p>见<a href=\"notes.html#s2-1\">对轴的转动惯量</a></p>")
+LINKS_WITH_RULE = ("<style>body{color:var(--text);}\na{color:var(--blue);text-underline-offset:2px;}\n"
+                   "</style>\n<p><a href=\"notes.html#s2-1\">对轴的转动惯量</a></p>")
+NO_LINKS_NO_RULE = "<style>body{color:var(--text);}</style>\n<p>无链接的片段</p>"
+
 
 def run():
     # 1. macros the file defines are recognised
@@ -170,7 +180,24 @@ def run():
     assert b.check_step_flex_children(STEP_OK_AFTER) == [], \
         f"fbox after step close wrongly flagged: {b.check_step_flex_children(STEP_OK_AFTER)}"
 
-    print("OK  build_and_check regression tests passed (23/23)")
+    # 20. links + only component-qualified a{} rules -> flagged (UA default = invisible in dark)
+    assert b.check_content_link_css(LINKS_NO_RULE), \
+        "page with links but no bare a{color:...} rule must be flagged"
+
+    # 21. links + the bare design-system rule -> clean
+    assert not b.check_content_link_css(LINKS_WITH_RULE), \
+        "bare a{color:...} rule must satisfy the content-link check"
+
+    # 22. no links at all -> never flagged, rule or not
+    assert not b.check_content_link_css(NO_LINKS_NO_RULE), \
+        "linkless page must not be flagged"
+
+    # 23. the bare rule at the very start of a <style> block also counts
+    assert not b.check_content_link_css(
+        "<style>a{color:var(--blue);}</style><a href=\"x.html\">x</a>"), \
+        "rule at start of style block must count"
+
+    print("OK  build_and_check regression tests passed (27/27)")
 
 
 if __name__ == "__main__":

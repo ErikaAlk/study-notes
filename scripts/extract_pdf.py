@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """extract_pdf.py — PDF helpers for the study-notes skill.
 
-Five subcommands:
+Six subcommands:
 
   text     Extract text per page (for textbook/worksheet reading).
   images   Render each page to a PNG (for scanned PDFs or layout viewing).
@@ -13,12 +13,15 @@ Five subcommands:
            This is the fix for "I eyeballed the --bbox and clipped half the figure".
   crop     Crop a HAND-SPECIFIED rectangular region of one page (fallback for when
            autocrop can't find a caption, or the source isn't a captioned textbook figure).
+  topdf    Convert a PPT/PPTX 课件 to PDF so all of the above can run on it (tries
+           LibreOffice `soffice`, then PowerPoint COM via PowerShell on Windows).
 
 All paths are arguments — nothing is hard-coded.
 
 Requires PyMuPDF:  pip install pymupdf --break-system-packages -q
 'locate' and 'autocrop' additionally need numpy + RapidOCR (CPU, models bundled in the wheel):
                    pip install rapidocr-onnxruntime numpy --break-system-packages -q
+'topdf' needs no Python deps — it shells out to LibreOffice or PowerPoint (whichever exists).
 """
 import argparse
 import os
@@ -301,6 +304,114 @@ def cmd_crop(args):
     print("Next: python3 scripts/embed_images.py datauri " + args.out)
 
 
+# ── topdf: PPT/PPTX 课件 -> PDF ─────────────────────────────────────────────
+# 课件 often arrives as PPT/PPTX, but every figure tool here (text/locate/autocrop/crop)
+# works on PDF only. Convert ONCE, then run the normal PDF pipeline on the result.
+# Converter strategy (no Python deps): LibreOffice `soffice` if installed (cross-platform,
+# also converts doc/docx/odp), else PowerPoint COM driven through PowerShell (Windows with
+# MS Office). If neither exists, the error says what to do instead (export manually, or use
+# the hyperlink fallback in design-system.md -> "Figures in MODE A").
+
+_SOFFICE_CANDIDATES = (
+    "soffice",
+    r"C:\Program Files\LibreOffice\program\soffice.exe",
+    r"C:\Program Files (x86)\LibreOffice\program\soffice.exe",
+    "/usr/bin/soffice", "/usr/local/bin/soffice",
+    "/Applications/LibreOffice.app/Contents/MacOS/soffice",
+)
+
+_PPT_EXTS = (".ppt", ".pptx", ".pps", ".ppsx")
+
+
+def _topdf_out_path(src, out=None):
+    """Default output: same directory, same stem, .pdf extension."""
+    if out:
+        return os.path.abspath(out)
+    return os.path.splitext(os.path.abspath(src))[0] + ".pdf"
+
+
+def _find_soffice():
+    import shutil
+    for cand in _SOFFICE_CANDIDATES:
+        if os.sep in cand or (os.altsep and os.altsep in cand):
+            if os.path.exists(cand):
+                return cand
+        else:
+            found = shutil.which(cand)
+            if found:
+                return found
+    return None
+
+
+def _soffice_cmd(soffice, src, outdir):
+    return [soffice, "--headless", "--convert-to", "pdf", "--outdir", outdir, src]
+
+
+def _ps_quote(s):
+    """Quote a string as a PowerShell single-quoted literal (embedded ' doubles)."""
+    return "'" + s.replace("'", "''") + "'"
+
+
+def _powerpoint_ps_script(src, dst):
+    """PowerShell that drives PowerPoint COM: open read-only + windowless, SaveAs PDF.
+    32 = ppSaveAsPDF; Open(FileName, ReadOnly, Untitled, WithWindow)."""
+    return (
+        "$ErrorActionPreference='Stop';"
+        "$app=New-Object -ComObject PowerPoint.Application;"
+        "try{"
+        f"$p=$app.Presentations.Open({_ps_quote(src)},$true,$false,$false);"
+        f"$p.SaveAs({_ps_quote(dst)},32);"
+        "$p.Close()"
+        "}finally{$app.Quit()}"
+    )
+
+
+def cmd_topdf(args):
+    import subprocess
+    src = os.path.abspath(args.src)
+    if not os.path.exists(src):
+        sys.exit(f"File not found: {src}")
+    if src.lower().endswith(".pdf"):
+        sys.exit(f"{src} is already a PDF — run the PDF pipeline on it directly.")
+    dst = _topdf_out_path(src, args.out)
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    next_hint = f'Next: python3 scripts/extract_pdf.py autocrop "{dst}" --page N --list'
+
+    soffice = _find_soffice()
+    if soffice:
+        outdir = os.path.dirname(dst)
+        r = subprocess.run(_soffice_cmd(soffice, src, outdir),
+                           capture_output=True, text=True, timeout=300)
+        # soffice always names its output <input-stem>.pdf inside --outdir
+        produced = os.path.join(outdir, os.path.splitext(os.path.basename(src))[0] + ".pdf")
+        if r.returncode == 0 and os.path.exists(produced):
+            if os.path.abspath(produced) != dst:
+                os.replace(produced, dst)
+            print(f"Converted (LibreOffice) -> {dst}")
+            print(next_hint)
+            return
+        print(f"LibreOffice conversion failed (exit {r.returncode}): "
+              f"{(r.stderr or r.stdout).strip()}", file=sys.stderr)
+
+    if sys.platform == "win32" and src.lower().endswith(_PPT_EXTS):
+        script = _powerpoint_ps_script(src, dst)
+        r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+                           capture_output=True, text=True, timeout=300)
+        if r.returncode == 0 and os.path.exists(dst):
+            print(f"Converted (PowerPoint COM) -> {dst}")
+            print(next_hint)
+            return
+        sys.exit("PowerPoint COM conversion failed: "
+                 + ((r.stderr or r.stdout).strip() or f"exit {r.returncode}"))
+
+    sys.exit(
+        "No converter available (need LibreOffice `soffice`, or PowerPoint on Windows).\n"
+        "Options: install LibreOffice; or export the file to PDF manually and re-run the PDF\n"
+        "pipeline on it; or fall back to a HYPERLINK reference to the source file + page\n"
+        "(design-system.md -> 'Figures in MODE A')."
+    )
+
+
 def main():
     p = argparse.ArgumentParser(description="PDF helpers for the study-notes skill.")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -344,6 +455,11 @@ def main():
     pc.add_argument("-o", "--out", required=True, help="output .png")
     pc.add_argument("--dpi", type=int, default=200)
     pc.set_defaults(func=cmd_crop)
+
+    pv = sub.add_parser("topdf", help="convert a PPT/PPTX 课件 to PDF so the PDF pipeline can run on it")
+    pv.add_argument("src", help="input .ppt/.pptx (via LibreOffice, .doc/.docx/.odp also work)")
+    pv.add_argument("-o", "--out", help="output .pdf (default: alongside the input, same stem)")
+    pv.set_defaults(func=cmd_topdf)
 
     args = p.parse_args()
     args.func(args)

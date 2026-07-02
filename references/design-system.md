@@ -18,7 +18,7 @@ Complete CSS and HTML component library for study notes. Copy the CSS block verb
 - **Self-test quiz widget** (optional) — CSS + HTML pattern + the one-copy JS
 - **Anki flashcard deck** (optional) — hidden `#anki-deck` format for `make_anki.py`
 - **Source citation tag `.src-ref`** — for source-grounded fidelity mode
-- **MODE A note components** — elective badge, figure reference, collapsible example/exercise card
+- **MODE A note components** — elective badge, figures (embed original / fig-ref fallback), collapsible example/exercise card
 
 ---
 
@@ -66,6 +66,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 .page{max-width:900px;margin:0 auto;padding:32px 24px 100px;}
 /* Safety net: if a div escapes .page due to a tag mismatch, body still constrains width */
 body>*:not(.page){max-width:900px;margin-left:auto;margin-right:auto;padding-left:24px;padding-right:24px;}
+/* Content links — without this rule a body link falls back to the UA default (#0000EE,
+   visited #551A8B), which is near-invisible on the dark background (1.78:1 / 1.52:1 measured;
+   WCAG AA needs 4.5:1 — a real user report). One rule fixes both schemes: --blue is #185FA5
+   in light (6.5:1 on white) and flips to the bright #5B9FE0 in dark (6.0:1). Components that
+   recolor their own <a> (.toc-l1/.toc-l2, #nav-panel, .lead) override this downstream;
+   build_and_check.py WARNs when a page's CSS is missing this rule. */
+a{color:var(--blue);text-underline-offset:2px;}
 .katex{font-size:1.06em;}
 /* ── Wide display-formula handling (revised) ──
    A display formula wider than the text column must NOT spill past its box / the viewport.
@@ -1467,7 +1474,7 @@ citation. A fabricated page number is worse than none.
 
 ---
 
-## MODE A note components (elective badge · figure reference · example card)
+## MODE A note components (elective badge · figures · example card)
 
 Three small components used by MODE A study notes. Add the CSS to the `<style>` block (it is
 part of the Full CSS contract, repeated here so MODE A has everything in one place).
@@ -1497,22 +1504,43 @@ included, keep them to one short card, never at core depth, and tag every includ
 Usage: `<h3 id="sX-X">§X.X 节标题 <span class="elective-badge">★ 选学</span></h3>`.
 In the TOC, append ` ★` (plain text) after the title of any elective section link.
 
-### Figure reference (MODE A only)
+### Figures in MODE A — 例题的图必须嵌原图；fig-ref 只是兜底
 
-In MODE A do **not** draw SVG diagrams or embed base64 images unless the user explicitly asks —
-write an inline reference instead, using the book's exact figure number and caption:
+**If a worked example (例题), an exercise, or a derivation the reader must SEE a figure to
+follow came WITH a figure in the source — embed the ORIGINAL image, same pipeline as MODE B/C**
+(`problem-solutions.md` §4). A text pointer like 「（见课件第10章 p24）」 forces the reader to dig
+out the source file and flip to the page **in the middle of a problem** — a real user complaint.
+
+- Source is a **PDF / scan** → `extract_pdf.py locate` + `autocrop` (auto-detected bbox), then
+  `embed_images.py datauri`.
+- Source is a **PPT/PPTX 课件** → convert to PDF **first**, then the same PDF pipeline:
+  `python scripts/extract_pdf.py topdf 课件.pptx` (tries LibreOffice `soffice`, then PowerPoint
+  COM on Windows).
+- Source is a **photo/PNG/JPG** → `embed_images.py datauri` directly.
+
+**Fallback — a hyperlink, only when you truly cannot crop** (the source file isn't available to
+you, or conversion is impossible in this environment): make the reference a **clickable link to
+the source file + page**, never bare text:
 
 ```html
-<p class="fig-ref">（见图 3-5：弹簧振子示意图）</p>
+<p class="fig-ref"><a href="file:///C:/课件/第10章.pdf#page=24" target="_blank">（见课件第10章 p24：双联滑轮示意图）</a></p>
 ```
+
+(`#page=N` opens PDFs at that page in every major browser. For a PPT you can only link the file
+itself — one more reason to convert and embed instead.) A bare-text `（见图 X-X：图题）` is the
+**last resort**, only when there is no source file at all (e.g. MODE A from scratch).
+
+**Concept-illustration figures you were NOT given** (decorative, non-essential): unchanged — in
+MODE A do **not** draw SVG diagrams or embed images unless the user explicitly asks; use the
+fig-ref (or nothing).
 
 ```css
 .fig-ref { color: var(--text3); font-size: 13px; font-style: italic;
            padding: 4px 0 4px 12px; border-left: 3px solid var(--border); margin: 8px 0; }
 ```
 
-Format: `（见图 X-X：图题）`. (MODE B/C are different — figures are mandatory there and either
-drawn as SVG or embedded from the original image; see `problem-solutions.md`.)
+(MODE B/C are stricter — figures are mandatory there and either embedded from the original or,
+for text-only problems, drawn as SVG; see `problem-solutions.md` §3–§4.)
 
 ### Collapsible example / exercise card
 

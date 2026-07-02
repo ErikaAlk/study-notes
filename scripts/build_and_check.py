@@ -28,6 +28,9 @@ Static checks (catch the SILENT failures KaTeX never reports):
                                                  .step-body, not nested inside it — squeezes the
                                                  text body to ~0 width and CJK shatters to one
                                                  character per line)
+ 10. Content-link CSS present (WARN)            (page has <a href> links but no bare a{color:...}
+                                                 rule -> UA default #0000EE, near-invisible on the
+                                                 dark background)
 
 Exit code: 0 = clean, 1 = one or more FAIL-level problems.
 \boxed is reported as a WARNING (allowed only in plain prose), and does not by
@@ -290,6 +293,23 @@ def check_step_flex_children(html):
     return hits
 
 
+# Content-link CSS (WARN-level). Without a global `a{color:...}` rule, body links fall back to
+# the UA default (#0000EE, visited #551A8B) — near-invisible on the dark background (~1.5:1,
+# real user report). The design-system Full CSS carries `a{color:var(--blue);...}`; a page built
+# from a stale CSS copy loses it silently, so flag its absence whenever the page has links at all.
+# The rule must be a BARE `a` selector (start of line / after } or ;) that sets color — a
+# qualified one like `.toc-l2 a{color:...}` only covers its own component, not content links.
+_BARE_A_RULE = re.compile(r"(?:^|[};])\s*a\s*\{[^}]*color\s*:", re.M)
+
+
+def check_content_link_css(html):
+    """WARN-level. True = problem (page has <a href> links but no bare a{color:...} CSS rule)."""
+    if not re.search(r"<a\s[^>]*href", html, re.I):
+        return False
+    styles = "\n".join(re.findall(r"<style[^>]*>([\s\S]*?)</style>", html, re.I))
+    return _BARE_A_RULE.search(styles) is None
+
+
 def check_div_balance(html):
     opens = len(re.findall(r"<div\b", html))
     closes = len(re.findall(r"</div\s*>", html))
@@ -427,6 +447,14 @@ def run_checks(path):
         print("       but fix the nesting for clean structure. (WARN only -- does not fail the build.)")
     else:
         print("[ok]  no block elements misplaced as .step flex children")
+
+    if check_content_link_css(html):
+        print("\n[WARN] page has <a href> links but the CSS has no bare a{color:...} rule --")
+        print("       links render in the UA default #0000EE, near-invisible on the dark background.")
+        print("       Add the design-system rule:  a{color:var(--blue);text-underline-offset:2px;}")
+        print("       (WARN only -- does not fail the build.)")
+    else:
+        print("[ok]  content links have a themed color rule (or page has no links)")
 
     print()
     if fails:
