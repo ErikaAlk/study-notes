@@ -13,6 +13,8 @@ Six subcommands:
            This is the fix for "I eyeballed the --bbox and clipped half the figure".
   crop     Crop a HAND-SPECIFIED rectangular region of one page (fallback for when
            autocrop can't find a caption, or the source isn't a captioned textbook figure).
+           The bbox only needs to be GENEROUS — it is tightened to the ink inside it, and
+           both crop and autocrop WARN when ink runs along a crop edge (= figure sliced).
   topdf    Convert a PPT/PPTX 课件 to PDF so all of the above can run on it (tries
            LibreOffice `soffice`, then PowerPoint COM via PowerShell on Windows).
 
@@ -191,20 +193,84 @@ def _column_of(gray, cx, y0, y1):
     return left, right
 
 
+def _cjk_count(t):
+    return sum(1 for ch in t if "一" <= ch <= "鿿")
+
+
 def _figure_top(res, x0, x1, cap_box):
-    """Top of the figure = bottom edge of the nearest WIDE text line above the caption.
+    """Top of the figure = bottom edge of the nearest WIDE CJK PROSE line above the caption.
     A delimiter must overlap the column horizontally (so a full-width page header bounds
-    both columns); narrow in-figure labels (S, N, (a)…) fail the width test and are ignored."""
+    both columns); narrow in-figure labels (S, N, (a)…) fail the width test. It must also
+    contain CJK prose (>=2 汉字): a dimension chain (2l | l | l | 2l) or a symbol row
+    (M2 G E A) can be just as WIDE as a text line but is part of the drawing — taking it
+    as the boundary slices the whole figure above it off (real case: 题二 beam figure cut
+    at its dimension row). No qualifying line -> top=0 (over-include; the ink-tighten and
+    the eyeball pass trim the excess — always better than cutting through the figure)."""
     cap_top = min(p[1] for p in cap_box)
     colw = max(1, x1 - x0)
     top = 0
-    for box, _txt, _sc in res or []:
+    for box, txt, _sc in res or []:
         bl, br = min(p[0] for p in box), max(p[0] for p in box)
         if br <= x0 or bl >= x1:          # must overlap the column horizontally
             continue
-        if max(p[1] for p in box) <= cap_top - 4 and (br - bl) >= 0.32 * colw:
+        if max(p[1] for p in box) <= cap_top - 4 and (br - bl) >= 0.32 * colw \
+                and _cjk_count(txt) >= 2:
             top = max(top, max(p[1] for p in box) + 4)
     return int(top)
+
+
+_MIN_INK_PX = 3   # a row/col needs this much ink to count as content
+
+
+def _ink_bbox_px(gray, np, min_px=_MIN_INK_PX):
+    """Ink bounding box (y0, y1, x0, x1) of a grayscale raster, or None if blank.
+    Rows/cols with fewer than min_px ink pixels are treated as blank, so an isolated
+    scan speck can't stretch the box and leave sheets of dead whitespace in the crop."""
+    ink = gray < _INK
+    rows = np.where(ink.sum(1) >= min_px)[0]
+    cols = np.where(ink.sum(0) >= min_px)[0]
+    if len(rows) == 0 or len(cols) == 0:
+        return None
+    return int(rows[0]), int(rows[-1]) + 1, int(cols[0]), int(cols[-1]) + 1
+
+
+def _pix_gray(pix, np):
+    img = np.frombuffer(pix.samples, dtype=np.uint8).reshape(pix.height, pix.width, pix.n)
+    return img[:, :, :3].mean(2) if pix.n >= 3 else img[:, :, 0].astype(float)
+
+
+def _longest_run(flags):
+    best = cur = 0
+    for v in flags:
+        cur = cur + 1 if v else 0
+        if cur > best:
+            best = cur
+    return best
+
+
+def _truncation_edges(gray, np, min_run=12):
+    """Names of crop edges that ink RUNS ALONG (>= min_run consecutive border pixels) —
+    the signature of a figure line/arrow/label sliced by the crop border. A clean crop's
+    borders sit in whitespace (the tighten step adds margin), so any such run means the
+    figure is probably cut there."""
+    ink = gray < _INK
+    out = []
+    for name, strip in (("top", ink[:2, :].any(0)), ("bottom", ink[-2:, :].any(0)),
+                        ("left", ink[:, :2].any(1)), ("right", ink[:, -2:].any(1))):
+        if _longest_run(strip) >= min_run:
+            out.append(name)
+    return out
+
+
+def _warn_if_truncated(pix, np):
+    cut = _truncation_edges(_pix_gray(pix, np), np)
+    if cut:
+        print(f"WARNING: ink runs along the {'/'.join(cut).upper()} edge(s) of this crop -- "
+              "the figure is probably CUT there (a sliced line/arrow/label).")
+        print("         Do NOT embed a half figure. Re-crop wider in that direction: "
+              "`crop --bbox` with a GENEROUS box (the tool tightens to the ink inside it),")
+        print("         then Read the result and check every label the problem mentions is visible.")
+    return cut
 
 
 def cmd_autocrop(args):
@@ -239,19 +305,18 @@ def cmd_autocrop(args):
     cap_top = int(min(p[1] for p in cap_box))
     x0, x1 = _column_of(gray, cx, max(0, cap_top - 700), cap_bot)
     top = _figure_top(res, x0, x1, cap_box)
-    sub = gray[top:cap_bot + 8, x0:x1] < _INK
-    rows = np.where(sub.any(1))[0]
-    cols = np.where(sub.any(0))[0]
-    if len(rows) == 0 or len(cols) == 0:
+    box_px = _ink_bbox_px(gray[top:cap_bot + 8, x0:x1], np)
+    if box_px is None:
         sys.exit("no ink found in the detected figure region")
+    ry0, ry1, rx0, rx1 = box_px
     m = args.margin
     # Clamp to the IMAGE bounds, not the column — so the margin may reach into the
     # (blank) gutter and never clips a label sitting right at the column edge (e.g. '2a').
     H, W = gray.shape
-    yy0 = max(0, top + int(rows.min()) - m)
-    yy1 = min(H, top + int(rows.max()) + m)
-    xx0 = max(0, x0 + int(cols.min()) - m)
-    xx1 = min(W, x0 + int(cols.max()) + m)
+    yy0 = max(0, top + ry0 - m)
+    yy1 = min(H, top + ry1 + m)
+    xx0 = max(0, x0 + rx0 - m)
+    xx1 = min(W, x0 + rx1 + m)
     # Re-render exactly that region via a PDF-point clip so the saved crop is a crisp
     # native render (not a resample of the detection raster).
     rect = page.rect
@@ -262,6 +327,7 @@ def cmd_autocrop(args):
     out_pix.save(args.out)
     print(f"autocropped '{cap_txt.strip()}' (page {args.page}) -> {args.out}  "
           f"[{out_pix.width}x{out_pix.height}px @ {args.out_dpi}dpi]  (bbox auto-detected, not hand-typed)")
+    _warn_if_truncated(out_pix, np)
     print("Next: python3 scripts/embed_images.py datauri " + args.out)
 
 
@@ -296,11 +362,35 @@ def cmd_crop(args):
         mode = "absolute(pt)"
     if clip.is_empty or clip.width <= 0 or clip.height <= 0:
         sys.exit(f"Computed clip is empty: {clip}")
+    np = None
+    if not args.no_tighten:
+        # The hand bbox only needs to be GENEROUS (surely contains the whole figure):
+        # tighten to the ink inside it + margin, so over-including costs nothing while
+        # under-including (the classic eyeballing error) slices the figure.
+        np = _lazy_np()
+        det = _pix_gray(page.get_pixmap(dpi=args.dpi, clip=clip), np)
+        b = _ink_bbox_px(det, np)
+        if b:
+            ry0, ry1, rx0, rx1 = b
+            m = args.margin
+            f = 72.0 / args.dpi
+            clip = fitz.Rect(max(rect.x0, clip.x0 + (rx0 - m) * f),
+                             max(rect.y0, clip.y0 + (ry0 - m) * f),
+                             min(rect.x1, clip.x0 + (rx1 + m) * f),
+                             min(rect.y1, clip.y0 + (ry1 + m) * f))
+            mode += "+ink-tightened"
     pix = page.get_pixmap(dpi=args.dpi, clip=clip)
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     pix.save(args.out)
     print(f"Cropped page {args.page} ({mode} bbox) -> {args.out}  "
           f"[{pix.width}x{pix.height}px @ {args.dpi}dpi]")
+    if np is None:
+        try:
+            np = _lazy_np()
+        except SystemExit:
+            np = None
+    if np is not None:
+        _warn_if_truncated(pix, np)
     print("Next: python3 scripts/embed_images.py datauri " + args.out)
 
 
@@ -447,13 +537,19 @@ def main():
     pa.add_argument("--margin", type=int, default=18, help="px margin around the tightened figure")
     pa.set_defaults(func=cmd_autocrop)
 
-    pc = sub.add_parser("crop", help="crop a HAND-SPECIFIED region (fallback for non-captioned figures)")
+    pc = sub.add_parser("crop", help="crop a GENEROUS hand bbox, auto-tightened to the ink inside "
+                                     "(fallback for non-captioned figures)")
     pc.add_argument("pdf")
     pc.add_argument("--page", type=int, required=True, help="1-based page number")
     pc.add_argument("--bbox", required=True,
-                    help="x0,y0,x1,y1 — fractional (0..1, from top-left) or absolute points")
+                    help="x0,y0,x1,y1 — fractional (0..1, from top-left) or absolute points; "
+                         "make it GENEROUS, the tool tightens to the ink inside it")
     pc.add_argument("-o", "--out", required=True, help="output .png")
     pc.add_argument("--dpi", type=int, default=200)
+    pc.add_argument("--margin", type=int, default=14,
+                    help="px margin kept around the tightened ink (default: 14)")
+    pc.add_argument("--no-tighten", action="store_true",
+                    help="keep the exact hand bbox (default: tighten to the ink inside it)")
     pc.set_defaults(func=cmd_crop)
 
     pv = sub.add_parser("topdf", help="convert a PPT/PPTX 课件 to PDF so the PDF pipeline can run on it")

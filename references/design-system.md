@@ -116,6 +116,17 @@ table,.answer-box,.two-col,.steps,.visual-row{
    not on formula containers (scrollbars on formula boxes intercept page scroll). */
 table{overflow-x:auto;display:block;}
 
+/* ── Embedded source figures (题目原图) ──
+   Every base64-embedded raster figure carries class="fig-embed". Without a HEIGHT cap,
+   a vertical phone-photo/scan crop renders at full height and fills the whole screen
+   (real user complaint) — max-width:100% alone does not save you. Cap it to roughly
+   half a viewport, center it, and let one click restore full size (zoom JS lives in
+   the skeleton, next to the other behavior scripts). */
+img.fig-embed{display:block;margin:12px auto;max-width:100%;width:auto;height:auto;
+  max-height:min(48vh,380px);border:1px solid var(--border);border-radius:8px;
+  cursor:zoom-in;}
+img.fig-embed.zoom{max-height:none;cursor:zoom-out;}
+
 /* Header */
 .header{text-align:center;padding:48px 0 36px;border-bottom:1px solid var(--border);margin-bottom:40px;}
 .header h1{font-size:30px;font-weight:700;margin-bottom:10px;letter-spacing:-0.5px;}
@@ -850,6 +861,16 @@ details[open] summary::before{transform:rotate(90deg);}
 })();
 </script>
 
+<!-- ── Embedded-figure zoom ──
+   img.fig-embed is height-capped by the CSS (a raw phone-photo crop would otherwise fill
+   the whole screen); one click toggles the cap off/on so no figure detail is ever lost. -->
+<script>
+document.addEventListener('click', function(e){
+  var t = e.target;
+  if(t.tagName === 'IMG' && t.classList.contains('fig-embed')) t.classList.toggle('zoom');
+});
+</script>
+
 </body>
 </html>
 ```
@@ -1516,7 +1537,12 @@ out the source file and flip to the page **in the middle of a problem** — a re
 - Source is a **PPT/PPTX 课件** → convert to PDF **first**, then the same PDF pipeline:
   `python scripts/extract_pdf.py topdf 课件.pptx` (tries LibreOffice `soffice`, then PowerPoint
   COM on Windows).
-- Source is a **photo/PNG/JPG** → `embed_images.py datauri` directly.
+- Source is a **photo/PNG/JPG** → `embed_images.py tidy` first (deskew + trim margins +
+  downscale — a raw phone photo is tilted and huge), **eyeball the output**, then `datauri`.
+
+Every embedded raster figure is `<img class="fig-embed" …>` — the Full CSS caps its height at
+`min(48vh, 380px)` and the skeleton JS makes a click toggle full size. Never ship a bare
+inline-styled `<img>` that can fill a whole screen (`problem-solutions.md` §4).
 
 **Fallback — a hyperlink, only when you truly cannot crop** (the source file isn't available to
 you, or conversion is impossible in this environment): make the reference a **clickable link to

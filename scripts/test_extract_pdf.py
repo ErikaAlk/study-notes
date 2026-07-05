@@ -116,6 +116,47 @@ def figure_top_uses_wide_textline_not_narrow_label():
     assert 220 <= top <= 240   # just below the wide text line, NOT down at the 'S' label (y=430)
 
 
+@test
+def figure_top_rejects_wide_but_cjkless_dimension_row():
+    # 题二 real case: the in-figure dimension chain "2l | l | l | 2l" is as WIDE as a text
+    # line but has no CJK — taking it as the boundary slices the whole structure above it.
+    cap = box(150, 600, 350, 630)
+    res = [
+        (box(110, 100, 390, 140), "不计图示平面结构各构件自重，载荷与尺寸如图", 0.9),  # true boundary
+        (box(110, 480, 390, 510), "2l l l 2l", 0.9),   # wide dimension row INSIDE the figure
+        (box(200, 300, 260, 330), "M2", 0.9),          # symbol label
+        (cap, "题二", 0.9),
+    ]
+    top = E._figure_top(res, 100, 400, cap)
+    assert 140 <= top <= 160, f"top must sit below the CJK prose line, not the dimension row: {top}"
+    # and with ONLY figure-internal rows above the caption, top falls back to 0 (over-include)
+    res_no_prose = res[1:]
+    assert E._figure_top(res_no_prose, 100, 400, cap) == 0
+
+
+@test
+def ink_bbox_ignores_lone_specks():
+    g = np.full((300, 400), 255.0)
+    g[100:200, 120:280] = 0     # the figure
+    g[20, 30] = 0               # a scan speck far away must not stretch the bbox
+    g[280, 390] = 0
+    assert E._ink_bbox_px(g, np) == (100, 200, 120, 280)
+    assert E._ink_bbox_px(np.full((50, 50), 255.0), np) is None
+
+
+@test
+def truncation_edges_detects_sliced_line():
+    g = np.full((200, 300), 255.0)
+    g[0:40, 140:160] = 0        # a rod sliced by the TOP edge (ink runs along the border)
+    assert E._truncation_edges(g, np) == ["top"]
+    clean = np.full((200, 300), 255.0)
+    clean[50:150, 50:250] = 0   # content well inside -> no edge flagged
+    assert E._truncation_edges(clean, np) == []
+    dots = np.full((200, 300), 255.0)
+    dots[0, 10] = 0             # a lone border speck is not a sliced line
+    assert E._truncation_edges(dots, np) == []
+
+
 if __name__ == "__main__":
     failed = 0
     for fn in _TESTS:

@@ -86,6 +86,17 @@ LINKS_WITH_RULE = ("<style>body{color:var(--text);}\na{color:var(--blue);text-un
                    "</style>\n<p><a href=\"notes.html#s2-1\">对轴的转动惯量</a></p>")
 NO_LINKS_NO_RULE = "<style>body{color:var(--text);}</style>\n<p>无链接的片段</p>"
 
+# Embedded-figure height cap (WARN): a data-URI raster <img> without class="fig-embed" renders
+# at natural height — a vertical phone-photo crop fills the whole screen. The favicon's
+# data:image/svg+xml URI is NOT a raster figure and must never be flagged.
+FIG_CSS = "<style>img.fig-embed{display:block;max-height:min(48vh,380px);}</style>\n"
+FIG_BARE = ("<img src=\"data:image/png;base64,iVBORw0KGgo=\" alt=\"第3题图\" "
+            "style=\"max-width:100%;border:1px solid var(--border);\">")
+FIG_GOOD = FIG_CSS + "<img class=\"fig-embed\" src=\"data:image/jpeg;base64,/9j/4AAQ=\" alt=\"题图\">"
+FIG_NO_CSS = "<img class=\"fig-embed\" src=\"data:image/png;base64,iVBORw0KGgo=\" alt=\"题图\">"
+FIG_SVG_FAVICON = ("<link rel=\"icon\" href=\"data:image/svg+xml,<svg xmlns='x'></svg>\">\n"
+                   "<img src=\"data:image/svg+xml;base64,PHN2Zz4=\" alt=\"矢量图\">")
+
 
 def run():
     # 1. macros the file defines are recognised
@@ -197,7 +208,24 @@ def run():
         "<style>a{color:var(--blue);}</style><a href=\"x.html\">x</a>"), \
         "rule at start of style block must count"
 
-    print("OK  build_and_check regression tests passed (27/27)")
+    # 24. a data-URI raster <img> without fig-embed (inline max-width only) is flagged
+    hits, _ = b.check_fig_embed(FIG_BARE)
+    assert hits, "uncapped data-URI raster <img> must be flagged"
+
+    # 25. class=\"fig-embed\" + the CSS rule -> fully clean
+    assert b.check_fig_embed(FIG_GOOD) == ([], False), \
+        f"compliant fig-embed wrongly flagged: {b.check_fig_embed(FIG_GOOD)}"
+
+    # 26. fig-embed used but the CSS never defines it -> css_missing (cap silently dead)
+    hits, css_missing = b.check_fig_embed(FIG_NO_CSS)
+    assert hits == [] and css_missing, \
+        f"fig-embed without its CSS must set css_missing, got {(hits, css_missing)}"
+
+    # 27. data:image/svg+xml (favicon or vector art) is not a raster embed -> never flagged
+    assert b.check_fig_embed(FIG_SVG_FAVICON) == ([], False), \
+        f"svg data-URIs wrongly flagged: {b.check_fig_embed(FIG_SVG_FAVICON)}"
+
+    print("OK  build_and_check regression tests passed (31/31)")
 
 
 if __name__ == "__main__":

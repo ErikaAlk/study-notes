@@ -310,6 +310,31 @@ def check_content_link_css(html):
     return _BARE_A_RULE.search(styles) is None
 
 
+# Embedded-figure sizing (WARN-level). max-width:100% alone does NOT stop a vertical
+# phone-photo/scan crop from rendering at full natural height and filling the whole screen
+# (real user complaint). Rule: every base64-embedded RASTER <img> carries class="fig-embed"
+# (design-system CSS caps it at min(48vh,380px) + click-to-zoom JS) — and if the page uses
+# fig-embed, the CSS must actually define it, or the cap silently does nothing.
+_DATA_IMG = re.compile(r"<img\b[^>]*?\bsrc\s*=\s*[\"']data:image/(?:png|jpe?g|webp|gif)", re.I)
+_FIG_EMBED_CSS = re.compile(r"img\.fig-embed\s*\{[^}]*max-height", re.S)
+_FIG_EMBED_CLASS = re.compile(r"class\s*=\s*[\"'][^\"']*\bfig-embed\b")
+
+
+def check_fig_embed(html):
+    """WARN-level. Return (hits, css_missing): hits = lines of data-URI raster <img> tags with
+    neither class fig-embed nor an inline max-height; css_missing = True when fig-embed is used
+    but no img.fig-embed{...max-height...} rule exists in the page CSS."""
+    hits = []
+    for m in _DATA_IMG.finditer(html):
+        end = html.find(">", m.start())
+        tag = html[m.start(): end + 1] if end != -1 else m.group()
+        if "fig-embed" not in tag and "max-height" not in tag:
+            hits.append(line_of(html, m.start()))
+    styles = "\n".join(re.findall(r"<style[^>]*>([\s\S]*?)</style>", html, re.I))
+    css_missing = bool(_FIG_EMBED_CLASS.search(html)) and _FIG_EMBED_CSS.search(styles) is None
+    return hits, css_missing
+
+
 def check_div_balance(html):
     opens = len(re.findall(r"<div\b", html))
     closes = len(re.findall(r"</div\s*>", html))
@@ -455,6 +480,20 @@ def run_checks(path):
         print("       (WARN only -- does not fail the build.)")
     else:
         print("[ok]  content links have a themed color rule (or page has no links)")
+
+    fig_hits, fig_css_missing = check_fig_embed(html)
+    if fig_hits:
+        print(f"\n[WARN] {len(fig_hits)} embedded raster <img> without a height cap at line(s) "
+              f"{', '.join(map(str, fig_hits[:20]))}{' ...' if len(fig_hits) > 20 else ''}:")
+        print("       add class=\"fig-embed\" (design-system CSS caps it at min(48vh,380px) +")
+        print("       click-to-zoom JS) -- a raw vertical photo crop fills the whole screen.")
+        print("       (WARN only -- does not fail the build.)")
+    else:
+        print("[ok]  embedded raster figures are height-capped (or none present)")
+    if fig_css_missing:
+        print("\n[WARN] the page uses class=\"fig-embed\" but its CSS never defines")
+        print("       img.fig-embed{...max-height...} -- the height cap silently does nothing.")
+        print("       Copy the fig-embed rules from design-system.md (Full CSS + zoom JS).")
 
     print()
     if fails:
