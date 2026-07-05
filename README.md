@@ -135,7 +135,7 @@ study-notes/
 │   ├── build_and_check.py            # 输出静态校验（裸 Unicode / div / $ / 禁用命令，宏感知）
 │   ├── test_build_and_check.py       # 校验器自身的回归测试（锁住宏感知修复）
 │   ├── extract_pdf.py                # PDF 取文字/渲染页/OCR定位/自动裁图；PPT→PDF (topdf)
-│   ├── embed_images.py               # 图片 base64 内联，保持单文件自包含
+│   ├── embed_images.py               # 图片 base64 内联 + tidy 照片整形（纠偏/裁边/缩尺寸）
 │   └── make_showcase.sh              # 从真实产物重生成 README 截图/GIF（可复现）
 ├── evals/
 │   ├── evals.json                    # 3 个标准测试 prompt（MODE A/B/C）+ 期望输出
@@ -158,6 +158,11 @@ python evals/check_features.py <输出>.html             # 10 项结构+正确�
 校验器为什么可信：它对模板**宏感知**——你注册成宏的命令（`\celsius`/`\unit`/`\bm` 等）不会误报，没注册却裸用的才拦；这条由 `scripts/test_build_and_check.py` 锁死。对照实验方法与数据见 [evals/benchmark.md](evals/benchmark.md)。
 
 ## 更新记录
+
+- **2026-07-04 · v0.8.13** — 治「题图照片原样嵌进笔记：歪的、还占满一整屏」。
+  - **为什么**：一道力学题的图是手机拍的竖版照片，嵌进笔记后**斜着、四周大片留白、一屏都装不下**——题面在图上头、解答被挤出首屏（用户截图投诉，且「经常出现」）。根因有二：① 照片路径（§4 Option B）完全不做处理，`datauri` 直接把原始照片塞进 HTML；② 嵌图样式只有 `max-width:100%`，**没有任何高度上限**，竖版大图就按原始高度铺满整屏。
+  - **怎么改**：① `embed_images.py` 新增 **`tidy`** 子命令——投影轮廓法自动纠偏（±7°，<0.3° 不动）、Otsu 墨迹 bbox 裁掉四周留白、宽度压到 ≤1400px，照片/截图**必须先 tidy 再 datauri**（输出须 Read 目检，失手可 `--no-deskew`/`--no-trim` 或退回原图）；中文路径下 cv2 读写也安全（fromfile/imdecode）。② 设计系统新增 **`img.fig-embed`**：高度封顶 `min(48vh, 380px)`、居中、`cursor:zoom-in`，配一段骨架 JS **点击在限高/原尺寸间切换**，细节不丢；所有 base64 光栅嵌图一律用该类，不再手写裸内联样式。③ `build_and_check.py` 新增 WARN 门：data-URI 光栅 `<img>` 缺 `fig-embed`/限高即报，用了 `fig-embed` 但 CSS 没定义也报（防「类写了、CSS 忘拷」静默失效）；SKILL.md / problem-solutions §4 / design-system（Full CSS+骨架+MODE A figures）多处同步成文。
+  - 真机实测：合成 +2.3° 倾斜竖版「题七」照片 → `tidy` 纠到 0°、1175×1942 裁到 890×1374、元素无损；Playwright 1280×800 渲染对比——旧写法图占满整屏只见顶部一截（复现投诉），新写法题面+图+解答入口同屏、点击图 380↔1264px 往返切换；门对旧写法 WARN、新写法干净。`test_build_and_check.py` 27→31、新增 `test_embed_images.py` 6 用例（纠偏角还原/空图/bbox/端到端/中文路径/datauri）全过。
 
 - **2026-07-02 · v0.8.12** — 例题的源图必须嵌进笔记（PPT 课件先转 PDF 再裁），别再让读者「见课件 pXX」自己翻。
   - **为什么**：一份 MODE-B 笔记里每道例题都只留一行灰字「（见课件第10章 p24：…）」——读者做题做到一半得自己翻出课件、翻到那页才能看图（用户投诉）。根因有二：① MODE A 的旧规则「不嵌图、写文字引用」把例题也一并覆盖了；② 课件常是 PPT/PPTX，而取图工具链（`locate`/`autocrop`）只吃 PDF，模型没有转换手段就顺势退化成文字引用。

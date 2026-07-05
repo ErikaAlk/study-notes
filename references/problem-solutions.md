@@ -7,7 +7,7 @@ How to turn homework problems into HTML — the always-visible problem + figure,
 1. **Reading problem images** — text / photo / PDF worksheet; transcribe exactly
 2. **The MODE C problem card** — 题号+题目 visible, `<details>` solution, `.answer-box`
 3. **Figure decision — SVG vs. embed original** — the core MODE C rule + checklist
-4. **Embedding the original figure (base64)** — crop from PDF / datauri / inline-at-end
+4. **Embedding the original figure (base64)** — crop from PDF / tidy a photo + datauri / inline-at-end
 5. **MODE B — homework as a worked-example card** — problem lives inside the concept section
 
 ---
@@ -153,19 +153,24 @@ python3 scripts/embed_images.py datauri fig_q3.png      # prints: data:image/png
 python3 scripts/extract_pdf.py crop homework.pdf --page 2 --bbox 0.08,0.18,0.92,0.52 -o fig_q3.png
 ```
 
-**Option B — from a photo/PNG/JPG the user uploaded**:
+**Option B — from a photo/PNG/JPG the user uploaded**. A phone photo / screenshot is almost
+never embeddable as-is: it is **tilted** a few degrees, ringed with dead margin, and far too
+large. Run `tidy` first (deskew ±7° by projection profile + trim to the ink bbox + downscale to
+≤1400px wide), **open the output with the Read tool and eyeball it**, then convert:
 
 ```bash
-python3 scripts/embed_images.py datauri /path/to/photo.jpg
+python3 scripts/embed_images.py tidy /path/to/photo.jpg -o fig_q3.png
+python3 scripts/embed_images.py datauri fig_q3.png
 ```
+
+`tidy` is reliable on paper/screen shots (light background, dark ink). On a dark or cluttered
+photo it can misjudge — if the output looks wrong, retry with `--no-deskew` / `--no-trim`, or
+fall back to the untouched original. Never ship a tidied image you haven't looked at.
 
 Paste the printed string into the `src`:
 
 ```html
-<div style="text-align:center;margin:12px 0;">
-  <img src="data:image/png;base64,iVBORw0KGgo..." alt="第3题图"
-       style="max-width:100%;border:1px solid var(--border);border-radius:8px;">
-</div>
+<img class="fig-embed" src="data:image/png;base64,iVBORw0KGgo..." alt="第3题图">
 ```
 
 **Option C — write `<img src="fig_q3.png">` first, inline everything at the end**: keep local file refs while drafting, then run once before presenting:
@@ -175,10 +180,15 @@ python3 scripts/embed_images.py inline final.html   # replaces every local <img 
 ```
 
 Image hygiene:
-- Add `style="max-width:100%; border:1px solid var(--border); border-radius:8px;"` so figures never overflow and match the design.
+- **Every embedded raster figure carries `class="fig-embed"`** (CSS + click-to-zoom JS are part
+  of the design system — `design-system.md` Full CSS / skeleton). It caps the height at
+  `min(48vh, 380px)`, centers the image, and a click restores full size. `max-width:100%` alone
+  does NOT stop a vertical phone-photo crop from filling the whole screen (real user
+  complaint) — never hand-roll a bare inline-styled `<img>`. `build_and_check.py` WARNs on a
+  data-URI `<img>` without the class.
 - Always give a meaningful `alt` (e.g. `第3题图`).
-- Crop tightly to the figure; don't include surrounding problem text in the crop (the text is already transcribed above the image).
-- Prefer PNG for line art/diagrams; JPG is fine for photos. Keep crops ≤ ~1600px wide to keep the file small.
+- Crop tightly to the figure; don't include surrounding problem text in the crop (the text is already transcribed above the image). Photos/screenshots go through `tidy` (Option B) — a tilted, margin-heavy photo embedded as-is reads as sloppy and wastes half the page.
+- Prefer PNG for line art/diagrams; JPG is fine for photos. Keep crops ≤ ~1600px wide to keep the file small (`tidy` already downscales to ≤1400px).
 - **A clean crop prevents mis-reading the figure; an x-verify catches it if you still do.** If you transcribed any number/geometry off the figure to solve, add a `<script type="text/x-verify">` block that re-derives a quantity the problem already prints (a range, a count, a stated answer) from your read values — see the `workflow-orchestration.md` checklist. (劳埃德镜: reading the mirror as 20cm-not-30cm recomputes **15** fringes, not the printed **33** → the gate FAILs the mis-read, no human review needed.)
 
 ---
