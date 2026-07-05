@@ -195,11 +195,38 @@ def _trim_bbox(gray, np, cv2, margin):
             max(0, int(cols[0]) - margin), min(w, int(cols[-1]) + 1 + margin))
 
 
+def _edge_cut_edges(gray, np, cv2, min_run=12):
+    """Names of image edges that content RUNS ALONG — the screenshot/photo itself probably
+    cut the figure there; tidy cannot restore what the source never captured. Only judged
+    on light-background images (a dark screenshot's background would read as 'ink' on
+    every edge and drown the signal in false positives)."""
+    ink = _ink_mask(gray, np, cv2) > 0
+    if ink.mean() > 0.35:      # dark/cluttered background — signal unusable, stay quiet
+        return []
+    out = []
+    for name, strip in (("top", ink[:2, :].any(0)), ("bottom", ink[-2:, :].any(0)),
+                        ("left", ink[:, :2].any(1)), ("right", ink[:, -2:].any(1))):
+        best = cur = 0
+        for v in strip:
+            cur = cur + 1 if v else 0
+            best = max(best, cur)
+        if best >= min_run:
+            out.append(name)
+    return out
+
+
 def cmd_tidy(args):
     np, cv2 = _lazy_cv()
     img = _imread(args.image, np, cv2)
     h0, w0 = img.shape[:2]
     steps = []
+
+    cut = _edge_cut_edges(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), np, cv2)
+    if cut:
+        print(f"WARNING: content touches the {'/'.join(cut).upper()} edge(s) of the SOURCE "
+              "image -- the figure may already be cut off in the screenshot/photo itself.")
+        print("         tidy cannot restore missing content. If anything the problem mentions "
+              "is missing, get a fuller screenshot/photo instead of embedding a half figure.")
 
     angle = 0.0
     if not args.no_deskew:

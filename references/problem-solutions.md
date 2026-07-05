@@ -146,12 +146,18 @@ python3 scripts/extract_pdf.py autocrop textbook.pdf --page 3 --caption "图4.4"
 python3 scripts/embed_images.py datauri fig_q3.png      # prints: data:image/png;base64,iVBORw0...
 ```
 
-> **Why not type the bbox by hand?** An eyeballed `--bbox` is exactly what clips half a figure (a source point, a `2a` label) — the same eyeball error as paraphrasing a figure's geometry (§3). `autocrop` removes the guess. Fall back to the hand-bbox `crop` below **only** when the figure has no 图X.Y caption to anchor on (a bare photo, a non-textbook scan):
+> **Why not type the bbox by hand?** An eyeballed `--bbox` is exactly what clips half a figure (a source point, a `2a` label) — the same eyeball error as paraphrasing a figure's geometry (§3). `autocrop` removes the guess. Fall back to the hand-bbox `crop` below **only** when the figure has no 图X.Y caption to anchor on (a bare photo, a non-textbook scan). **Make the bbox GENEROUS** — it is auto-tightened to the ink inside it, so over-including costs nothing, while under-including slices the figure:
 
 ```bash
-# fallback — hand-specified fractional bbox (x0,y0,x1,y1 from the top-left), no caption to anchor:
-python3 scripts/extract_pdf.py crop homework.pdf --page 2 --bbox 0.08,0.18,0.92,0.52 -o fig_q3.png
+# fallback — GENEROUS fractional bbox (x0,y0,x1,y1 from the top-left), auto-tightened to the ink:
+python3 scripts/extract_pdf.py crop homework.pdf --page 2 --bbox 0.05,0.10,0.95,0.60 -o fig_q3.png
 ```
+
+> **Heed the truncation warning.** Both `autocrop` and `crop` check the finished crop and print
+> `WARNING: ink runs along the TOP/... edge(s)` when a figure line/arrow/label is sliced by the
+> crop border. That warning means **the crop is incomplete — re-crop wider in that direction;
+> never embed a half figure** (real case: 题二 beam structure cut off above its dimension row,
+> while blank paper filled the bottom/right of the crop).
 
 **Option B — from a photo/PNG/JPG the user uploaded**. A phone photo / screenshot is almost
 never embeddable as-is: it is **tilted** a few degrees, ringed with dead margin, and far too
@@ -187,7 +193,14 @@ Image hygiene:
   complaint) — never hand-roll a bare inline-styled `<img>`. `build_and_check.py` WARNs on a
   data-URI `<img>` without the class.
 - Always give a meaningful `alt` (e.g. `第3题图`).
-- Crop tightly to the figure; don't include surrounding problem text in the crop (the text is already transcribed above the image). Photos/screenshots go through `tidy` (Option B) — a tilted, margin-heavy photo embedded as-is reads as sloppy and wastes half the page.
+- **Completeness QA — mandatory for every crop/tidy output.** Read the image and check, in this
+  order: ① **nothing sliced at an edge** — the tools print `WARNING: ink runs along the … edge`
+  when they detect it; a warning = re-crop, never embed; ② **every part/label the problem text
+  names is visible** (题面点名 B、C、G、q、F… 就得在图里找到它们); ③ no sheets of dead margin
+  (the ink-tighten handles this — big blanks mean something went wrong). **Completeness beats
+  tightness**: when re-cropping, over-include — the tools trim; what they can't do is restore
+  content that was cut off.
+- Crop tightly to the figure; don't include surrounding problem text in the crop (the text is already transcribed above the image). Photos/screenshots go through `tidy` (Option B) — a tilted, margin-heavy photo embedded as-is reads as sloppy and wastes half the page. `tidy` also warns when content touches the source image's own edges (the screenshot itself cut the figure — get a fuller one).
 - Prefer PNG for line art/diagrams; JPG is fine for photos. Keep crops ≤ ~1600px wide to keep the file small (`tidy` already downscales to ≤1400px).
 - **A clean crop prevents mis-reading the figure; an x-verify catches it if you still do.** If you transcribed any number/geometry off the figure to solve, add a `<script type="text/x-verify">` block that re-derives a quantity the problem already prints (a range, a count, a stated answer) from your read values — see the `workflow-orchestration.md` checklist. (劳埃德镜: reading the mirror as 20cm-not-30cm recomputes **15** fringes, not the printed **33** → the gate FAILs the mis-read, no human review needed.)
 

@@ -93,6 +93,21 @@ def run():
         assert uri.startswith("data:image/png;base64,"), uri[:40]
         n += 1
 
+    # 7. content running along the source image's TOP edge -> the screenshot itself cut the
+    #    figure there (real case: 题二 rod truncated in the source); a clean page -> no flag
+    cut = np.full((400, 500), 235, np.uint8)
+    cut[0:80, 200:260] = 30                              # rod sliced by the top edge
+    assert e._edge_cut_edges(cut, np, cv2) == ["top"]
+    clean = cv2.cvtColor(_page(), cv2.COLOR_BGR2GRAY)    # figure well inside its margins
+    assert e._edge_cut_edges(clean, np, cv2) == []
+    n += 1
+
+    # 8. a dark-background screenshot must NOT spam edge warnings (background reads as ink)
+    dark = np.full((400, 500), 20, np.uint8)
+    dark[100:300, 100:400] = 240                         # light content on dark UI
+    assert e._edge_cut_edges(dark, np, cv2) == []
+    n += 1
+
     print(f"OK  embed_images tidy tests passed ({n}/{n})")
 
 
