@@ -83,10 +83,12 @@ a{color:var(--blue);text-underline-offset:2px;}
    trackpad gesture passes straight through to the page instead of being trapped on the formula
    (the "jump" the earlier all-visible design was trying to avoid). The box auto-sizes to the
    formula's natural height, so overflow-y:hidden never clips a tall \dfrac / \int / \sqrt /
-   matrix (verified by rendering). The chunky OS-native scrollbar is replaced by the thin,
+   matrix (verified by rendering). Top accents (\vec / \hat / \bar / \dot) DO sit a hair above
+   that measured height, so top padding is 0.45em (not 2px) so the arrowhead is not shaved. The
+   chunky OS-native scrollbar is replaced by the thin,
    theme-aware one defined just below. */
 .katex-display{margin:4px 0!important;overflow-x:auto;overflow-y:hidden;
-  overscroll-behavior-x:contain;padding:2px 0;-webkit-overflow-scrolling:touch;}
+  overscroll-behavior-x:contain;padding:0.45em 0 2px;-webkit-overflow-scrolling:touch;}
 /* Thin, theme-aware scrollbar for the only two things that scroll horizontally — wide
    formulas and wide tables — instead of the jarring white OS default with stepper arrows.
    It only appears when content actually overflows; formulas that fit show no bar. The thumb
