@@ -188,6 +188,8 @@ img.fig-embed.zoom{max-height:none;cursor:zoom-out;}
 /* Formula boxes */
 .fbox{background:var(--bg3);border-left:3.5px solid;border-radius:0 10px 10px 0;padding:18px 22px;margin:14px 0;overflow:visible;}
 .fbox .flabel{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:12px;opacity:0.75;}
+/* inline math in a label must keep its real case: the uppercase transform above would otherwise turn x,y,z,t into X,Y,Z,T (a real render bug) */
+.fbox .flabel .katex, .fbox .flabel .katex *{text-transform:none;}
 /* CRITICAL: never set line-height on .frow — KaTeX uses internal vertical-align to position
    fractions, integrals, matrices. If line-height is smaller than the formula's rendered height,
    the inline content inside .katex-display protrudes below the line box, and the NEXT element's
@@ -470,7 +472,7 @@ details[open] summary::before{transform:rotate(90deg);}
         /* siunitx-style unit helper (not a KaTeX built-in).
            NO wrapping braces: the inner \text takes its argument from OUTSIDE the macro
            (\unit{m/s}). '{\\,\\text}' would expand \unit{m/s} → {\,\text}{m/s}, leaving \text
-           with no argument → KaTeX "Extra }" parse error (silent until render). */
+           with no argument → KaTeX 'Extra }' parse error (silent until render). */
         '\\unit':    '\\,\\text',
         '\\celsius': '{{{}^\\circ\\text{C}}}',
         /* Bold vector alternative — bare alias, NOT '{\\boldsymbol}': \bm{F} must expand to
@@ -1013,8 +1015,9 @@ follow it — copy them.
 - **Absolute numbers only — never `%` geometry.** All `x` `y` `cx` `cy` `x1` `y1` `x2` `y2` `width` `height` on
   shapes must be plain numbers in the viewBox coordinate system. A percentage resolves against the nearest SVG
   viewport, which silently means the wrong box.
-- **No `foreignObject`.** Put any rich/HTML content (formulas, paragraphs) in normal HTML *below* the figure
-  (e.g. a `.fbox`), never inside the SVG.
+- **`foreignObject` is allowed — it is how you put real KaTeX INTO an SVG (see "KaTeX labels in SVG" below).**
+  Keep it simple: absolute `x`/`y`/`width`/`height` in the viewBox system + `overflow="visible"`, no nesting
+  and no CSS `transform` around it. For long paragraphs (not labels) still prefer a `.fbox` below the figure.
 - **No CSS `transform` / `transform-origin` on SVG elements.** The CSS form is not equivalent to the SVG
   attribute and its reference box is browser-dependent. To rotate, use the **SVG attribute with an explicit
   centre**: `transform="rotate(30 150 100)"` (angle, then cx cy). Keep to at most one `<g transform="…">` layer.
@@ -1112,36 +1115,66 @@ invisible — worst in dark mode, where a saturated label on a same-hue tint can
 <text x="275" y="150" font-size="12" fill="#378ADD" text-anchor="middle">F</text>
 ```
 
-### SVG `<text>` elements must use Unicode — never `$...$` KaTeX syntax
+### KaTeX labels in SVG — use `<foreignObject>` (primary); Unicode only for a lone symbol
 
-KaTeX is a JavaScript library that scans the HTML DOM after page load. It **cannot enter SVG** — SVG `<text>` nodes are not part of the HTML text flow, so any `$...$` or `$$...$$` inside an SVG will be displayed as raw literal characters, not rendered as math.
+KaTeX scans the HTML DOM and **cannot render inside a native SVG `<text>` node** — a `$v_1$` written in a
+`<text>` shows as the literal characters `$v_1$`. But you do **not** have to fall back to plain Unicode (which
+has no real fractions/roots and reads as flat and ugly). There are two ways to label a diagram; **prefer the
+first for anything past a single symbol.**
 
-**Rule: all labels, subscripts, and symbols inside `<svg>` must be written directly in Unicode.**
+**① `<foreignObject>` + `$…$` — real KaTeX inside the SVG (RECOMMENDED).** A `<foreignObject>` embeds an HTML
+sub-tree in the SVG, and that HTML *is* part of the page DOM, so the template's existing `renderMathInElement`
+renders any `$…$` in it — you get real fractions, vectors, Greek, roots, identical to body math. (Verified by
+render test: `foreignObject .katex` count > 0, zero `.katex-error`.)
 
-| What you want | Wrong (KaTeX won't run here) | Correct (Unicode) |
+```svg
+<!-- the inner <div> MUST carry the XHTML namespace or it will not parse inside SVG -->
+<foreignObject x="150" y="55" width="130" height="44" overflow="visible">
+  <div xmlns="http://www.w3.org/1999/xhtml"
+       style="font-size:15px; color:var(--teal); line-height:1;">$\vec v_1=\dfrac{a t^2}{2}$</div>
+</foreignObject>
+```
+
+Rules that make it reliable:
+- The inner `<div>` **must** have `xmlns="http://www.w3.org/1999/xhtml"` (it is XHTML inside SVG). Without it the
+  label silently disappears.
+- Give the box a generous `width`/`height` **and** `overflow="visible"` so a tall `\dfrac`/`\sqrt` is not clipped.
+  `x,y` is the **top-left corner** of the box (not a text baseline) — to centre a label, position the box, or add
+  `style="text-align:center; width:…"`.
+- Colour with `color:var(--teal)` / `currentColor`, not a hardcoded hex, so labels follow dark mode (a native
+  `<text fill="#…">` cannot — see the dark-mode caveat above).
+- `foreignObject` renders in **inline** SVG (exactly how these notes embed diagrams). It does **not** render
+  inside a `data:image/svg+xml` URI (e.g. the favicon), and some SVG→PNG exporters ignore it — neither matters
+  for on-screen study notes, just never build a foreignObject label into a data-URI image.
+- **Keep labels OFF the lines — place them in clear space FIRST (this is the real fix, not a halo).** Most
+  label/line overlaps are avoidable by placement: put each label in an empty region (above or beside a curve,
+  out past an arrow tip, in the corner a curve leaves open), offset a clear margin (≥ ~10px in viewBox units)
+  from every stroke, and nudge it — or draw a short thin leader line from the label to the point it names —
+  rather than dropping it on top of a curve. A label should almost never cross a line, and a foreignObject
+  formula almost always has empty room nearby, so **move it; do not cover the diagram to make room.**
+- **Do NOT put a solid background box behind a label to hide the line underneath — it blanks out that part of
+  the diagram and defeats the figure.** If a crossing is genuinely unavoidable (usually only a lone `<text>`
+  symbol wedged into a busy spot), use a **thin stroke halo** so the glyphs get a faint outline while the
+  diagram still shows through between them — never a filled block:
+  `paint-order="stroke" stroke="var(--bg)" stroke-width="3.5" stroke-linejoin="round"` on the `<text>`. Keep the
+  stroke thin (3–4px); it should read as a faint outline, not a fill. (A foreignObject formula can't get a clean
+  glyph-outline like this — its `\dfrac` bar is a border, not a glyph — which is one more reason to *place*
+  formulas in clear space rather than trying to halo them.)
+
+**② Native `<text>` + Unicode — only for a lone symbol / short tag** where a foreignObject is overkill (an axis
+name `x`, a point label `P`, a single `v₁` or `θ`). **Never** put a fraction, root, or multi-term formula in a
+`<text>` — use ①. `build_and_check.py` FAILs on a `$…$` found inside a native `<text>` (it will not render); the
+same `$…$` inside a `<foreignObject>` is fine and is not flagged.
+
+| For a label like | Native `<text>` (Unicode, only if trivial) | Better — `<foreignObject>` + KaTeX |
 |---|---|---|
-| Subscript number | `$v_1$` | `v₁` |
-| Subscript letter | `$T_p$` | `Tₚ` |
-| Superscript | `$v^2$` | `v²` |
-| Greek letters | `$\omega$`, `$\theta$`, `$\Delta$` | `ω`, `θ`, `Δ` |
-| Arrow over letter | `$\vec{v}$` | `v⃗` or just `v` with an arrow drawn separately |
-| Fractions / complex math | `$\frac{1}{2}mv^2$` | Avoid in SVG — put the formula in a `.fbox` below the diagram instead |
-| Infinity | `$\infty$` | `∞` |
-| Proportional | `$\propto$` | `∝` |
-| Approximately | `$\approx$` | `≈` |
-| Plus-minus | `$\pm$` | `±` |
+| subscripted symbol | `v₁`, `Tₚ` | `$v_1$`, `$T_p$` |
+| Greek / operator | `ω θ Δ ∇ ∞ ≈ ±` | `$\omega$` `$\theta$` `$\nabla$` … |
+| a vector | `v⃗` (combining arrow, faint) | `$\vec v$` (clear arrow) |
+| **any fraction / root / multi-term** | ✗ Unicode cannot express it | `$\dfrac{1}{2}mv^2$`, `$\sqrt{x^2+y^2}$` |
 
-**Unicode subscript/superscript digits and letters:**
-
-```
-Subscripts:   ₀₁₂₃₄₅₆₇₈₉  ₐₑₒₓₙₘₖₗ  (limited — not all letters exist)
-Superscripts: ⁰¹²³⁴⁵⁶⁷⁸⁹  ⁿ
-Greek:        α β γ δ ε ζ η θ ι κ λ μ ν ξ π ρ σ τ υ φ χ ψ ω
-              Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Π Ρ Σ Τ Υ Φ Χ Ψ Ω
-Common:       → ← ↑ ↓ ↗ ↘  ∝ ≈ ≠ ≤ ≥ ∞ ± × ÷ √ ∫ ∑ ∂ ∇
-```
-
-**If a label needs complex math that can't be expressed in Unicode, do not put it in the SVG.** Instead, place a simplified Unicode label in the SVG (e.g. `"f(v)"`) and put the full formula in a `.fbox` immediately below the diagram with a text explanation like "其中 $f(v)$ 的完整表达式见上方公式框".
+Unicode sub/superscripts if you do use ②: `₀₁₂₃₄₅₆₇₈₉ ₐₑₒₓₙ`, `⁰¹²³⁴⁵⁶⁷⁸⁹ⁿ`; Greek `α β γ δ ε θ λ μ π ρ σ φ ω …`;
+common `→ ← ↑ ↓ ∝ ≈ ≠ ≤ ≥ ∞ ± × ÷ √ ∫ ∑ ∂ ∇`.
 
 - [ ] `markerWidth` and `markerHeight` are both ≤ 6
 - [ ] Every arrow label is offset at least 14px from the arrow shaft
@@ -1683,3 +1716,4 @@ python scripts/verify_solutions.py <file>.html           # executes the checks (
 `build_and_check` accepts an x-verify block as a valid verify artifact; `verify_solutions` is the
 decisive gate. **Hard rule:** if `verify_solutions` FAILs a solution, fix the solution (or downgrade
 its badge to `未自动核验`) before shipping — a false `已核验` is worse than none.
+
