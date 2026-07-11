@@ -253,6 +253,31 @@ def check_svg_offset_risks(html):
     return hits
 
 
+# SVG <text> + KaTeX (FAIL-level). KaTeX scans the HTML DOM and cannot enter a native SVG <text>
+# node, so a $...$ written there renders as the literal characters "$v_1$". The RECOMMENDED way to
+# put math in a diagram is <foreignObject> + $...$ (that HTML is in the DOM, so renderMathInElement
+# renders it); its math lives in a <div>, not <text>, so scanning <text> bodies only flags the
+# broken case and leaves foreignObject labels alone. See design-system.md -> "KaTeX labels in SVG".
+_SVG_TEXT = re.compile(r"<text\b[^>]*>(.*?)</text\s*>", re.I | re.S)
+_DOLLAR_MATH = re.compile(r"\$[^$\n]+\$")
+
+
+def check_svg_text_katex(html):
+    """FAIL-level. Return sorted [(line, snippet)] for native SVG <text> elements containing a
+    $...$ KaTeX delimiter (which will NOT render there). foreignObject labels use <div>, not
+    <text>, so they are correctly not flagged."""
+    stripped = _strip_favicon_lines(html)
+    spans, _ = _svg_spans(stripped)
+    hits = []
+    for (s, e) in spans:
+        seg = stripped[s:e]
+        for m in _SVG_TEXT.finditer(seg):
+            if _DOLLAR_MATH.search(m.group(1)):
+                hits.append((line_of(stripped, s + m.start()), m.group(1).strip()[:50]))
+    hits.sort()
+    return hits
+
+
 # .step is display:flex (step-num + step-body side by side). A block element placed as a DIRECT
 # child of .step — a .fbox/.callout/.answer-box/.big-formula or a <p>, i.e. a SIBLING of
 # .step-body rather than nested INSIDE it — becomes a third flex item. A wide display formula's
@@ -458,6 +483,21 @@ def run_checks(path):
         print("       (WARN only -- does not fail the build. Render the file and eyeball the figure.)")
     else:
         print("[ok]  no SVG safe-subset offset risks")
+
+    svgtext_hits = check_svg_text_katex(html)
+    if svgtext_hits:
+        fails += 1
+        print(f"\n[FAIL] {len(svgtext_hits)} SVG <text> element(s) contain $...$ KaTeX that will NOT render")
+        print("       (KaTeX cannot enter a native <text>; it shows as literal \"$...$\"):")
+        for ln, snip in svgtext_hits[:20]:
+            print(f"  line {ln}: {snip}")
+        if len(svgtext_hits) > 20:
+            print(f"  ... and {len(svgtext_hits) - 20} more")
+        print("       Fix: wrap it in <foreignObject><div xmlns=...>$...$</div></foreignObject>")
+        print("       (real KaTeX), or use plain Unicode for a lone symbol. See design-system.md")
+        print("       -> \"KaTeX labels in SVG\".")
+    else:
+        print("[ok]  no $...$ trapped in a native SVG <text>")
 
     step_hits = check_step_flex_children(html)
     if step_hits:

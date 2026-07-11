@@ -159,6 +159,11 @@ python evals/check_features.py <输出>.html             # 10 项结构+正确�
 
 ## 更新记录
 
+- **2026-07-10 · v0.8.16** — SVG 里的数学标签可以渲染真 KaTeX 了：改用 `<foreignObject>`，不必再退回 Unicode。
+  - **为什么**：先前立的规矩是「KaTeX 扫 HTML DOM、进不了原生 SVG `<text>`，图里标签只能写 Unicode」——可 Unicode 没有真分数/根号与复杂上下标，深色下也读着糙。其实 `<foreignObject>` 嵌进 SVG 的那截 HTML 仍属页面 DOM，模板既有的 `renderMathInElement` 会照常渲染其中的 `$…$`，「SVG 里不能有真数学」是个多余的自我设限。另有一个静默 bug：`.fbox .flabel` 上的 `text-transform:uppercase` 会把标签里 KaTeX 渲染出的 `x y z t` 一并大写成 `X Y Z T`。
+  - **怎么改**：① design-system.md 把「SVG `<text>` 必须用 Unicode」整节改写为「SVG 里的 KaTeX 标签——首选 `<foreignObject>` + `$…$`（绝对 `x/y/width/height` + `overflow="visible"`、不嵌套、不套 CSS transform），Unicode 只留给单个符号」，并撤掉「禁用 foreignObject」旧条。② 加 `.fbox .flabel .katex{text-transform:none}` 修大写 bug。③ build_and_check.py 新增 FAIL 级检查 `check_svg_text_katex`：揪出写在原生 `<text>` 里的 `$…$`（那里渲染不出来），而 `<foreignObject>` 标签的数学在 `<div>` 里、正确地不被误报。
+  - 验证：自带回归测试 `test_build_and_check.py` 31/31 通过；`<foreignObject>` 的浏览器真机渲染尚需按惯例（Playwright）复核后补记。
+
 - **2026-07-09 · v0.8.15** — 治「行间 \vec 的箭头尖被裁平」（\hat \bar \dot 等顶部标注同理）。
   - **为什么**：`.katex-display` 为了不弹出垂直滚动条用了 `overflow-y:hidden`，盒高按公式的度量框自动贴合。但顶部标注的**实际墨迹**会比 KaTeX 预留的度量框再高出一丁点——正文 1.06em 下实测约 1.3px 探出盒子顶沿，恰好连同只有 2px 的上内边距一起被 `overflow-y:hidden` 削掉，箭头尖成了平头。放大到 2em 反倒不裁：大字号下度量框取整后正好兜住墨迹，这颗暗雷偏偏卡在正文字号，所以平时看正文才发现。
   - **怎么改**：`.katex-display` 的 `padding` 由 `2px 0` 改成 `0.45em 0 2px`——上内边距给到 0.45em（正文约 7.6px、随字号缩放，稳压各号字的标注墨迹），下内边距保留 2px、左右仍为 0，横向滚动条位置不动。design-system.md 里那段「overflow-y:hidden 从不裁切高公式」的注释补一句：顶部标注确实会高出度量框，上 padding 取 0.45em 而非 2px 正是为此，免得日后有人又收回 2px。三份示例（MODE-A/B/C）内嵌的同一条规则一并更新，动力学那份满纸矢量、先前正裁着。
