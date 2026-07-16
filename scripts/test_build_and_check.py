@@ -86,6 +86,20 @@ LINKS_WITH_RULE = ("<style>body{color:var(--text);}\na{color:var(--blue);text-un
                    "</style>\n<p><a href=\"notes.html#s2-1\">对轴的转动惯量</a></p>")
 NO_LINKS_NO_RULE = "<style>body{color:var(--text);}</style>\n<p>无链接的片段</p>"
 
+# KaTeX tracking guard (WARN): letter-spacing is inherited, so tracking on ANY ancestor leaks into
+# .katex and adds a gap after every glyph box. The design-system CSS resets it on .katex itself; a
+# page built from a stale CSS copy loses that guard silently. .fbox .flabel is the live in-the-wild
+# source (0.09em on a label that can contain inline math) — the same rule whose text-transform leak
+# was fixed in v0.8.16.
+KATEX_LS_LEAK = ("<style>.header h1{font-size:30px;letter-spacing:-0.021em;}\n"
+                 ".fbox .flabel{text-transform:uppercase;letter-spacing:0.09em;}\n"
+                 ".katex{font-size:1.06em;}</style>\n<span class=\"katex\">v</span>")
+KATEX_LS_RESET = ("<style>.header h1{font-size:30px;letter-spacing:-0.021em;}\n"
+                  ".katex{font-size:1.06em;letter-spacing:normal;}</style>\n"
+                  "<span class=\"katex\">v</span>")
+KATEX_NO_TRACKING = "<style>.katex{font-size:1.06em;}</style>\n<span class=\"katex\">v</span>"
+NO_KATEX_TRACKING = "<style>.header h1{letter-spacing:-0.021em;}</style>\n<p>没有数学的页面</p>"
+
 # Embedded-figure height cap (WARN): a data-URI raster <img> without class="fig-embed" renders
 # at natural height — a vertical phone-photo crop fills the whole screen. The favicon's
 # data:image/svg+xml URI is NOT a raster figure and must never be flagged.
@@ -225,7 +239,23 @@ def run():
     assert b.check_fig_embed(FIG_SVG_FAVICON) == ([], False), \
         f"svg data-URIs wrongly flagged: {b.check_fig_embed(FIG_SVG_FAVICON)}"
 
-    print("OK  build_and_check regression tests passed (31/31)")
+    # 28. tracking on ancestors + KaTeX but no .katex reset -> flagged (leaks into the math)
+    assert b.check_katex_letter_spacing(KATEX_LS_LEAK), \
+        "letter-spacing with no .katex{letter-spacing:normal} reset must be flagged"
+
+    # 29. the design-system reset satisfies the check
+    assert not b.check_katex_letter_spacing(KATEX_LS_RESET), \
+        ".katex{letter-spacing:normal} must satisfy the tracking guard"
+
+    # 30. no tracking anywhere -> nothing to leak, never flagged even without the reset
+    assert not b.check_katex_letter_spacing(KATEX_NO_TRACKING), \
+        "page that sets no letter-spacing must not be flagged"
+
+    # 31. tracking but no math on the page -> never flagged
+    assert not b.check_katex_letter_spacing(NO_KATEX_TRACKING), \
+        "page without KaTeX must not be flagged"
+
+    print("OK  build_and_check regression tests passed (35/35)")
 
 
 if __name__ == "__main__":
