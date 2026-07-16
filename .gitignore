@@ -4,3 +4,7 @@ __pycache__/
 .DS_Store
 Thumbs.db
 *.skill
+
+# 渲染中间产物：make_mobile_shot.py 已用 try/finally 自清理，这里只是硬杀（SIGKILL/断电）时的兜底
+_mobile_wrap.html
+*.cap.png
