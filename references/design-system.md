@@ -38,6 +38,13 @@ Complete CSS and HTML component library for study notes. Copy the CSS block verb
   --red:#A32D2D;    --red-light:#FCEBEB;    --red-dark:#791F1F;
   --pink:#993556;   --pink-light:#FBEAF0;
   --radius:10px;
+  /* Easing. The built-in CSS keywords are too weak to read as intentional, so the house style is
+     these two. --ease-out for anything entering or leaving: it puts the movement at the instant
+     the reader is watching most closely. --ease-in-out for something morphing while already on
+     screen. Never ease-in on UI — it withholds the first frames and feels sluggish at the very
+     same duration. */
+  --ease-out:cubic-bezier(0.23,1,0.32,1);
+  --ease-in-out:cubic-bezier(0.77,0,0.175,1);
 }
 @media(prefers-color-scheme:dark){
   :root{
@@ -73,7 +80,13 @@ body>*:not(.page){max-width:900px;margin-left:auto;margin-right:auto;padding-lef
    recolor their own <a> (.toc-l1/.toc-l2, #nav-panel, .lead) override this downstream;
    build_and_check.py WARNs when a page's CSS is missing this rule. */
 a{color:var(--blue);text-underline-offset:2px;}
-.katex{font-size:1.06em;}
+/* letter-spacing is INHERITED, so tracking set on any ancestor lands inside KaTeX and adds a gap
+   after every glyph box, wrecking the spacing KaTeX computed. Two live sources: the heading scale
+   below (.header h1 / .section h2 / .card h3) and .fbox .flabel's 0.09em, which reaches the inline
+   math inside a formula label. That is the same class of bug as the flabel text-transform one
+   fixed in v0.8.16 — that fix missed that the very same rule leaks letter-spacing too. A rule
+   naming .katex directly beats inheritance from any ancestor, however specific. */
+.katex{font-size:1.06em;letter-spacing:normal;}
 /* ── Wide display-formula handling (revised) ──
    A display formula wider than the text column must NOT spill past its box / the viewport.
    That overflow happens at ANY width (a long equation overflows a 900px column too, not just
@@ -131,7 +144,24 @@ img.fig-embed.zoom{max-height:none;cursor:zoom-out;}
 
 /* Header */
 .header{text-align:center;padding:48px 0 36px;border-bottom:1px solid var(--border);margin-bottom:40px;}
-.header h1{font-size:30px;font-weight:700;margin-bottom:10px;letter-spacing:-0.5px;}
+/* ── Heading type scale (h1 → h5) ──
+   Two size-dependent rules, applied to every heading below:
+   • Tracking scales WITH size and must be in em, never px. Letters read too far apart as they
+     grow, so large text wants negative tracking and body wants ~0; a fixed px value is therefore
+     wrong at every size except the one it was tuned for. The mobile block at the end of this
+     sheet re-sizes h1 and h2, where an em value follows along and a px value would not. The
+     values are deliberately conservative: this rule comes from Latin display type, and CJK glyphs
+     sit on a fixed em grid with no side bearings, so they collide sooner and gain less from
+     tightening than Latin does.
+   • Leading scales INVERSELY to size — tight on large headings, loose on body. Every heading here
+     used to inherit body's line-height:1.8, i.e. a 41px line box on a 23px h2, which reads
+     unglued the moment a heading wraps to two lines (Chinese titles wrap often). h4 already
+     carried its own 1.4; the rest had been left behind. */
+.header h1{font-size:30px;font-weight:700;margin-bottom:10px;letter-spacing:-0.021em;line-height:1.25;}
+/* A heading may contain inline math, and the tightened leading above would squeeze the
+   vertical-align KaTeX uses to place fractions and accents — the same root cause as the .frow
+   occlusion documented further down. Tracking is already handled globally on .katex, above. */
+.header h1 .katex,.section h2 .katex,.card h3 .katex{line-height:normal;}
 .header .subtitle{color:var(--text2);font-size:14px;margin-bottom:16px;}
 .tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
 .tag{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;}
@@ -143,21 +173,26 @@ img.fig-embed.zoom{max-height:none;cursor:zoom-out;}
 .toc-l1{margin-bottom:2px;}
 .toc-l1>a{display:flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;
   font-size:14px;font-weight:600;padding:5px 6px;border-radius:6px;transition:background 0.12s;}
-.toc-l1>a:hover{background:var(--bg3);}
+/* Hover is gated to real pointers throughout this sheet. A touch tap fires :hover and it STICKS
+   until the next tap elsewhere, so the row you just left stays highlighted. :active is the
+   touch-correct feedback, and it doubles as the press feedback a pointer user gets too. */
+@media(hover:hover) and (pointer:fine){.toc-l1>a:hover{background:var(--bg3);}}
+.toc-l1>a:active{background:var(--bg4);}
 .toc-l1>a .sec-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 /* L2: sub-section rows */
 .toc-l2{padding-left:22px;margin-top:1px;margin-bottom:3px;}
 .toc-l2 a{display:flex;align-items:center;gap:7px;color:var(--blue);text-decoration:none;
   font-size:13px;padding:3px 6px;border-radius:5px;transition:background 0.12s;
   border-left:2px solid var(--border);}
-.toc-l2 a:hover{background:var(--bg3);text-decoration:none;}
+@media(hover:hover) and (pointer:fine){.toc-l2 a:hover{background:var(--bg3);text-decoration:none;}}
+.toc-l2 a:active{background:var(--bg4);}
 .toc-l2 a .sec-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;opacity:0.7;}
 
 /* Section */
 .section{margin-bottom:60px;}
 .section-header{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:14px;border-bottom:2.5px solid var(--border);}
 .section-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;}
-.section h2{font-size:23px;font-weight:700;}
+.section h2{font-size:23px;font-weight:700;letter-spacing:-0.014em;line-height:1.35;}  /* type scale: see .header h1 */
 
 /* ── Cards ── */
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px 26px;margin-bottom:16px;}
@@ -171,14 +206,15 @@ img.fig-embed.zoom{max-height:none;cursor:zoom-out;}
 .card,.example-block{content-visibility:auto;contain-intrinsic-size:auto 600px;}
 
 /* Level 1 card title: prominent, full-width bottom rule */
-.card h3{font-size:17px;font-weight:700;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.card h3{font-size:17px;font-weight:700;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--border);
+  letter-spacing:-0.006em;line-height:1.45;}  /* type scale: see .header h1 */
 
 /* Level 2 sub-heading: left accent bar + slightly indented */
 .card h4{font-size:14px;font-weight:700;margin:20px 0 8px;padding-left:10px;
   border-left:3px solid var(--border);color:var(--text);line-height:1.4;}
 
 /* Level 3 sub-sub-heading: muted, no decoration, tight top margin */
-.card h5{font-size:13px;font-weight:600;margin:14px 0 6px;color:var(--text2);letter-spacing:0.02em;}
+.card h5{font-size:13px;font-weight:600;margin:14px 0 6px;color:var(--text2);letter-spacing:0.02em;line-height:1.5;}
 
 .card p{margin-bottom:10px;line-height:1.8;}
 .card p:last-child{margin-bottom:0;}
@@ -245,7 +281,13 @@ td .katex,th .katex{font-size:0.95em;}
 details{border:1px solid var(--border);border-radius:9px;margin-bottom:10px;overflow:visible;}
 summary{padding:13px 18px;font-weight:600;font-size:14px;cursor:pointer;background:var(--bg2);display:flex;align-items:center;gap:8px;list-style:none;user-select:none;}
 summary::-webkit-details-marker{display:none;}
-summary::before{content:"▶";font-size:9px;color:var(--text3);transition:transform 0.2s;flex-shrink:0;}
+/* Press feedback. Something pressable that does nothing on pointer-down reads as dead — the
+   feedback belongs on the press, not the release. summary is a full-width row, so the usual
+   button treatment (scale 0.97) would visibly shrink the whole card header; darken the
+   background instead. Real buttons do get the scale — see #nav-btn. */
+summary:active{background:var(--bg3);}
+/* The arrow morphs in place rather than entering or leaving, so it takes --ease-in-out. */
+summary::before{content:"▶";font-size:9px;color:var(--text3);transition:transform 0.2s var(--ease-in-out);flex-shrink:0;}
 details[open] summary::before{transform:rotate(90deg);}
 .details-body{padding:18px 20px;}
 .details-body p{margin-bottom:8px;font-size:14px;}
@@ -368,10 +410,14 @@ details[open] summary::before{transform:rotate(90deg);}
   border:1px solid var(--border);cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 1px 6px rgba(0,0,0,0.18);
-  transition:background 0.15s,color 0.15s,box-shadow 0.15s;
+  transition:background 0.15s,color 0.15s,box-shadow 0.15s,transform 0.12s var(--ease-out);
   font-size:15px;line-height:1;
 }
-#nav-btn:hover{background:var(--bg3);color:var(--text);box-shadow:0 2px 12px rgba(0,0,0,0.22);}
+@media(hover:hover) and (pointer:fine){
+  #nav-btn:hover{background:var(--bg3);color:var(--text);box-shadow:0 2px 12px rgba(0,0,0,0.22);}
+}
+/* This one IS a real button, so it takes the press scale rather than a background shift. */
+#nav-btn:active{transform:scale(0.94);}
 #nav-panel{
   position:fixed;bottom:66px;right:24px;z-index:9998;
   background:var(--bg);border:1px solid var(--border);border-radius:10px;
@@ -380,7 +426,7 @@ details[open] summary::before{transform:rotate(90deg);}
   scrollbar-width:thin;scrollbar-color:var(--text2) transparent;  /* Firefox: thin themed bar */
   padding:8px 0;
   opacity:0;transform:translateY(8px) scale(0.97);
-  pointer-events:none;transition:opacity 0.15s,transform 0.15s;
+  pointer-events:none;transition:opacity 0.15s var(--ease-out),transform 0.15s var(--ease-out);
 }
 /* WebKit: the panel scrolls vertically when the list is long. Without this it falls back to the
    OS-native scrollbar, whose light track shows as an ugly white strip down the dark panel.
@@ -399,7 +445,8 @@ details[open] summary::before{transform:rotate(90deg);}
   text-decoration:none;line-height:1.4;
   transition:background 0.1s;
 }
-#nav-panel a:hover{background:var(--bg2);}
+@media(hover:hover) and (pointer:fine){#nav-panel a:hover{background:var(--bg2);}}
+#nav-panel a:active{background:var(--bg3);}
 #nav-panel a .nd{
   width:20px;height:20px;border-radius:5px;font-size:10px;font-weight:700;
   display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
@@ -430,6 +477,23 @@ details[open] summary::before{transform:rotate(90deg);}
   .katex{font-size:1em;}
   .header h1{font-size:24px;}
   .section h2{font-size:20px;}
+}
+
+/* ── Reduced motion ──
+   This block MUST stay at the END of the sheet. #nav-panel's transform is set at plain #id
+   specificity above, so an equal-specificity @media block placed earlier would simply lose the
+   cascade and silently do nothing.
+   The rule is DOWNGRADE, not zero: drop the vestibular triggers (long scroll journeys, translate,
+   scale) and keep opacity and colour, which aid comprehension. Hence the panel still fades — it
+   just no longer flies. The dominant motion source on this page is smooth scrolling: every TOC
+   and floating-nav click sweeps the entire page past the eye, which is exactly the case the
+   preference exists for. The JS paths are already safe and need no guard (scroll-memory restore
+   passes behavior:'instant'; the panel's scrollIntoView is 'auto' on a container that never sets
+   scroll-behavior, so it is instant too). */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  #nav-panel{transform:none;transition:opacity 0.15s var(--ease-out);}  /* keep the fade, drop translateY+scale */
+  summary::before{transition:none;}                                      /* arrow snaps instead of rotating */
 }
 ```
 
@@ -1375,7 +1439,8 @@ summary). Keep it to 3–8 questions per chapter; every option and explanation m
   background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:700;margin-right:8px}
 .quiz-opt{display:block;width:100%;text-align:left;border:1px solid var(--border);background:var(--bg2);color:var(--text);
   border-radius:7px;padding:9px 13px;margin:6px 0;font:inherit;font-size:13.5px;cursor:pointer;transition:background .12s,border-color .12s}
-.quiz-opt:hover:not(:disabled){background:var(--bg3)}
+@media(hover:hover) and (pointer:fine){.quiz-opt:hover:not(:disabled){background:var(--bg3)}}
+.quiz-opt:active:not(:disabled){background:var(--bg4)}
 .quiz-opt:disabled{cursor:default}
 .quiz-opt .mk{float:right;font-weight:700}
 .quiz-opt.correct{background:var(--green-light);border-color:rgba(59,109,17,.5);color:var(--green-dark)}

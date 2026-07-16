@@ -335,6 +335,30 @@ def check_content_link_css(html):
     return _BARE_A_RULE.search(styles) is None
 
 
+# KaTeX tracking guard (WARN-level). letter-spacing is INHERITED, so tracking set on ANY ancestor
+# reaches inside .katex and inserts a gap after every glyph box, quietly wrecking the spacing KaTeX
+# had computed. Two live sources in the Full CSS: the heading type scale (.header h1 / .section h2
+# / .card h3) and .fbox .flabel's 0.09em, which lands on the inline math inside a formula label.
+# The design-system CSS carries `.katex{...letter-spacing:normal;}` to beat that inheritance -- a
+# rule naming .katex directly wins over inheritance from any ancestor, however specific. A page
+# built from a stale CSS copy loses the guard and its math renders subtly wrong with nothing on
+# screen to explain why. Same silent-failure shape as the .fbox .flabel text-transform bug fixed
+# in v0.8.16 -- that fix missed that the very same rule leaks letter-spacing too.
+_KATEX_LS_RESET = re.compile(r"\.katex[^{}]*\{[^}]*letter-spacing\s*:\s*normal", re.S)
+_ANY_TRACKING = re.compile(r"letter-spacing\s*:\s*(?!normal)[^;}]", re.I)
+
+
+def check_katex_letter_spacing(html):
+    """WARN-level. True = problem (page renders KaTeX and its CSS sets letter-spacing somewhere,
+    but has no .katex{...letter-spacing:normal} reset to stop it cascading into the math)."""
+    if "katex" not in html.lower():
+        return False
+    styles = "\n".join(re.findall(r"<style[^>]*>([\s\S]*?)</style>", html, re.I))
+    if not _ANY_TRACKING.search(styles):
+        return False
+    return _KATEX_LS_RESET.search(styles) is None
+
+
 # Embedded-figure sizing (WARN-level). max-width:100% alone does NOT stop a vertical
 # phone-photo/scan crop from rendering at full natural height and filling the whole screen
 # (real user complaint). Rule: every base64-embedded RASTER <img> carries class="fig-embed"
@@ -520,6 +544,15 @@ def run_checks(path):
         print("       (WARN only -- does not fail the build.)")
     else:
         print("[ok]  content links have a themed color rule (or page has no links)")
+
+    if check_katex_letter_spacing(html):
+        print("\n[WARN] the CSS sets letter-spacing but never resets it inside .katex --")
+        print("       tracking is inherited, so it leaks into the math and adds a gap after every")
+        print("       glyph box, wrecking the spacing KaTeX computed.")
+        print("       Add the design-system rule:  .katex{font-size:1.06em;letter-spacing:normal;}")
+        print("       (WARN only -- does not fail the build.)")
+    else:
+        print("[ok]  KaTeX is insulated from inherited letter-spacing (or page has no math)")
 
     fig_hits, fig_css_missing = check_fig_embed(html)
     if fig_hits:
