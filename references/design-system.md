@@ -188,7 +188,10 @@ img.fig-embed.zoom{max-height:none;cursor:zoom-out;}
      used to inherit body's line-height:1.8, i.e. a 41px line box on a 23px h2, which reads
      unglued the moment a heading wraps to two lines (Chinese titles wrap often). h4 already
      carried its own 1.4; the rest had been left behind. */
-.header h1{font-size:30px;font-weight:700;margin-bottom:10px;letter-spacing:-0.021em;line-height:1.25;}
+/* 字号走 --fs-h1（主题可覆盖）；字距与行高是 v0.8.17 的标题刻度，原样保留。
+   注意：此前这里写死 30px，导致主题设的 --fs-h1 根本没人消费。 */
+.header h1{font-size:var(--fs-h1);font-weight:var(--h1-weight,700);margin-bottom:10px;
+  letter-spacing:-0.021em;line-height:var(--h1-lh,1.25);}
 /* A heading may contain inline math, and the tightened leading above would squeeze the
    vertical-align KaTeX uses to place fractions and accents — the same root cause as the .frow
    occlusion documented further down. Tracking is already handled globally on .katex, above. */
@@ -242,7 +245,7 @@ img.fig-embed.zoom{max-height:none;cursor:zoom-out;}
 .card,.example-block{content-visibility:auto;contain-intrinsic-size:auto 600px;}
 
 /* Level 1 card title: prominent, full-width bottom rule */
-.card h3{font-size:17px;font-weight:700;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--border);
+.card h3{font-size:var(--fs-h3);font-weight:700;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--border);
   letter-spacing:-0.006em;line-height:1.45;}  /* type scale: see .header h1 */
 
 /* Level 2 sub-heading: left accent bar + slightly indented */
@@ -527,40 +530,14 @@ details[open] summary::before{transform:rotate(90deg);}
 .band h3{font-size:var(--fs-xl);font-weight:700;margin-bottom:var(--sp3);}
 
 /* ══════════════════════════════════════════════════════════════════════════
-   主题层 —— 写在 <html data-theme="lecture|textbook|lab">，省略 = 旧版暖米白多彩。
-   只有三套：学习笔记的使用情景就这三种。刻意**没有**"高对比杂志"那类方向 ——
-   46px 大标题在一份六十屏、要反复展开折叠的笔记里只是浪费纵向空间。
+   主题层 —— 写在 <html data-theme="journal|editorial|console">，省略 = 旧版暖米白多彩。
+   命名与 visual-report 一致，两个 skill 共用一套词汇。
    每套只覆盖变量，组件规则一律不动；核验徽章的绿/琥珀走语义色，不受主题影响。
    ══════════════════════════════════════════════════════════════════════════ */
 
-/* ── 讲义 lecture｜冷静清晰，单色分区｜日常笔记、概念课、理论章节（推荐默认）── */
-[data-theme="lecture"]{
-  --bg:#ffffff; --bg2:#F4F6F9; --bg3:#EAEEF3; --bg4:#DFE5EC; --card-solid:#ffffff;
-  --text:#12171E; --text2:#525E6C; --text3:#66707C;
-  --border:rgba(16,24,40,.12);
-  --lh-body:1.82; --radius:4px; --num-radius:4px;
-  --card-px:30px; --card-py:26px; --rule-w:1px; --measure:880px;
-  --blue:#1F4E8C;  --blue-light:#E7EEF7;  --blue-dark:#123B70;  --blue-mid:#3D77BF;
-  --teal:#1D6B5A;  --teal-light:#E2F1EC;  --teal-dark:#0F4B3E;  --teal-mid:#2F9A80;
-  --amber:#8A6410; --amber-light:#F5EEDD; --amber-dark:#5F4408; --amber-mid:#C89422;
-  --red:#96302F;   --red-light:#F7E9E9;   --red-dark:#6E2120;
-  --pink:#8A3352;  --pink-light:#F7E9EE;
-  --green:#2E6B33; --green-light:#E6F1E5; --green-dark:#1C4A20; --green-mid:#4E9A54;
-  --purple:#3F3D8F;--purple-light:#EAE9F6;--purple-dark:#2A2868;--purple-mid:#6C69C4;
-  --coral:#8A4322; --coral-light:#F6EAE4; --coral-dark:#5F2C14; --coral-mid:#C06A3F;
-  --s1:#1F4E8C;--s1-l:#E7EEF7;--s1-d:#123B70;--s1-m:#3D77BF;
-  --s2:#1F4E8C;--s2-l:#E7EEF7;--s2-d:#123B70;--s2-m:#3D77BF;
-  --s3:#1F4E8C;--s3-l:#E7EEF7;--s3-d:#123B70;--s3-m:#3D77BF;
-  --s4:#1F4E8C;--s4-l:#E7EEF7;--s4-d:#123B70;--s4-m:#3D77BF;
-  --s5:#1F4E8C;--s5-l:#E7EEF7;--s5-d:#123B70;--s5-m:#3D77BF;
-  --s6:#1F4E8C;--s6-l:#E7EEF7;--s6-d:#123B70;--s6-m:#3D77BF;
-  --s7:#96302F;--s7-l:#F7E9E9;--s7-d:#6E2120;--s7-m:#96302F;
-}
-[data-theme="lecture"] .card{background:var(--card-solid);}
-
-/* ── 教材 textbook｜衬线正文 + 窄版心｜长推导、通读复习。
+/* ── 纸本学刊 journal｜衬线正文 + 窄版心｜长推导、通读复习（推荐默认）。
       衬线与 KaTeX（Computer Modern 血统）同源，公式和正文不再像两种东西 ── */
-[data-theme="textbook"]{
+[data-theme="journal"]{
   --bg:#FCFBF8; --bg2:#F6F3ED; --bg3:#F1EDE4; --bg4:#E9E3D6; --card-solid:transparent;
   --text:#1B1815; --text2:#5C554C; --text3:#746D64;
   --border:rgba(27,24,21,.16);
@@ -585,17 +562,52 @@ details[open] summary::before{transform:rotate(90deg);}
   --s6:#7C2A22;--s6-l:#F4E9E7;--s6-d:#5C1D17;--s6-m:#A8483C;
   --s7:#7C2A22;--s7-l:#F4E9E7;--s7-d:#5C1D17;--s7-m:#A8483C;
 }
-[data-theme="textbook"] .card{border-bottom:1px solid var(--border);
+[data-theme="journal"] .card{border-bottom:1px solid var(--border);
   padding-bottom:var(--sp5);margin-bottom:var(--sp5);}
-[data-theme="textbook"] .card:last-child{border-bottom:0;}
-[data-theme="textbook"] .card h3{border-bottom:0;padding-bottom:0;margin-bottom:var(--sp3);}
-[data-theme="textbook"] .section-num{background:transparent;border:1px solid var(--border);
+[data-theme="journal"] .card:last-child{border-bottom:0;}
+[data-theme="journal"] .card h3{border-bottom:0;padding-bottom:0;margin-bottom:var(--sp3);}
+[data-theme="journal"] .section-num{background:transparent;border:1px solid var(--border);
   color:var(--text2);}
-[data-theme="textbook"] summary{background:transparent;border-bottom:1px dashed var(--border);}
-[data-theme="textbook"] details{border:0;}
+[data-theme="journal"] summary{background:transparent;border-bottom:1px dashed var(--border);}
+[data-theme="journal"] details{border:0;}
 
-/* ── 理工 lab｜等宽承担数字/单位/序号，紧排宽版心｜算法、实验数据、代码类笔记 ── */
-[data-theme="lab"]{
+/* ── 高对比杂志 editorial｜大号衬线标题 + 强层级跳跃 + 一支正红
+      ｜考前速览、重点复习、要快速扫读抓重点的笔记 ── */
+[data-theme="editorial"]{
+  --bg:#FFFFFF; --bg2:#F6F5F3; --bg3:#EDEBE7; --bg4:#E2DFDA; --card-solid:#ffffff;
+  --text:#0B0B0C; --text2:#54524F; --text3:#716E6B;
+  --border:rgba(0,0,0,.13);
+  --font-display:var(--font-serif); --font-num:var(--font-serif);
+  --fs-body:15.5px; --fs-h1:46px; --fs-h2:30px; --fs-h3:var(--fs-xl);
+  --lh-body:1.8; --h2-lh:1.22;
+  --radius:6px; --num-radius:50%;
+  --card-px:28px; --card-py:24px; --rule-w:3px; --measure:840px;
+  --blue:#1B4F8F;  --blue-light:#E7EFF8;  --blue-dark:#0F3567;  --blue-mid:#3F7CC4;
+  --teal:#1D5C4A;  --teal-light:#E3F0EB;  --teal-dark:#124034;  --teal-mid:#2E8A6D;
+  --amber:#9A6A0F; --amber-light:#F7EFDC; --amber-dark:#6B4A08; --amber-mid:#D19A22;
+  --red:#C31F2E;   --red-light:#FAE9EA;   --red-dark:#8E1520;
+  --pink:#9A2B55;  --pink-light:#FAE8EE;
+  --green:#356515; --green-light:#EAF2E1; --green-dark:#22470A; --green-mid:#5A9128;
+  --purple:#4A31A8;--purple-light:#EDE9FA;--purple-dark:#33207A;--purple-mid:#7A63D6;
+  --coral:#A2431F; --coral-light:#F9EBE4; --coral-dark:#752D11; --coral-mid:#D06A38;
+  --s1:#C31F2E;--s1-l:#FAE9EA;--s1-d:#8E1520;--s1-m:#E14A57;
+  --s2:#C31F2E;--s2-l:#FAE9EA;--s2-d:#8E1520;--s2-m:#E14A57;
+  --s3:#C31F2E;--s3-l:#FAE9EA;--s3-d:#8E1520;--s3-m:#E14A57;
+  --s4:#C31F2E;--s4-l:#FAE9EA;--s4-d:#8E1520;--s4-m:#E14A57;
+  --s5:#C31F2E;--s5-l:#FAE9EA;--s5-d:#8E1520;--s5-m:#E14A57;
+  --s6:#C31F2E;--s6-l:#FAE9EA;--s6-d:#8E1520;--s6-m:#E14A57;
+  --s7:#C31F2E;--s7-l:#FAE9EA;--s7-d:#8E1520;--s7-m:#E14A57;
+}
+[data-theme="editorial"] .card{background:var(--card-solid);}
+/* 标题区左对齐、字重拉到 900：更像刊物不像证书。
+   .header h1 的 font-weight/letter-spacing 是写死的（v0.8.17 的字距刻度），只能在这里覆盖。 */
+[data-theme="editorial"] .header{text-align:left;}
+[data-theme="editorial"] .header h1{font-weight:900;line-height:1.08;letter-spacing:-0.02em;}
+[data-theme="editorial"] .header .subtitle,
+[data-theme="editorial"] .tags{justify-content:flex-start;text-align:left;}
+
+/* ── 工程终端 console｜等宽承担数字/单位/序号，紧排宽版心｜电子、算法、实验数据、代码类 ── */
+[data-theme="console"]{
   --bg:#FBFBFA; --bg2:#F2F2F0; --bg3:#E7E7E4; --bg4:#DCDCD8; --card-solid:#ffffff;
   --text:#16171A; --text2:#575A5E; --text3:#6B6D70;
   --border:rgba(0,0,0,.14);
@@ -619,37 +631,17 @@ details[open] summary::before{transform:rotate(90deg);}
   --s6:#0E6E78;--s6-l:#E1EFF0;--s6-d:#085057;--s6-m:#1B9AA8;
   --s7:#A03434;--s7-l:#F8EAEA;--s7-d:#762323;--s7-m:#A03434;
 }
-[data-theme="lab"] .card{background:var(--card-solid);}
-[data-theme="lab"] .section-num{background:transparent;border:1px solid var(--sec);
+[data-theme="console"] .card{background:var(--card-solid);}
+[data-theme="console"] .section-num{background:transparent;border:1px solid var(--sec);
   color:var(--sec);width:auto;padding:0 8px;height:26px;font-size:12px;}
-[data-theme="lab"] .section-num::before{content:"[";}
-[data-theme="lab"] .section-num::after{content:"]";}
+[data-theme="console"] .section-num::before{content:"[";}
+[data-theme="console"] .section-num::after{content:"]";}
 
 /* ══ 各方向的深色版本 ══
    ⚠ 必须写在主题块之后：@media 不提升特异性，:root 与 [data-theme=x] 同为 (0,1,0)，
      同分比先后。放前面会被主题静默吃掉 —— 表现为深色模式下主题全停在白底。 */
 @media(prefers-color-scheme:dark){
-  [data-theme="lecture"]{
-    --bg:#0F1319; --bg2:#161B23; --bg3:#1D232C; --bg4:#242B36; --card-solid:#151A21;
-    --text:#E3E8EF; --text2:#98A3B2; --text3:#7A8593;
-    --border:rgba(255,255,255,.12);
-    --blue:#6FA6E8;   --blue-light:#132741;   --blue-dark:#A9CDF4;   --blue-mid:#4B8AD0;
-    --teal:#4FB98C;   --teal-light:#0C2E23;   --teal-dark:#88DAB6;   --teal-mid:#3C9E75;
-    --amber:#DFA22C;  --amber-light:#33240A;  --amber-dark:#F1C76D;  --amber-mid:#C88C1E;
-    --red:#E07878;    --red-light:#3A1717;    --red-dark:#F1AAAA;
-    --pink:#D67C9C;   --pink-light:#3B1622;
-    --green:#6FBF57;  --green-light:#18300F;  --green-dark:#9FD886;  --green-mid:#5CA347;
-    --purple:#9A93E4; --purple-light:#221D52; --purple-dark:#C6C1F3; --purple-mid:#7A72D4;
-    --coral:#E08558;  --coral-light:#3D1D0C;  --coral-dark:#F2B08D;  --coral-mid:#C46A3F;
-    --s1:#6FA6E8;--s1-l:#132741;--s1-d:#A9CDF4;--s1-m:#4B8AD0;
-    --s2:#6FA6E8;--s2-l:#132741;--s2-d:#A9CDF4;--s2-m:#4B8AD0;
-    --s3:#6FA6E8;--s3-l:#132741;--s3-d:#A9CDF4;--s3-m:#4B8AD0;
-    --s4:#6FA6E8;--s4-l:#132741;--s4-d:#A9CDF4;--s4-m:#4B8AD0;
-    --s5:#6FA6E8;--s5-l:#132741;--s5-d:#A9CDF4;--s5-m:#4B8AD0;
-    --s6:#6FA6E8;--s6-l:#132741;--s6-d:#A9CDF4;--s6-m:#4B8AD0;
-    --s7:#E07878;--s7-l:#3A1717;--s7-d:#F1AAAA;--s7-m:#E07878;
-  }
-  [data-theme="textbook"]{
+  [data-theme="journal"]{
     --bg:#18160F; --bg2:#201D16; --bg3:#28241C; --bg4:#302B21; --card-solid:transparent;
     --text:#EDE7DA; --text2:#A9A08E; --text3:#908571;
     --border:rgba(237,231,218,.18);
@@ -669,7 +661,27 @@ details[open] summary::before{transform:rotate(90deg);}
     --s6:#E08B7E;--s6-l:#3B1B15;--s6-d:#F1B4A8;--s6-m:#C46A5C;
     --s7:#E08B7E;--s7-l:#3B1B15;--s7-d:#F1B4A8;--s7-m:#C46A5C;
   }
-  [data-theme="lab"]{
+  [data-theme="editorial"]{
+    --bg:#0B0B0C; --bg2:#151517; --bg3:#1D1D20; --bg4:#26262A; --card-solid:#141416;
+    --text:#F2F1EF; --text2:#A2A09C; --text3:#82807B;
+    --border:rgba(255,255,255,.15);
+    --blue:#6BA3E8;   --blue-light:#12263D;   --blue-dark:#A6CBF2;   --blue-mid:#4A83C9;
+    --teal:#43AC8E;   --teal-light:#0D2C24;   --teal-dark:#7BD2B4;   --teal-mid:#31967A;
+    --amber:#DDA733;  --amber-light:#33270A;  --amber-dark:#EFCA74;  --amber-mid:#C29024;
+    --red:#F0616D;    --red-light:#3E1219;    --red-dark:#F79EA6;
+    --pink:#E089A8;   --pink-light:#3D1A28;
+    --green:#90C258;  --green-light:#1E2F11;  --green-dark:#B5DC89;  --green-mid:#76A644;
+    --purple:#9C8FF0; --purple-light:#231C57; --purple-dark:#C4BBF7; --purple-mid:#7E70DC;
+    --coral:#EE9264;  --coral-light:#3F1E0D;  --coral-dark:#F7BA96;  --coral-mid:#D07444;
+    --s1:#F0616D;--s1-l:#3E1219;--s1-d:#F79EA6;--s1-m:#E8505E;
+    --s2:#F0616D;--s2-l:#3E1219;--s2-d:#F79EA6;--s2-m:#E8505E;
+    --s3:#F0616D;--s3-l:#3E1219;--s3-d:#F79EA6;--s3-m:#E8505E;
+    --s4:#F0616D;--s4-l:#3E1219;--s4-d:#F79EA6;--s4-m:#E8505E;
+    --s5:#F0616D;--s5-l:#3E1219;--s5-d:#F79EA6;--s5-m:#E8505E;
+    --s6:#F0616D;--s6-l:#3E1219;--s6-d:#F79EA6;--s6-m:#E8505E;
+    --s7:#F0616D;--s7-l:#3E1219;--s7-d:#F79EA6;--s7-m:#E8505E;
+  }
+  [data-theme="console"]{
     --bg:#121214; --bg2:#19191C; --bg3:#212124; --bg4:#2A2A2E; --card-solid:#171719;
     --text:#E5E5E8; --text2:#9A9B9F; --text3:#828388;
     --border:rgba(255,255,255,.14);
@@ -705,8 +717,8 @@ details[open] summary::before{transform:rotate(90deg);}
 ```html
 <!DOCTYPE html>
 <!-- data-theme 决定整篇观感；省略 = 旧版暖米白多彩。选哪套见「Section Color Assignment Guide」。
-     lecture=讲义(推荐默认) / textbook=教材(衬线正文,长推导) / lab=理工(等宽数字,算法与实验) -->
-<html lang="zh-CN" data-theme="lecture">
+     journal=纸本学刊(衬线正文,推荐默认) / editorial=高对比杂志(考前速览) / console=工程终端(电子与算法) -->
+<html lang="zh-CN" data-theme="journal">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -783,18 +795,18 @@ details[open] summary::before{transform:rotate(90deg);}
   <div class="toc-title">目录</div>
 
   <div class="toc-l1">
-    <a href="#s8-1"><span class="sec-dot" style="background:var(--purple-mid)"></span>§8-1 液体的微观结构</a>
+    <a href="#s8-1"><span class="sec-dot" style="background:var(--s1-m)"></span>§8-1 液体的微观结构</a>
     <div class="toc-l2">
-      <a href="#s8-1-1"><span class="sec-dot" style="background:var(--purple-mid)"></span>§8-1-1 近程有序性</a>
-      <a href="#s8-1-2"><span class="sec-dot" style="background:var(--purple-mid)"></span>§8-1-2 液晶</a>
+      <a href="#s8-1-1"><span class="sec-dot" style="background:var(--s1-m)"></span>§8-1-1 近程有序性</a>
+      <a href="#s8-1-2"><span class="sec-dot" style="background:var(--s1-m)"></span>§8-1-2 液晶</a>
     </div>
   </div>
 
   <div class="toc-l1">
-    <a href="#s8-2"><span class="sec-dot" style="background:var(--teal-mid)"></span>§8-2 热传导与扩散</a>
+    <a href="#s8-2"><span class="sec-dot" style="background:var(--s2-m)"></span>§8-2 热传导与扩散</a>
     <div class="toc-l2">
-      <a href="#s8-2-1"><span class="sec-dot" style="background:var(--teal-mid)"></span>§8-2-1 热传导</a>
-      <a href="#s8-2-2"><span class="sec-dot" style="background:var(--teal-mid)"></span>§8-2-2 黏性</a>
+      <a href="#s8-2-1"><span class="sec-dot" style="background:var(--s2-m)"></span>§8-2-1 热传导</a>
+      <a href="#s8-2-2"><span class="sec-dot" style="background:var(--s2-m)"></span>§8-2-2 黏性</a>
     </div>
   </div>
 
@@ -807,7 +819,7 @@ details[open] summary::before{transform:rotate(90deg);}
      and closes exactly 2 divs at the end (</div></div>).
      NEVER nest another .sec-COLOR div inside a section.
 -->
-<div class="sec-purple" id="s1">  <!-- depth +1 -->
+<div class="sec-1" id="s1">  <!-- depth +1 -->
 <div class="section">             <!-- depth +2 -->
 
   <div class="section-header">
@@ -1231,13 +1243,12 @@ Everything else — formula boxes, derivations, examples, tables, sub-headings �
 
 | `data-theme` | 观感与承诺 | 用于 |
 |---|---|---|
-| `lecture` **（推荐默认）** | 冷静清晰；冷中性 slate ＋单支深蓝；4px 圆角只描边；宽松 880px | 日常笔记、概念课、理论章节 |
-| `textbook` | 思源宋体正文 16px/1.95；取消卡片改发丝线；零圆角；760px 窄版心。**衬线与 KaTeX 同源，公式和正文不再像两种东西** | 长推导、通读复习、数学/物理 |
-| `lab` | 等宽字承担数字、单位、`[01]` 序号；紧排；960px 宽版心（放得下更宽的数据表） | 算法、实验数据、代码类笔记 |
+| `journal` **（推荐默认）** | 思源宋体正文 16px/1.95；取消卡片改发丝线；零圆角；760px 窄版心。**衬线与 KaTeX 的 Computer Modern 同源，公式和正文不再像两种东西** | 长推导、通读复习、数学/物理 —— 笔记的常态 |
+| `editorial` | 思源宋体 Black 46px 大标题，46/30/20/15.5 真尺寸跳跃；标题区左对齐；一支正红；840px | 考前速览、重点复习 —— 要快速扫读抓重点时 |
+| `console` | 等宽字承担数字、单位、`[01]` 序号；紧排；960px 宽版心（放得下更宽的数据表） | **电子、电路、信号**，以及算法、实验数据、代码类 |
 | 省略 | 旧版暖米白多彩 | 兼容既有笔记 |
 
-各配深色版。**刻意没有「高对比杂志」那类方向** —— 46px 大标题在一份六十屏、
-要反复展开折叠的笔记里只是浪费纵向空间。
+各配深色版。命名与 `visual-report` 一致，两个 skill 共用一套词汇。
 
 ### 再排分区槽
 

@@ -302,9 +302,9 @@ If there are many problems (≈8+) or they are independent of each other, you ma
 
    | 这份笔记是 | `data-theme` |
    |---|---|
-   | 日常笔记、概念课、理论章节 — **拿不准就这套** | `lecture`（默认） |
-   | 长推导、通读复习、数学/物理（衬线正文，与 KaTeX 同源） | `textbook` |
-   | 算法、实验数据、代码类（等宽数字与单位，宽表格） | `lab` |
+   | 长推导、通读复习、数学/物理 — 衬线正文与 KaTeX 同源，**拿不准就这套** | `journal`（默认） |
+   | 考前速览、重点复习 — 要快速扫读抓重点，大标题真跳跃 | `editorial` |
+   | **电子、电路、信号**，以及算法、实验数据、代码类 — 等宽数字与单位，宽表格 | `console` |
 
    Keep one direction for the whole note — don't hand-tune variables mid-document. The verification
    badges (`.b-verified` green / `.b-unverified` amber) are semantic colors and stay put in every
