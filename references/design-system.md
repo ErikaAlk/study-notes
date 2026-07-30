@@ -26,8 +26,26 @@ Complete CSS and HTML component library for study notes. Copy the CSS block verb
 
 ```css
 :root {
+  /* ── 间距刻度（4px 基）。旧版散值 22/26/13/18/2.5px 归并到这里 ── */
+  --sp1:4px; --sp2:8px; --sp3:12px; --sp4:16px; --sp5:24px; --sp6:32px; --sp7:48px;
+  /* ── 字号刻度 ── */
+  --fs-xs:12px; --fs-sm:13px; --fs-md:14px; --fs-base:15px;
+  --fs-lg:17px; --fs-xl:20px; --fs-2xl:23px; --fs-3xl:30px; --fs-4xl:38px;
+  /* ── 字体族。均为本机/常见 Windows 字体，无网络依赖，缺字自动回退 ── */
+  --font-sans:"Noto Sans SC","Segoe UI Variable Text","Segoe UI",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  --font-serif:"Noto Serif SC","Sitka Text",Constantia,Georgia,"华文宋体",宋体,serif;
+  --font-mono:"Cascadia Mono",Consolas,"Noto Sans SC","Microsoft YaHei",monospace;
+  /* ── 主题旋钮：换皮只改这些，组件规则不动 ── */
+  --font-body:var(--font-sans); --font-display:var(--font-sans); --font-num:var(--font-sans);
+  --fs-h1:var(--fs-3xl); --fs-h2:var(--fs-2xl); --fs-h3:var(--fs-lg); --fs-body:var(--fs-base);
+  --lh-body:1.8;
+  --card-px:26px; --card-py:22px;
+  --card-bg:var(--bg2); --card-bd:1px solid var(--border);
+  --rule-w:2.5px; --measure:900px;
   --bg:#ffffff; --bg2:#f7f6f2; --bg3:#f0ede6; --bg4:#e8e4db;
-  --text:#1a1a18; --text2:#5a5a56; --text3:#8a8a84;
+  /* text3 由 #8a8a84 调深：旧值在 --bg2 卡片上只有 3.21:1，低于 AA。图注、TOC 标题、
+     meta 标签都吃它。保持色相只调明度解得。 */
+  --text:#1a1a18; --text2:#5a5a56; --text3:#70706B;
   --border:rgba(0,0,0,0.11);
   --purple:#534AB7; --purple-light:#EEEDFE; --purple-dark:#3C3489; --purple-mid:#7F77DD;
   --teal:#0F6E56;   --teal-light:#E1F5EE;   --teal-dark:#085041;   --teal-mid:#1D9E75;
@@ -38,6 +56,13 @@ Complete CSS and HTML component library for study notes. Copy the CSS block verb
   --red:#A32D2D;    --red-light:#FCEBEB;    --red-dark:#791F1F;
   --pink:#993556;   --pink-light:#FBEAF0;
   --radius:10px;
+  /* ══ 分区色与语义色解耦 ══
+     旧版 .sec-green 与核验徽章 .b-verified 共用 --green、.sec-amber 与 .b-unverified 共用
+     --amber。想把分区改成单色，就会连带把「已核验（绿框）/ 未自动核验（琥珀框）」一起染掉，
+     那是笔记里最不能丢的语义。拆成两套：
+       --green/--amber/--blue/--red/--teal/…  只服务语义（核验徽章、callout、答案框）
+       --s1..--s7                             只服务分区（序号块/标题/步骤号/TOC 圆点/导航徽章）
+     多彩 = 七槽七色；单色 = 前六槽同色（--s7 练习/考题保持红，那是语义不是装饰）。 */
   /* Easing. The built-in CSS keywords are too weak to read as intentional, so the house style is
      these two. --ease-out for anything entering or leaving: it puts the movement at the instant
      the reader is watching most closely. --ease-in-out for something morphing while already on
@@ -49,7 +74,7 @@ Complete CSS and HTML component library for study notes. Copy the CSS block verb
 @media(prefers-color-scheme:dark){
   :root{
     --bg:#1e1e1c; --bg2:#252523; --bg3:#2c2c2a; --bg4:#333330;
-    --text:#e8e6de; --text2:#a8a69e; --text3:#706e68;
+    --text:#e8e6de; --text2:#a8a69e; --text3:#8F8D85;
     --border:rgba(255,255,255,0.1);
     --purple-light:#26215C; --teal-light:#04342C; --coral-light:#4A1B0C;
     --amber-light:#412402; --blue-light:#042C53; --green-light:#173404;
@@ -68,9 +93,15 @@ Complete CSS and HTML component library for study notes. Copy the CSS block verb
   }
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.8;}
-.page{max-width:900px;margin:0 auto;padding:32px 24px 100px;}
+/* overflow-x:clip 落在 html（真正的滚动容器）上——通栏 .band 用 100vw，而 100vw 含竖向
+   滚动条宽度，只加在 body 上挡不住。用 clip 不用 hidden：hidden 会让 html 变成滚动容器，
+   粘性定位失效。 */
+html{scroll-behavior:smooth;overflow-x:clip;}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);
+  font-size:var(--fs-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased;overflow-x:clip;}
+p,li{text-wrap:pretty;}   /* 消灭段尾孤字 */
+.header h1,.section h2,.card h3,.card h4{font-family:var(--font-display);}
+.page{max-width:var(--measure);margin:0 auto;padding:var(--sp6) var(--sp5) 100px;}
 /* Safety net: if a div escapes .page due to a tag mismatch, body still constrains width */
 body>*:not(.page){max-width:900px;margin-left:auto;margin-right:auto;padding-left:24px;padding-right:24px;}
 /* Content links — without this rule a body link falls back to the UA default (#0000EE,
@@ -157,7 +188,10 @@ img.fig-embed.zoom{max-height:none;cursor:zoom-out;}
      used to inherit body's line-height:1.8, i.e. a 41px line box on a 23px h2, which reads
      unglued the moment a heading wraps to two lines (Chinese titles wrap often). h4 already
      carried its own 1.4; the rest had been left behind. */
-.header h1{font-size:30px;font-weight:700;margin-bottom:10px;letter-spacing:-0.021em;line-height:1.25;}
+/* 字号走 --fs-h1（主题可覆盖）；字距与行高是 v0.8.17 的标题刻度，原样保留。
+   注意：此前这里写死 30px，导致主题设的 --fs-h1 根本没人消费。 */
+.header h1{font-size:var(--fs-h1);font-weight:var(--h1-weight,700);margin-bottom:10px;
+  letter-spacing:-0.021em;line-height:var(--h1-lh,1.25);}
 /* A heading may contain inline math, and the tightened leading above would squeeze the
    vertical-align KaTeX uses to place fractions and accents — the same root cause as the .frow
    occlusion documented further down. Tracking is already handled globally on .katex, above. */
@@ -190,12 +224,17 @@ img.fig-embed.zoom{max-height:none;cursor:zoom-out;}
 
 /* Section */
 .section{margin-bottom:60px;}
-.section-header{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:14px;border-bottom:2.5px solid var(--border);}
-.section-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;}
-.section h2{font-size:23px;font-weight:700;letter-spacing:-0.014em;line-height:1.35;}  /* type scale: see .header h1 */
+.section-header{display:flex;align-items:center;gap:var(--sp3);margin-bottom:var(--sp5);
+  padding-bottom:var(--sp3);border-bottom:var(--rule-w) solid var(--border);}
+.section-num{width:36px;height:36px;border-radius:var(--num-radius,50%);display:flex;align-items:center;
+  justify-content:center;font-size:var(--fs-base);font-weight:700;flex-shrink:0;font-family:var(--font-num);
+  background:var(--sec-l,var(--bg3));color:var(--sec-d,var(--text));}
+.section h2{font-size:var(--fs-h2);font-weight:700;letter-spacing:-0.014em;line-height:var(--h2-lh,1.35);
+  color:var(--sec-d,var(--text));}  /* type scale: see .header h1 */
 
 /* ── Cards ── */
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px 26px;margin-bottom:16px;}
+.card{background:var(--card-bg);border:var(--card-bd);border-radius:var(--radius);
+  padding:var(--card-py) var(--card-px);margin-bottom:var(--sp4);}
 /* ── Perf on huge notes (1000s of formulas) ──
    content-visibility:auto lets the browser SKIP layout + paint of off-screen blocks, so opening a
    <details> (or any reflow) no longer forces the whole tall page to re-layout/repaint — that whole-
@@ -206,7 +245,7 @@ img.fig-embed.zoom{max-height:none;cursor:zoom-out;}
 .card,.example-block{content-visibility:auto;contain-intrinsic-size:auto 600px;}
 
 /* Level 1 card title: prominent, full-width bottom rule */
-.card h3{font-size:17px;font-weight:700;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--border);
+.card h3{font-size:var(--fs-h3);font-weight:700;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--border);
   letter-spacing:-0.006em;line-height:1.45;}  /* type scale: see .header h1 */
 
 /* Level 2 sub-heading: left accent bar + slightly indented */
@@ -222,7 +261,8 @@ img.fig-embed.zoom{max-height:none;cursor:zoom-out;}
 .card li{margin-bottom:6px;line-height:1.8;font-size:14px;}
 
 /* Formula boxes */
-.fbox{background:var(--bg3);border-left:3.5px solid;border-radius:0 10px 10px 0;padding:18px 22px;margin:14px 0;overflow:visible;}
+.fbox{background:var(--bg3);border-left:3.5px solid var(--sec,var(--border));
+  border-radius:0 var(--radius) var(--radius) 0;padding:18px 22px;margin:var(--sp3) 0;overflow:visible;}
 .fbox .flabel{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:12px;opacity:0.75;}
 /* inline math in a label must keep its real case: the uppercase transform above would otherwise turn x,y,z,t into X,Y,Z,T (a real render bug) */
 .fbox .flabel .katex, .fbox .flabel .katex *{text-transform:none;}
@@ -307,7 +347,9 @@ details[open] summary::before{transform:rotate(90deg);}
      • .step>BLOCK{flex:0 0 100%} — forces any stray block child to a full-width row BELOW
    build_and_check.py also WARNs on the mis-nesting so it gets cleaned up at the source. */
 .step{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:16px;}
-.step-num{width:28px;height:28px;border-radius:50%;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.step-num{width:28px;height:28px;border-radius:var(--num-radius,50%);font-size:var(--fs-sm);font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:var(--font-num);
+  background:var(--sec-l,var(--bg3));color:var(--sec-d,var(--text));}
 .step-body{flex:1 1 0;min-width:0;font-size:14px;line-height:1.75;}
 .step>.fbox,.step>.callout,.step>.answer-box,.step>.big-formula,.step>p{flex:0 0 100%;width:100%;box-sizing:border-box;margin-top:0;}
 /* Bold has exactly TWO levels in a step, and only the FIRST gets a line of its own:
@@ -321,35 +363,24 @@ details[open] summary::before{transform:rotate(90deg);}
 .step-body > strong:first-of-type{display:block;margin-bottom:4px;}
 .step-body p strong,.step-body li strong{display:inline;font-weight:700;}
 
-/* Section color accents — apply to wrapper div, e.g. <div class="sec-purple"> */
-.sec-purple .section-num{background:var(--purple-light);color:var(--purple-dark);}
-.sec-purple .section h2{color:var(--purple-dark);}
-.sec-purple .fbox{border-color:var(--purple);}
-.sec-purple .step-num{background:var(--purple-light);color:var(--purple-dark);}
-.sec-teal .section-num{background:var(--teal-light);color:var(--teal-dark);}
-.sec-teal .section h2{color:var(--teal-dark);}
-.sec-teal .fbox{border-color:var(--teal);}
-.sec-teal .step-num{background:var(--teal-light);color:var(--teal-dark);}
-.sec-coral .section-num{background:var(--coral-light);color:var(--coral-dark);}
-.sec-coral .section h2{color:var(--coral-dark);}
-.sec-coral .fbox{border-color:var(--coral);}
-.sec-coral .step-num{background:var(--coral-light);color:var(--coral-dark);}
-.sec-amber .section-num{background:var(--amber-light);color:var(--amber-dark);}
-.sec-amber .section h2{color:var(--amber-dark);}
-.sec-amber .fbox{border-color:var(--amber);}
-.sec-amber .step-num{background:var(--amber-light);color:var(--amber-dark);}
-.sec-blue .section-num{background:var(--blue-light);color:var(--blue-dark);}
-.sec-blue .section h2{color:var(--blue-dark);}
-.sec-blue .fbox{border-color:var(--blue);}
-.sec-blue .step-num{background:var(--blue-light);color:var(--blue-dark);}
-.sec-green .section-num{background:var(--green-light);color:var(--green-dark);}
-.sec-green .section h2{color:var(--green-dark);}
-.sec-green .fbox{border-color:var(--green);}
-.sec-green .step-num{background:var(--green-light);color:var(--green-dark);}
-.sec-red .section-num{background:var(--red-light);color:var(--red-dark);}
-.sec-red .section h2{color:var(--red-dark);}
-.sec-red .fbox{border-color:var(--red);}
-.sec-red .step-num{background:var(--red-light);color:var(--red-dark);}
+/* 分区槽位。旧类名保留为别名，老笔记一个字都不用改；新笔记写 .sec-1 .. .sec-7。
+   组件不再需要 28 行 .sec-X .Y 规则：--sec* 是自定义属性，会从外层继承下来。 */
+:root{
+  --s1:var(--purple); --s1-l:var(--purple-light); --s1-d:var(--purple-dark); --s1-m:var(--purple-mid);
+  --s2:var(--teal);   --s2-l:var(--teal-light);   --s2-d:var(--teal-dark);   --s2-m:var(--teal-mid);
+  --s3:var(--coral);  --s3-l:var(--coral-light);  --s3-d:var(--coral-dark);  --s3-m:var(--coral-mid);
+  --s4:var(--amber);  --s4-l:var(--amber-light);  --s4-d:var(--amber-dark);  --s4-m:var(--amber-mid);
+  --s5:var(--blue);   --s5-l:var(--blue-light);   --s5-d:var(--blue-dark);   --s5-m:var(--blue-mid);
+  --s6:var(--green);  --s6-l:var(--green-light);  --s6-d:var(--green-dark);  --s6-m:var(--green-mid);
+  --s7:var(--red);    --s7-l:var(--red-light);    --s7-d:var(--red-dark);    --s7-m:var(--red);
+}
+.sec-1,.sec-purple{--sec:var(--s1);--sec-l:var(--s1-l);--sec-d:var(--s1-d);--sec-m:var(--s1-m);}
+.sec-2,.sec-teal  {--sec:var(--s2);--sec-l:var(--s2-l);--sec-d:var(--s2-d);--sec-m:var(--s2-m);}
+.sec-3,.sec-coral {--sec:var(--s3);--sec-l:var(--s3-l);--sec-d:var(--s3-d);--sec-m:var(--s3-m);}
+.sec-4,.sec-amber {--sec:var(--s4);--sec-l:var(--s4-l);--sec-d:var(--s4-d);--sec-m:var(--s4-m);}
+.sec-5,.sec-blue  {--sec:var(--s5);--sec-l:var(--s5-l);--sec-d:var(--s5-d);--sec-m:var(--s5-m);}
+.sec-6,.sec-green {--sec:var(--s6);--sec-l:var(--s6-l);--sec-d:var(--s6-d);--sec-m:var(--s6-m);}
+.sec-7,.sec-red   {--sec:var(--s7);--sec-l:var(--s7-l);--sec-d:var(--s7-d);--sec-m:var(--s7-m);}
 
 /* Badges */
 .badge{display:inline-block;padding:2px 9px;border-radius:4px;font-size:11px;font-weight:600;margin-right:4px;}
@@ -490,6 +521,188 @@ details[open] summary::before{transform:rotate(90deg);}
    preference exists for. The JS paths are already safe and need no guard (scroll-memory restore
    passes behavior:'instant'; the panel's scrollIntoView is 'auto' on a container that never sets
    scroll-behavior, so it is instant too). */
+/* ── 节奏破格：通栏。长笔记从头到尾都是灰卡片，读三屏眼睛就不分层级了。
+   每 3～4 节插一条，也是放整幅插图、阶段小结、章节导读的天然位置。 */
+.band{margin:var(--sp7) calc(50% - 50vw);padding:var(--sp7) calc(50vw - 50% + var(--sp5));
+  background:var(--band-bg,var(--bg3));
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.band .band-inner{max-width:var(--measure);margin:0 auto;}
+.band h3{font-size:var(--fs-xl);font-weight:700;margin-bottom:var(--sp3);}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   主题层 —— 写在 <html data-theme="journal|editorial|console">，省略 = 旧版暖米白多彩。
+   命名与 visual-report 一致，两个 skill 共用一套词汇。
+   每套只覆盖变量，组件规则一律不动；核验徽章的绿/琥珀走语义色，不受主题影响。
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 纸本学刊 journal｜衬线正文 + 窄版心｜长推导、通读复习（推荐默认）。
+      衬线与 KaTeX（Computer Modern 血统）同源，公式和正文不再像两种东西 ── */
+[data-theme="journal"]{
+  --bg:#FCFBF8; --bg2:#F6F3ED; --bg3:#F1EDE4; --bg4:#E9E3D6; --card-solid:transparent;
+  --text:#1B1815; --text2:#5C554C; --text3:#746D64;
+  --border:rgba(27,24,21,.16);
+  --font-body:var(--font-serif); --font-display:var(--font-serif); --font-num:var(--font-serif);
+  --fs-body:16px; --fs-h1:var(--fs-4xl); --fs-h2:26px; --fs-h3:var(--fs-xl);
+  --lh-body:1.95; --radius:0px; --num-radius:0px;
+  --card-px:0px; --card-py:0px; --card-bg:transparent; --card-bd:0;
+  --rule-w:1px; --measure:760px;
+  --blue:#2B4A6B;  --blue-light:#E8EDF2;  --blue-dark:#1A3350;  --blue-mid:#4A7099;
+  --teal:#3F5A44;  --teal-light:#E8EEE8;  --teal-dark:#2A3F2E;  --teal-mid:#5C7F62;
+  --amber:#8A6410; --amber-light:#F5EDDB; --amber-dark:#5F4408; --amber-mid:#C89422;
+  --red:#7C2A22;   --red-light:#F4E9E7;   --red-dark:#5C1D17;
+  --pink:#7A3550;  --pink-light:#F4E9ED;
+  --green:#3B5E40; --green-light:#E7EEE7; --green-dark:#264229; --green-mid:#57814E;
+  --purple:#4A3F63;--purple-light:#EDEAF2;--purple-dark:#332A48;--purple-mid:#726399;
+  --coral:#8A4A2A; --coral-light:#F5EAE3; --coral-dark:#5F311A; --coral-mid:#B5714A;
+  --s1:#7C2A22;--s1-l:#F4E9E7;--s1-d:#5C1D17;--s1-m:#A8483C;
+  --s2:#7C2A22;--s2-l:#F4E9E7;--s2-d:#5C1D17;--s2-m:#A8483C;
+  --s3:#7C2A22;--s3-l:#F4E9E7;--s3-d:#5C1D17;--s3-m:#A8483C;
+  --s4:#7C2A22;--s4-l:#F4E9E7;--s4-d:#5C1D17;--s4-m:#A8483C;
+  --s5:#7C2A22;--s5-l:#F4E9E7;--s5-d:#5C1D17;--s5-m:#A8483C;
+  --s6:#7C2A22;--s6-l:#F4E9E7;--s6-d:#5C1D17;--s6-m:#A8483C;
+  --s7:#7C2A22;--s7-l:#F4E9E7;--s7-d:#5C1D17;--s7-m:#A8483C;
+}
+[data-theme="journal"] .card{border-bottom:1px solid var(--border);
+  padding-bottom:var(--sp5);margin-bottom:var(--sp5);}
+[data-theme="journal"] .card:last-child{border-bottom:0;}
+[data-theme="journal"] .card h3{border-bottom:0;padding-bottom:0;margin-bottom:var(--sp3);}
+[data-theme="journal"] .section-num{background:transparent;border:1px solid var(--border);
+  color:var(--text2);}
+[data-theme="journal"] summary{background:transparent;border-bottom:1px dashed var(--border);}
+[data-theme="journal"] details{border:0;}
+
+/* ── 高对比杂志 editorial｜大号衬线标题 + 强层级跳跃 + 一支正红
+      ｜考前速览、重点复习、要快速扫读抓重点的笔记 ── */
+[data-theme="editorial"]{
+  --bg:#FFFFFF; --bg2:#F6F5F3; --bg3:#EDEBE7; --bg4:#E2DFDA; --card-solid:#ffffff;
+  --text:#0B0B0C; --text2:#54524F; --text3:#716E6B;
+  --border:rgba(0,0,0,.13);
+  --font-display:var(--font-serif); --font-num:var(--font-serif);
+  --fs-body:15.5px; --fs-h1:46px; --fs-h2:30px; --fs-h3:var(--fs-xl);
+  --lh-body:1.8; --h2-lh:1.22;
+  --radius:6px; --num-radius:50%;
+  --card-px:28px; --card-py:24px; --rule-w:3px; --measure:840px;
+  --blue:#1B4F8F;  --blue-light:#E7EFF8;  --blue-dark:#0F3567;  --blue-mid:#3F7CC4;
+  --teal:#1D5C4A;  --teal-light:#E3F0EB;  --teal-dark:#124034;  --teal-mid:#2E8A6D;
+  --amber:#9A6A0F; --amber-light:#F7EFDC; --amber-dark:#6B4A08; --amber-mid:#D19A22;
+  --red:#C31F2E;   --red-light:#FAE9EA;   --red-dark:#8E1520;
+  --pink:#9A2B55;  --pink-light:#FAE8EE;
+  --green:#356515; --green-light:#EAF2E1; --green-dark:#22470A; --green-mid:#5A9128;
+  --purple:#4A31A8;--purple-light:#EDE9FA;--purple-dark:#33207A;--purple-mid:#7A63D6;
+  --coral:#A2431F; --coral-light:#F9EBE4; --coral-dark:#752D11; --coral-mid:#D06A38;
+  --s1:#C31F2E;--s1-l:#FAE9EA;--s1-d:#8E1520;--s1-m:#E14A57;
+  --s2:#C31F2E;--s2-l:#FAE9EA;--s2-d:#8E1520;--s2-m:#E14A57;
+  --s3:#C31F2E;--s3-l:#FAE9EA;--s3-d:#8E1520;--s3-m:#E14A57;
+  --s4:#C31F2E;--s4-l:#FAE9EA;--s4-d:#8E1520;--s4-m:#E14A57;
+  --s5:#C31F2E;--s5-l:#FAE9EA;--s5-d:#8E1520;--s5-m:#E14A57;
+  --s6:#C31F2E;--s6-l:#FAE9EA;--s6-d:#8E1520;--s6-m:#E14A57;
+  --s7:#C31F2E;--s7-l:#FAE9EA;--s7-d:#8E1520;--s7-m:#E14A57;
+}
+[data-theme="editorial"] .card{background:var(--card-solid);}
+/* 标题区左对齐、字重拉到 900：更像刊物不像证书。
+   .header h1 的 font-weight/letter-spacing 是写死的（v0.8.17 的字距刻度），只能在这里覆盖。 */
+[data-theme="editorial"] .header{text-align:left;}
+[data-theme="editorial"] .header h1{font-weight:900;line-height:1.08;letter-spacing:-0.02em;}
+[data-theme="editorial"] .header .subtitle,
+[data-theme="editorial"] .tags{justify-content:flex-start;text-align:left;}
+
+/* ── 工程终端 console｜等宽承担数字/单位/序号，紧排宽版心｜电子、算法、实验数据、代码类 ── */
+[data-theme="console"]{
+  --bg:#FBFBFA; --bg2:#F2F2F0; --bg3:#E7E7E4; --bg4:#DCDCD8; --card-solid:#ffffff;
+  --text:#16171A; --text2:#575A5E; --text3:#6B6D70;
+  --border:rgba(0,0,0,.14);
+  --font-num:var(--font-mono);
+  --fs-body:14.5px; --fs-h1:28px; --fs-h2:20px; --fs-h3:16px;
+  --lh-body:1.72; --radius:2px; --num-radius:2px;
+  --card-px:20px; --card-py:18px; --rule-w:1px; --measure:960px;
+  --blue:#0E6E78;  --blue-light:#E1EFF0;  --blue-dark:#085057;  --blue-mid:#1B9AA8;
+  --teal:#146B4E;  --teal-light:#E2F0EA;  --teal-dark:#0B4B36;  --teal-mid:#219A71;
+  --amber:#94670E; --amber-light:#F6EEDC; --amber-dark:#684808; --amber-mid:#CE9420;
+  --red:#A03434;   --red-light:#F8EAEA;   --red-dark:#762323;
+  --pink:#8E3556;  --pink-light:#F7E9EE;
+  --green:#3E6B18; --green-light:#EBF2E2; --green-dark:#2A4C0C; --green-mid:#639922;
+  --purple:#4B4392;--purple-light:#EBEAF5;--purple-dark:#332C6B;--purple-mid:#7970C4;
+  --coral:#8E4423; --coral-light:#F6EBE5; --coral-dark:#622C14; --coral-mid:#C06B41;
+  --s1:#0E6E78;--s1-l:#E1EFF0;--s1-d:#085057;--s1-m:#1B9AA8;
+  --s2:#0E6E78;--s2-l:#E1EFF0;--s2-d:#085057;--s2-m:#1B9AA8;
+  --s3:#0E6E78;--s3-l:#E1EFF0;--s3-d:#085057;--s3-m:#1B9AA8;
+  --s4:#0E6E78;--s4-l:#E1EFF0;--s4-d:#085057;--s4-m:#1B9AA8;
+  --s5:#0E6E78;--s5-l:#E1EFF0;--s5-d:#085057;--s5-m:#1B9AA8;
+  --s6:#0E6E78;--s6-l:#E1EFF0;--s6-d:#085057;--s6-m:#1B9AA8;
+  --s7:#A03434;--s7-l:#F8EAEA;--s7-d:#762323;--s7-m:#A03434;
+}
+[data-theme="console"] .card{background:var(--card-solid);}
+[data-theme="console"] .section-num{background:transparent;border:1px solid var(--sec);
+  color:var(--sec);width:auto;padding:0 8px;height:26px;font-size:12px;}
+[data-theme="console"] .section-num::before{content:"[";}
+[data-theme="console"] .section-num::after{content:"]";}
+
+/* ══ 各方向的深色版本 ══
+   ⚠ 必须写在主题块之后：@media 不提升特异性，:root 与 [data-theme=x] 同为 (0,1,0)，
+     同分比先后。放前面会被主题静默吃掉 —— 表现为深色模式下主题全停在白底。 */
+@media(prefers-color-scheme:dark){
+  [data-theme="journal"]{
+    --bg:#18160F; --bg2:#201D16; --bg3:#28241C; --bg4:#302B21; --card-solid:transparent;
+    --text:#EDE7DA; --text2:#A9A08E; --text3:#908571;
+    --border:rgba(237,231,218,.18);
+    --blue:#7FA8CC;   --blue-light:#1B2A38;   --blue-dark:#B4CFE6;   --blue-mid:#6289AB;
+    --teal:#89B08F;   --teal-light:#1D2C1F;   --teal-dark:#B2CFB6;   --teal-mid:#6D9474;
+    --amber:#D9A63A;  --amber-light:#33260A;  --amber-dark:#EDC97D;  --amber-mid:#BE8E28;
+    --red:#E08B7E;    --red-light:#3B1B15;    --red-dark:#F1B4A8;
+    --pink:#CE8AA2;   --pink-light:#33202A;
+    --green:#93BE99;  --green-light:#1E2F20;  --green-dark:#BBD6BF;  --green-mid:#74A07B;
+    --purple:#A79BC9; --purple-light:#2A2338; --purple-dark:#C7BFE0; --purple-mid:#8B7DB4;
+    --coral:#D69068;  --coral-light:#3A2413;  --coral-dark:#EBB795;  --coral-mid:#B8794F;
+    --s1:#E08B7E;--s1-l:#3B1B15;--s1-d:#F1B4A8;--s1-m:#C46A5C;
+    --s2:#E08B7E;--s2-l:#3B1B15;--s2-d:#F1B4A8;--s2-m:#C46A5C;
+    --s3:#E08B7E;--s3-l:#3B1B15;--s3-d:#F1B4A8;--s3-m:#C46A5C;
+    --s4:#E08B7E;--s4-l:#3B1B15;--s4-d:#F1B4A8;--s4-m:#C46A5C;
+    --s5:#E08B7E;--s5-l:#3B1B15;--s5-d:#F1B4A8;--s5-m:#C46A5C;
+    --s6:#E08B7E;--s6-l:#3B1B15;--s6-d:#F1B4A8;--s6-m:#C46A5C;
+    --s7:#E08B7E;--s7-l:#3B1B15;--s7-d:#F1B4A8;--s7-m:#C46A5C;
+  }
+  [data-theme="editorial"]{
+    --bg:#0B0B0C; --bg2:#151517; --bg3:#1D1D20; --bg4:#26262A; --card-solid:#141416;
+    --text:#F2F1EF; --text2:#A2A09C; --text3:#82807B;
+    --border:rgba(255,255,255,.15);
+    --blue:#6BA3E8;   --blue-light:#12263D;   --blue-dark:#A6CBF2;   --blue-mid:#4A83C9;
+    --teal:#43AC8E;   --teal-light:#0D2C24;   --teal-dark:#7BD2B4;   --teal-mid:#31967A;
+    --amber:#DDA733;  --amber-light:#33270A;  --amber-dark:#EFCA74;  --amber-mid:#C29024;
+    --red:#F0616D;    --red-light:#3E1219;    --red-dark:#F79EA6;
+    --pink:#E089A8;   --pink-light:#3D1A28;
+    --green:#90C258;  --green-light:#1E2F11;  --green-dark:#B5DC89;  --green-mid:#76A644;
+    --purple:#9C8FF0; --purple-light:#231C57; --purple-dark:#C4BBF7; --purple-mid:#7E70DC;
+    --coral:#EE9264;  --coral-light:#3F1E0D;  --coral-dark:#F7BA96;  --coral-mid:#D07444;
+    --s1:#F0616D;--s1-l:#3E1219;--s1-d:#F79EA6;--s1-m:#E8505E;
+    --s2:#F0616D;--s2-l:#3E1219;--s2-d:#F79EA6;--s2-m:#E8505E;
+    --s3:#F0616D;--s3-l:#3E1219;--s3-d:#F79EA6;--s3-m:#E8505E;
+    --s4:#F0616D;--s4-l:#3E1219;--s4-d:#F79EA6;--s4-m:#E8505E;
+    --s5:#F0616D;--s5-l:#3E1219;--s5-d:#F79EA6;--s5-m:#E8505E;
+    --s6:#F0616D;--s6-l:#3E1219;--s6-d:#F79EA6;--s6-m:#E8505E;
+    --s7:#F0616D;--s7-l:#3E1219;--s7-d:#F79EA6;--s7-m:#E8505E;
+  }
+  [data-theme="console"]{
+    --bg:#121214; --bg2:#19191C; --bg3:#212124; --bg4:#2A2A2E; --card-solid:#171719;
+    --text:#E5E5E8; --text2:#9A9B9F; --text3:#828388;
+    --border:rgba(255,255,255,.14);
+    --blue:#3FB8C4;   --blue-light:#0A2E33;   --blue-dark:#7FDCE5;   --blue-mid:#2AA0AC;
+    --teal:#4FBF95;   --teal-light:#0C2E22;   --teal-dark:#88DCB6;   --teal-mid:#37A67C;
+    --amber:#D9A32E;  --amber-light:#33250A;  --amber-dark:#EEC670;  --amber-mid:#BE8C1F;
+    --red:#E07A7A;    --red-light:#3A1818;    --red-dark:#F1ADAD;
+    --pink:#D37F9E;   --pink-light:#381824;
+    --green:#88C34E;  --green-light:#1C2F0E;  --green-dark:#B0DC80;  --green-mid:#6FA83C;
+    --purple:#8F86DC; --purple-light:#201C4A; --purple-dark:#BAB4EE; --purple-mid:#7168C4;
+    --coral:#DE8459;  --coral-light:#3A1C0C;  --coral-dark:#F0AF8D;  --coral-mid:#C26A3F;
+    --s1:#3FB8C4;--s1-l:#0A2E33;--s1-d:#7FDCE5;--s1-m:#2AA0AC;
+    --s2:#3FB8C4;--s2-l:#0A2E33;--s2-d:#7FDCE5;--s2-m:#2AA0AC;
+    --s3:#3FB8C4;--s3-l:#0A2E33;--s3-d:#7FDCE5;--s3-m:#2AA0AC;
+    --s4:#3FB8C4;--s4-l:#0A2E33;--s4-d:#7FDCE5;--s4-m:#2AA0AC;
+    --s5:#3FB8C4;--s5-l:#0A2E33;--s5-d:#7FDCE5;--s5-m:#2AA0AC;
+    --s6:#3FB8C4;--s6-l:#0A2E33;--s6-d:#7FDCE5;--s6-m:#2AA0AC;
+    --s7:#E07A7A;--s7-l:#3A1818;--s7-d:#F1ADAD;--s7-m:#E07A7A;
+  }
+}
+
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto;}
   #nav-panel{transform:none;transition:opacity 0.15s var(--ease-out);}  /* keep the fade, drop translateY+scale */
@@ -503,7 +716,9 @@ details[open] summary::before{transform:rotate(90deg);}
 
 ```html
 <!DOCTYPE html>
-<html lang="zh-CN">
+<!-- data-theme 决定整篇观感；省略 = 旧版暖米白多彩。选哪套见「Section Color Assignment Guide」。
+     journal=纸本学刊(衬线正文,推荐默认) / editorial=高对比杂志(考前速览) / console=工程终端(电子与算法) -->
+<html lang="zh-CN" data-theme="journal">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -580,18 +795,18 @@ details[open] summary::before{transform:rotate(90deg);}
   <div class="toc-title">目录</div>
 
   <div class="toc-l1">
-    <a href="#s8-1"><span class="sec-dot" style="background:var(--purple-mid)"></span>§8-1 液体的微观结构</a>
+    <a href="#s8-1"><span class="sec-dot" style="background:var(--s1-m)"></span>§8-1 液体的微观结构</a>
     <div class="toc-l2">
-      <a href="#s8-1-1"><span class="sec-dot" style="background:var(--purple-mid)"></span>§8-1-1 近程有序性</a>
-      <a href="#s8-1-2"><span class="sec-dot" style="background:var(--purple-mid)"></span>§8-1-2 液晶</a>
+      <a href="#s8-1-1"><span class="sec-dot" style="background:var(--s1-m)"></span>§8-1-1 近程有序性</a>
+      <a href="#s8-1-2"><span class="sec-dot" style="background:var(--s1-m)"></span>§8-1-2 液晶</a>
     </div>
   </div>
 
   <div class="toc-l1">
-    <a href="#s8-2"><span class="sec-dot" style="background:var(--teal-mid)"></span>§8-2 热传导与扩散</a>
+    <a href="#s8-2"><span class="sec-dot" style="background:var(--s2-m)"></span>§8-2 热传导与扩散</a>
     <div class="toc-l2">
-      <a href="#s8-2-1"><span class="sec-dot" style="background:var(--teal-mid)"></span>§8-2-1 热传导</a>
-      <a href="#s8-2-2"><span class="sec-dot" style="background:var(--teal-mid)"></span>§8-2-2 黏性</a>
+      <a href="#s8-2-1"><span class="sec-dot" style="background:var(--s2-m)"></span>§8-2-1 热传导</a>
+      <a href="#s8-2-2"><span class="sec-dot" style="background:var(--s2-m)"></span>§8-2-2 黏性</a>
     </div>
   </div>
 
@@ -604,7 +819,7 @@ details[open] summary::before{transform:rotate(90deg);}
      and closes exactly 2 divs at the end (</div></div>).
      NEVER nest another .sec-COLOR div inside a section.
 -->
-<div class="sec-purple" id="s1">  <!-- depth +1 -->
+<div class="sec-1" id="s1">  <!-- depth +1 -->
 <div class="section">             <!-- depth +2 -->
 
   <div class="section-header">
@@ -739,14 +954,8 @@ details[open] summary::before{transform:rotate(90deg);}
 
 
   /* ── Floating navigator: hierarchical heading tracking ── */
-  var COLORS = {
-    purple:'#534AB7', teal:'#0F6E56', coral:'#993C1D',
-    amber:'#BA7517',  blue:'#185FA5', green:'#3B6D11', red:'#A32D2D'
-  };
-  if(window.matchMedia('(prefers-color-scheme:dark)').matches) COLORS = {
-    purple:'#AFA9EC', teal:'#5DCAA5', coral:'#F0997B',
-    amber:'#EF9F27',  blue:'#85B7EB', green:'#97C459', red:'#F09595'
-  };
+  /* 分区色不在 JS 里取值：把分区类原样挂到导航行上，徽章和圆点写 var(--sec*)，由 CSS 求值。
+     主题切换与明暗切换都实时跟随。旧版在这里写死了明暗两张十六进制表 —— 一换主题必然错色。 */
 
   var list  = document.getElementById('nav-list');
   var btn   = document.getElementById('nav-btn');
@@ -757,6 +966,7 @@ details[open] summary::before{transform:rotate(90deg);}
   var anchors = [];
 
   var secs = document.querySelectorAll(
+    '[id].sec-1,[id].sec-2,[id].sec-3,[id].sec-4,[id].sec-5,[id].sec-6,[id].sec-7,' +
     '[id].sec-purple,[id].sec-teal,[id].sec-coral,[id].sec-amber,[id].sec-blue,[id].sec-green,[id].sec-red'
   );
   secs.forEach(function(sec){
@@ -764,11 +974,11 @@ details[open] summary::before{transform:rotate(90deg);}
     if(!hdr) return;
     var num   = (hdr.querySelector('.section-num')||{}).textContent || '';
     var ttl   = (hdr.querySelector('h2')||{}).textContent || '';
-    var cls   = (sec.className||'').match(/sec-(\w+)/);
-    var color = cls ? (COLORS[cls[1]] || '#888') : '#888';
+    var secCls = ((sec.className || '').match(/sec-[\w-]+/) || [''])[0];
 
     /* L0: chapter row */
     var row = document.createElement('a');
+    row.className = secCls;
     row.href = '#' + sec.id;
     row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 14px 5px;'+
       'font-size:13px;font-weight:600;color:inherit;text-decoration:none;'+
@@ -777,14 +987,14 @@ details[open] summary::before{transform:rotate(90deg);}
     badge.textContent = num;
     badge.style.cssText = 'min-width:22px;height:20px;border-radius:4px;font-size:10px;font-weight:700;'+
       'display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;padding:0 3px;'+
-      'background:'+color+';color:#fff;';
+      'background:var(--sec-l,var(--bg3));color:var(--sec-d,var(--text));';
     var lbl = document.createElement('span');
     lbl.textContent = ttl;
     lbl.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
     row.appendChild(badge); row.appendChild(lbl);
     row.addEventListener('click', function(){ panel.classList.remove('open'); });
     list.appendChild(row);
-    anchors.push({el: hdr, link: row, level: 0, color: color});
+    anchors.push({el: hdr, link: row, level: 0});
 
     /* L1: sub-headings — collect section-header h2 siblings at card/h3/h4 level.
        We look for elements that bear an id (section sub-anchors assigned by TOC)
@@ -796,13 +1006,14 @@ details[open] summary::before{transform:rotate(90deg);}
     /* Also pick up explicit subsection anchors (h3 with class .subsec or just any h3 with id) */
     sec.querySelectorAll('.card h3[id]').forEach(function(h3){
       var sub = document.createElement('a');
+      sub.className = secCls;
       sub.href = '#' + h3.id;
       sub.style.cssText = 'display:flex;align-items:center;gap:7px;'+
         'padding:3px 14px 3px 32px;font-size:12px;color:var(--text2,#a8a69e);'+
         'text-decoration:none;transition:background 0.1s,color 0.1s;'+
         'border-left:2px solid transparent;margin-left:0;';
       var dot = document.createElement('span');
-      dot.style.cssText = 'width:4px;height:4px;border-radius:50%;background:'+color+';'+
+      dot.style.cssText = 'width:4px;height:4px;border-radius:50%;background:var(--sec,#888);'+
         'flex-shrink:0;opacity:0.5;transition:opacity 0.1s;';
       var slbl = document.createElement('span');
       slbl.textContent = h3.textContent.replace(/^\s*[\d§.]+\s*/, ''); /* strip leading numbers */
@@ -810,7 +1021,7 @@ details[open] summary::before{transform:rotate(90deg);}
       sub.appendChild(dot); sub.appendChild(slbl);
       sub.addEventListener('click', function(){ panel.classList.remove('open'); });
       list.appendChild(sub);
-      anchors.push({el: h3, link: sub, level: 1, dot: dot, color: color});
+      anchors.push({el: h3, link: sub, level: 1, dot: dot});
     });
   });
 
@@ -837,7 +1048,7 @@ details[open] summary::before{transform:rotate(90deg);}
       a.link.style.color = 'var(--text,#e8e6de)';
     } else {
       a.link.style.color = 'var(--text,#e8e6de)';
-      a.link.style.borderLeftColor = a.color || '#378ADD';
+      a.link.style.borderLeftColor = 'var(--sec,#378ADD)';
       if(a.dot) a.dot.style.opacity = '1';
     }
     /* Scroll nav panel to keep active item visible */
@@ -1026,18 +1237,42 @@ Everything else — formula boxes, derivations, examples, tables, sub-headings �
 
 ## Section Color Assignment Guide
 
-Assign colors based on conceptual role, not sequence:
+### 先选方向（`<html data-theme="…">`）
 
-| Color | Best for |
+一套固定观感用在每份笔记上，翻上几十份必然疲劳。按**这份笔记是什么**来挑：
+
+| `data-theme` | 观感与承诺 | 用于 |
+|---|---|---|
+| `journal` **（推荐默认）** | 思源宋体正文 16px/1.95；取消卡片改发丝线；零圆角；760px 窄版心。**衬线与 KaTeX 的 Computer Modern 同源，公式和正文不再像两种东西** | 长推导、通读复习、数学/物理 —— 笔记的常态 |
+| `editorial` | 思源宋体 Black 46px 大标题，46/30/20/15.5 真尺寸跳跃；标题区左对齐；一支正红；840px | 考前速览、重点复习 —— 要快速扫读抓重点时 |
+| `console` | 等宽字承担数字、单位、`[01]` 序号；紧排；960px 宽版心（放得下更宽的数据表） | **电子、电路、信号**，以及算法、实验数据、代码类 |
+| 省略 | 旧版暖米白多彩 | 兼容既有笔记 |
+
+各配深色版。命名与 `visual-report` 一致，两个 skill 共用一套词汇。
+
+### 再排分区槽
+
+`.sec-1` … `.sec-7` 是**槽位不是颜色**：按知识角色分配，不按顺序。
+
+| 槽 | 用于 |
 |---|---|
-| `sec-purple` | Foundational definitions, prerequisites |
-| `sec-teal` | Geometric or spatial concepts (gradient, vectors) |
-| `sec-coral` | Scalar-producing operations (divergence, norms) |
-| `sec-amber` | Rotational/dynamic concepts (curl, angular quantities) |
-| `sec-blue` | Major theorems and integral laws |
-| `sec-green` | Applications, worked-out results |
-| `sec-red` | Practice problems, exams |
-| neutral `.section-num` style | Summary/comparison sections |
+| `.sec-1` | 基础定义、前置知识 |
+| `.sec-2` | 几何 / 空间概念（梯度、向量） |
+| `.sec-3` | 产生标量的运算（散度、范数） |
+| `.sec-4` | 旋转 / 动力学概念（旋度、角量） |
+| `.sec-5` | 主要定理与积分定律 |
+| `.sec-6` | 应用、已解结果 |
+| `.sec-7` | 练习题、考题 —— **所有方向里都保持红色**，那是语义不是装饰 |
+
+三套方向里前六槽是同一个色（单色分区，靠序号和规则线区分章节）；只有省略 `data-theme`
+时才是六色轮转。
+
+旧类名 `.sec-purple` `.sec-teal` `.sec-coral` `.sec-amber` `.sec-blue` `.sec-green` `.sec-red`
+仍然有效（依次是 1–7 槽的别名），**老笔记一个字都不用改**。
+
+**核验徽章不受主题影响**：`.b-verified`（绿框）和 `.b-unverified`（琥珀框）走的是语义色
+`--green-*` / `--amber-*`，与分区槽已彻底解耦 —— 换任何方向，「已核验 / 未自动核验」
+的颜色语义都不会被染掉。
 
 ## Big Formula Usage
 
