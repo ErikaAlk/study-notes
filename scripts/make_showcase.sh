@@ -14,6 +14,10 @@
 # virtual-time budget, so no manual wait is required.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# _full_b.png below is a scratch capture that the PIL crop deletes on its way out. Under
+# `set -e` a failure anywhere in that heredoc aborts the script first, so the removal is
+# only guaranteed from here. Path is relative — must come after the cd above.
+trap 'rm -f assets/_full_b.png' EXIT
 
 BROWSER=""
 for c in "/c/Program Files/Google/Chrome/Application/chrome.exe" \

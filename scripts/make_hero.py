@@ -23,6 +23,11 @@ CHROME = next((p for p in [
 
 DESKTOP_SRC = "examples/重积分应用与含参积分（MODE-B·作业反推章节笔记）.html"
 MOBILE_PNG = "assets/mobile.png"
+# Scratch files: the desktop capture only exists to be inlined as base64, and the layout
+# is what Chrome actually screenshots. Neither is an artifact — main() deletes both in a
+# finally, so a mid-run failure cannot leave them behind.
+DESKTOP_TMP = "assets/_hero_desktop.png"
+LAYOUT_TMP = "assets/_hero_layout.html"
 
 
 def shot(url, out, size, budget=10000):
@@ -37,20 +42,8 @@ def b64(path):
         return "data:image/png;base64," + base64.b64encode(f.read()).decode()
 
 
-def main():
-    if CHROME is None:
-        sys.exit("no Chrome/Edge found")
-    os.makedirs("assets", exist_ok=True)
-
-    # 1. real desktop capture (top of a MODE-B page: header → formula box → example)
-    dtmp = "assets/_hero_desktop.png"
-    shot("file:///" + os.path.abspath(DESKTOP_SRC).replace("\\", "/"), dtmp, "1180,1500")
-    if not os.path.exists(MOBILE_PNG):
-        subprocess.run([sys.executable, "scripts/make_mobile_shot.py"], check=True)
-
-    desk, mob = b64(dtmp), b64(MOBILE_PNG)
-    hero = "assets/_hero_layout.html"
-    with open(hero, "w", encoding="utf-8") as f:
+def write_layout(path, desk, mob):
+    with open(path, "w", encoding="utf-8") as f:
         f.write(f"""<!doctype html><meta charset="utf-8">
 <style>
   *{{margin:0;box-sizing:border-box;font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}}
@@ -92,9 +85,27 @@ def main():
     <div class="phone"><img src="{mob}"></div>
   </div>
 </div>""")
-    shot("file:///" + os.path.abspath(hero).replace("\\", "/"), "assets/hero.png", "1280,640", budget=4000)
-    os.remove(dtmp)
-    os.remove(hero)
+
+
+def main():
+    if CHROME is None:
+        sys.exit("no Chrome/Edge found")
+    os.makedirs("assets", exist_ok=True)
+
+    try:
+        # 1. real desktop capture (top of a MODE-B page: header → formula box → example)
+        shot("file:///" + os.path.abspath(DESKTOP_SRC).replace("\\", "/"), DESKTOP_TMP, "1180,1500")
+        if not os.path.exists(MOBILE_PNG):
+            subprocess.run([sys.executable, "scripts/make_mobile_shot.py"], check=True)
+
+        # 2. lay the real captures out as HTML, then screenshot the layout
+        desk, mob = b64(DESKTOP_TMP), b64(MOBILE_PNG)
+        write_layout(LAYOUT_TMP, desk, mob)
+        shot("file:///" + os.path.abspath(LAYOUT_TMP).replace("\\", "/"), "assets/hero.png", "1280,640", budget=4000)
+    finally:
+        for tmp in (DESKTOP_TMP, LAYOUT_TMP):
+            if os.path.exists(tmp):
+                os.remove(tmp)
     from PIL import Image
     print(f"wrote assets/hero.png  {Image.open('assets/hero.png').size}")
 

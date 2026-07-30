@@ -67,28 +67,34 @@ def main():
     if CHROME is None:
         sys.exit("no Chrome/Edge found")
     os.makedirs(os.path.dirname(OUT) or ".", exist_ok=True)
+    # The full-page capture lands next to the GIF (it is far too tall to keep in
+    # memory as the only copy), so every path out of here must remove it again —
+    # hence the finally below.
     tmp = OUT + ".full.png"
-    render_fullpage(HTML, tmp)
-    im = Image.open(tmp).convert("RGB")
-    H = min(content_bottom(im), MAX_SCROLL)
-    im = im.crop((0, 0, RENDER_W, H))
+    try:
+        render_fullpage(HTML, tmp)
+        im = Image.open(tmp).convert("RGB")
+        H = min(content_bottom(im), MAX_SCROLL)
+        im = im.crop((0, 0, RENDER_W, H))
 
-    frames, y = [], 0
-    last = max(0, H - VIEW_H)
-    while y < last:
-        win = im.crop((0, y, RENDER_W, y + VIEW_H))
-        win = win.resize((FRAME_W, int(VIEW_H * FRAME_W / RENDER_W)), Image.LANCZOS)
-        frames.append(win.convert("P", palette=Image.ADAPTIVE, colors=COLORS))
-        y += STEP
-    tail = im.crop((0, last, RENDER_W, H)).resize(
-        (FRAME_W, int((H - last) * FRAME_W / RENDER_W)), Image.LANCZOS).convert(
-        "P", palette=Image.ADAPTIVE, colors=COLORS)
-    frames.append(tail)
+        frames, y = [], 0
+        last = max(0, H - VIEW_H)
+        while y < last:
+            win = im.crop((0, y, RENDER_W, y + VIEW_H))
+            win = win.resize((FRAME_W, int(VIEW_H * FRAME_W / RENDER_W)), Image.LANCZOS)
+            frames.append(win.convert("P", palette=Image.ADAPTIVE, colors=COLORS))
+            y += STEP
+        tail = im.crop((0, last, RENDER_W, H)).resize(
+            (FRAME_W, int((H - last) * FRAME_W / RENDER_W)), Image.LANCZOS).convert(
+            "P", palette=Image.ADAPTIVE, colors=COLORS)
+        frames.append(tail)
 
-    seq = frames[:1] * HOLD_TOP + frames + frames[-1:] * HOLD_END
-    seq[0].save(OUT, save_all=True, append_images=seq[1:], loop=0,
-                duration=FRAME_MS, optimize=True, disposal=2)
-    os.remove(tmp)
+        seq = frames[:1] * HOLD_TOP + frames + frames[-1:] * HOLD_END
+        seq[0].save(OUT, save_all=True, append_images=seq[1:], loop=0,
+                    duration=FRAME_MS, optimize=True, disposal=2)
+    finally:
+        if os.path.exists(tmp):
+            os.remove(tmp)
     kb = os.path.getsize(OUT) // 1024
     print(f"wrote {OUT}  ({len(seq)} frames, {kb} KB, content height {H}px)")
 

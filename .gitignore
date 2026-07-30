@@ -5,6 +5,11 @@ __pycache__/
 Thumbs.db
 *.skill
 
-# 渲染中间产物：make_mobile_shot.py 已用 try/finally 自清理，这里只是硬杀（SIGKILL/断电）时的兜底
+# 渲染中间产物：四个出图脚本都已自清理（Python 用 try/finally，shell 用 trap EXIT），
+# 这里只是硬杀（SIGKILL/断电）时的兜底——不拿 .gitignore 遮盖「脚本不收拾自己」
 _mobile_wrap.html
 *.cap.png
+_hero_desktop.png
+_hero_layout.html
+_full_b.png
+*.full.png
