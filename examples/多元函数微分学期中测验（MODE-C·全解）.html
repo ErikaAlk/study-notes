@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="journal">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,7 +34,25 @@
 <script>if('scrollRestoration' in history) history.scrollRestoration = 'manual';</script>
 <style>
 :root {
+  /* ── 间距刻度（4px 基）。旧版散值 22/26/13/18/2.5px 归并到这里 ── */
+  --sp1:4px; --sp2:8px; --sp3:12px; --sp4:16px; --sp5:24px; --sp6:32px; --sp7:48px;
+  /* ── 字号刻度 ── */
+  --fs-xs:12px; --fs-sm:13px; --fs-md:14px; --fs-base:15px;
+  --fs-lg:17px; --fs-xl:20px; --fs-2xl:23px; --fs-3xl:30px; --fs-4xl:38px;
+  /* ── 字体族。均为本机/常见 Windows 字体，无网络依赖，缺字自动回退 ── */
+  --font-sans:"Noto Sans SC","Segoe UI Variable Text","Segoe UI",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  --font-serif:"Noto Serif SC","Sitka Text",Constantia,Georgia,"华文宋体",宋体,serif;
+  --font-mono:"Cascadia Mono",Consolas,"Noto Sans SC","Microsoft YaHei",monospace;
+  /* ── 主题旋钮：换皮只改这些，组件规则不动 ── */
+  --font-body:var(--font-sans); --font-display:var(--font-sans); --font-num:var(--font-sans);
+  --fs-h1:var(--fs-3xl); --fs-h2:var(--fs-2xl); --fs-h3:var(--fs-lg); --fs-body:var(--fs-base);
+  --lh-body:1.8;
+  --card-px:26px; --card-py:22px;
+  --card-bg:var(--bg2); --card-bd:1px solid var(--border);
+  --rule-w:2.5px; --measure:900px;
   --bg:#ffffff; --bg2:#f7f6f2; --bg3:#f0ede6; --bg4:#e8e4db;
+  /* text3 由 #8a8a84 调深：旧值在 --bg2 卡片上只有 3.21:1，低于 AA。图注、TOC 标题、
+     meta 标签都吃它。保持色相只调明度解得。 */
   --text:#1a1a18; --text2:#5a5a56; --text3:#70706B;
   --border:rgba(0,0,0,0.11);
   --purple:#534AB7; --purple-light:#EEEDFE; --purple-dark:#3C3489; --purple-mid:#7F77DD;
@@ -46,9 +64,20 @@
   --red:#A32D2D;    --red-light:#FCEBEB;    --red-dark:#791F1F;
   --pink:#993556;   --pink-light:#FBEAF0;
   --radius:10px;
-  /* Easing: the built-in keywords are too weak to read as intentional. --ease-out for enter/exit,
-     --ease-in-out for on-screen morphing. Never ease-in on UI -- it withholds the first frames. */
-  --ease-out:cubic-bezier(0.23,1,0.32,1); --ease-in-out:cubic-bezier(0.77,0,0.175,1);
+  /* ══ 分区色与语义色解耦 ══
+     旧版 .sec-green 与核验徽章 .b-verified 共用 --green、.sec-amber 与 .b-unverified 共用
+     --amber。想把分区改成单色，就会连带把「已核验（绿框）/ 未自动核验（琥珀框）」一起染掉，
+     那是笔记里最不能丢的语义。拆成两套：
+       --green/--amber/--blue/--red/--teal/…  只服务语义（核验徽章、callout、答案框）
+       --s1..--s7                             只服务分区（序号块/标题/步骤号/TOC 圆点/导航徽章）
+     多彩 = 七槽七色；单色 = 前六槽同色（--s7 练习/考题保持红，那是语义不是装饰）。 */
+  /* Easing. The built-in CSS keywords are too weak to read as intentional, so the house style is
+     these two. --ease-out for anything entering or leaving: it puts the movement at the instant
+     the reader is watching most closely. --ease-in-out for something morphing while already on
+     screen. Never ease-in on UI — it withholds the first frames and feels sluggish at the very
+     same duration. */
+  --ease-out:cubic-bezier(0.23,1,0.32,1);
+  --ease-in-out:cubic-bezier(0.77,0,0.175,1);
 }
 @media(prefers-color-scheme:dark){
   :root{
@@ -58,6 +87,13 @@
     --purple-light:#26215C; --teal-light:#04342C; --coral-light:#4A1B0C;
     --amber-light:#412402; --blue-light:#042C53; --green-light:#173404;
     --red-light:#501313; --pink-light:#4B1528;
+    /* CRITICAL dark-mode contrast fix. The block above only re-darkens the *-light
+       BACKGROUNDS; without the two lines below, the base accents and the *-dark TEXT
+       colours keep their light-mode (dark) values, so every "accent text on accent-light
+       background" pairing — badges (.b-teal), section headings (.sec-* h2), .flabel,
+       callout icons, graded .quiz-opt — becomes dark-on-dark and unreadable (old
+       teal-dark on teal-light measured 1.46:1). Brightening them restores 6.8–9.9:1.
+       *-mid are already bright; leave them untouched. */
     --purple:#9A92E6; --teal:#3FB389; --coral:#E07B52; --amber:#E89A2A;
     --blue:#5B9FE0; --green:#7FB23E; --red:#E07676; --pink:#D87B9C;
     --purple-dark:#C7C2F5; --teal-dark:#74D6B0; --coral-dark:#F4A487; --amber-dark:#F2B75A;
@@ -65,46 +101,127 @@
   }
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.8;}
-.page{max-width:900px;margin:0 auto;padding:32px 24px 100px;}
+/* overflow-x:clip 落在 html（真正的滚动容器）上——通栏 .band 用 100vw，而 100vw 含竖向
+   滚动条宽度，只加在 body 上挡不住。用 clip 不用 hidden：hidden 会让 html 变成滚动容器，
+   粘性定位失效。 */
+html{scroll-behavior:smooth;overflow-x:clip;}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);
+  font-size:var(--fs-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased;overflow-x:clip;}
+p,li{text-wrap:pretty;}   /* 消灭段尾孤字 */
+.header h1,.section h2,.card h3,.card h4{font-family:var(--font-display);}
+.page{max-width:var(--measure);margin:0 auto;padding:var(--sp6) var(--sp5) 100px;}
+/* Safety net: if a div escapes .page due to a tag mismatch, body still constrains width */
 body>*:not(.page){max-width:900px;margin-left:auto;margin-right:auto;padding-left:24px;padding-right:24px;}
+/* Content links — without this rule a body link falls back to the UA default (#0000EE,
+   visited #551A8B), which is near-invisible on the dark background (1.78:1 / 1.52:1 measured;
+   WCAG AA needs 4.5:1 — a real user report). One rule fixes both schemes: --blue is #185FA5
+   in light (6.5:1 on white) and flips to the bright #5B9FE0 in dark (6.0:1). Components that
+   recolor their own <a> (.toc-l1/.toc-l2, #nav-panel, .lead) override this downstream;
+   build_and_check.py WARNs when a page's CSS is missing this rule. */
 a{color:var(--blue);text-underline-offset:2px;}
-/* letter-spacing is inherited, so tracking on any ancestor (the heading scale below, .fbox
-   .flabel's 0.09em) leaks into the math and adds a gap after every glyph box. Reset it here. */
+/* letter-spacing is INHERITED, so tracking set on any ancestor lands inside KaTeX and adds a gap
+   after every glyph box, wrecking the spacing KaTeX computed. Two live sources: the heading scale
+   below (.header h1 / .section h2 / .card h3) and .fbox .flabel's 0.09em, which reaches the inline
+   math inside a formula label. That is the same class of bug as the flabel text-transform one
+   fixed in v0.8.16 — that fix missed that the very same rule leaks letter-spacing too. A rule
+   naming .katex directly beats inheritance from any ancestor, however specific. */
 .katex{font-size:1.06em;letter-spacing:normal;}
-.katex-display{margin:4px 0!important;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;padding:0.45em 0 2px;-webkit-overflow-scrolling:touch;}
+/* ── Wide display-formula handling (revised) ──
+   A display formula wider than the text column must NOT spill past its box / the viewport.
+   That overflow happens at ANY width (a long equation overflows a 900px column too, not just
+   on a phone), so the fix must be width-independent: scroll the formula horizontally INSIDE
+   its own box at all widths. overflow-y:hidden is deliberate and load-bearing — it stops
+   .katex-display from becoming a *vertical* scroll container, so a mostly-vertical wheel /
+   trackpad gesture passes straight through to the page instead of being trapped on the formula
+   (the "jump" the earlier all-visible design was trying to avoid). The box auto-sizes to the
+   formula's natural height, so overflow-y:hidden never clips a tall \dfrac / \int / \sqrt /
+   matrix (verified by rendering). Top accents (\vec / \hat / \bar / \dot) DO sit a hair above
+   that measured height, so top padding is 0.45em (not 2px) so the arrowhead is not shaved. The
+   chunky OS-native scrollbar is replaced by the thin,
+   theme-aware one defined just below. */
+.katex-display{margin:4px 0!important;overflow-x:auto;overflow-y:hidden;
+  overscroll-behavior-x:contain;padding:0.45em 0 2px;-webkit-overflow-scrolling:touch;}
+/* Thin, theme-aware scrollbar for the only two things that scroll horizontally — wide
+   formulas and wide tables — instead of the jarring white OS default with stepper arrows.
+   It only appears when content actually overflows; formulas that fit show no bar. The thumb
+   is --text2 (not --text3): --text3 measured 2.7–3.0:1 on the box bg, just under WCAG 1.4.11's
+   3:1 for non-text UI; --text2 clears it at ~5.7:1 and reads as a clearer scroll affordance. */
 .katex-display,table{scrollbar-width:thin;scrollbar-color:var(--text2) transparent;}
 .katex-display::-webkit-scrollbar,table::-webkit-scrollbar{height:7px;}
+.katex-display::-webkit-scrollbar-track,table::-webkit-scrollbar-track{background:transparent;}
 .katex-display::-webkit-scrollbar-thumb,table::-webkit-scrollbar-thumb{background:var(--text2);border-radius:4px;}
+.katex-display:hover::-webkit-scrollbar-thumb,table:hover::-webkit-scrollbar-thumb{background:var(--text);}
+/* drop the chunky stepper-arrow buttons at the ends → a clean, minimal bar */
 .katex-display::-webkit-scrollbar-button,table::-webkit-scrollbar-button{display:none;width:0;height:0;}
-.card p,.card li,.callout-body p,.callout-body li{overflow-wrap:break-word;}
+/* keyboard a11y: the JS below adds tabindex=0 to a formula/table ONLY when it actually
+   overflows, so a keyboard user can focus it and arrow-scroll. Show a focus ring for them. */
+.katex-display:focus-visible,table:focus-visible{outline:2px solid var(--blue-mid);outline-offset:2px;border-radius:4px;}
+
+/* ── Global width normalisation ──
+   Every block component is width:100% and cannot overflow its container.
+   NOTE: <details> is intentionally excluded — it needs overflow:visible for tall formulas. */
 .card,.fbox,.callout,.big-formula,.example-block,.toc,
 table,.answer-box,.two-col,.steps,.visual-row{
-  width:100%;max-width:100%;box-sizing:border-box;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
 }
+/* Tables may be wide — allow horizontal scroll only on the table element itself,
+   not on formula containers (scrollbars on formula boxes intercept page scroll). */
 table{overflow-x:auto;display:block;}
+
+/* ── Embedded source figures (题目原图) ──
+   Every base64-embedded raster figure carries class="fig-embed". Without a HEIGHT cap,
+   a vertical phone-photo/scan crop renders at full height and fills the whole screen
+   (real user complaint) — max-width:100% alone does not save you. Cap it to roughly
+   half a viewport, center it, and let one click restore full size (zoom JS lives in
+   the skeleton, next to the other behavior scripts). */
+img.fig-embed{display:block;margin:12px auto;max-width:100%;width:auto;height:auto;
+  max-height:min(48vh,380px);border:1px solid var(--border);border-radius:8px;
+  cursor:zoom-in;}
+img.fig-embed.zoom{max-height:none;cursor:zoom-out;}
+
+/* Header */
 .header{text-align:center;padding:48px 0 36px;border-bottom:1px solid var(--border);margin-bottom:40px;}
-/* Heading type scale: tracking scales WITH size (em, never px -- the mobile block re-sizes
-   h1/h2), leading scales INVERSELY (headings used to inherit body's 1.8 = a 41px line box on
-   a 23px h2, which reads unglued once a Chinese title wraps). Values stay conservative: CJK
-   glyphs sit on a fixed em grid and collide sooner than Latin. */
-.header h1{font-size:30px;font-weight:700;margin-bottom:10px;letter-spacing:-0.021em;line-height:1.25;}
-/* A heading may hold inline math; tightened leading would squeeze KaTeX's vertical-align. */
+/* ── Heading type scale (h1 → h5) ──
+   Two size-dependent rules, applied to every heading below:
+   • Tracking scales WITH size and must be in em, never px. Letters read too far apart as they
+     grow, so large text wants negative tracking and body wants ~0; a fixed px value is therefore
+     wrong at every size except the one it was tuned for. The mobile block at the end of this
+     sheet re-sizes h1 and h2, where an em value follows along and a px value would not. The
+     values are deliberately conservative: this rule comes from Latin display type, and CJK glyphs
+     sit on a fixed em grid with no side bearings, so they collide sooner and gain less from
+     tightening than Latin does.
+   • Leading scales INVERSELY to size — tight on large headings, loose on body. Every heading here
+     used to inherit body's line-height:1.8, i.e. a 41px line box on a 23px h2, which reads
+     unglued the moment a heading wraps to two lines (Chinese titles wrap often). h4 already
+     carried its own 1.4; the rest had been left behind. */
+/* 字号走 --fs-h1（主题可覆盖）；字距与行高是 v0.8.17 的标题刻度，原样保留。
+   注意：此前这里写死 30px，导致主题设的 --fs-h1 根本没人消费。 */
+.header h1{font-size:var(--fs-h1);font-weight:var(--h1-weight,700);margin-bottom:10px;
+  letter-spacing:-0.021em;line-height:var(--h1-lh,1.25);}
+/* A heading may contain inline math, and the tightened leading above would squeeze the
+   vertical-align KaTeX uses to place fractions and accents — the same root cause as the .frow
+   occlusion documented further down. Tracking is already handled globally on .katex, above. */
 .header h1 .katex,.section h2 .katex,.card h3 .katex{line-height:normal;}
 .header .subtitle{color:var(--text2);font-size:14px;margin-bottom:16px;}
 .tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
 .tag{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;}
+
+/* TOC — hierarchical outline style */
 .toc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px 26px;margin-bottom:44px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;}
+/* L1: chapter rows */
 .toc-l1{margin-bottom:2px;}
 .toc-l1>a{display:flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;
   font-size:14px;font-weight:600;padding:5px 6px;border-radius:6px;transition:background 0.12s;}
-/* Hover is gated to real pointers: a touch tap fires :hover and it STICKS until the next tap
-   elsewhere. :active is the touch-correct feedback, and it doubles as press feedback. */
+/* Hover is gated to real pointers throughout this sheet. A touch tap fires :hover and it STICKS
+   until the next tap elsewhere, so the row you just left stays highlighted. :active is the
+   touch-correct feedback, and it doubles as the press feedback a pointer user gets too. */
 @media(hover:hover) and (pointer:fine){.toc-l1>a:hover{background:var(--bg3);}}
 .toc-l1>a:active{background:var(--bg4);}
 .toc-l1>a .sec-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+/* L2: sub-section rows */
 .toc-l2{padding-left:22px;margin-top:1px;margin-bottom:3px;}
 .toc-l2 a{display:flex;align-items:center;gap:7px;color:var(--blue);text-decoration:none;
   font-size:13px;padding:3px 6px;border-radius:5px;transition:background 0.12s;
@@ -112,37 +229,76 @@ table{overflow-x:auto;display:block;}
 @media(hover:hover) and (pointer:fine){.toc-l2 a:hover{background:var(--bg3);text-decoration:none;}}
 .toc-l2 a:active{background:var(--bg4);}
 .toc-l2 a .sec-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;opacity:0.7;}
+
+/* Section */
 .section{margin-bottom:60px;}
-.section-header{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:14px;border-bottom:2.5px solid var(--border);}
-.section-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;}
-.section h2{font-size:23px;font-weight:700;letter-spacing:-0.014em;line-height:1.35;}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px 26px;margin-bottom:16px;}
-/* Perf on huge notes: content-visibility:auto skips layout+paint of off-screen blocks so
-   opening a <details> no longer re-lays-out/repaints the whole tall page (multi-second jank).
-   'auto' caches the real off-screen height once seen; scroll position is approximate until then. */
+.section-header{display:flex;align-items:center;gap:var(--sp3);margin-bottom:var(--sp5);
+  padding-bottom:var(--sp3);border-bottom:var(--rule-w) solid var(--border);}
+.section-num{width:36px;height:36px;border-radius:var(--num-radius,50%);display:flex;align-items:center;
+  justify-content:center;font-size:var(--fs-base);font-weight:700;flex-shrink:0;font-family:var(--font-num);
+  background:var(--sec-l,var(--bg3));color:var(--sec-d,var(--text));}
+.section h2{font-size:var(--fs-h2);font-weight:700;letter-spacing:-0.014em;line-height:var(--h2-lh,1.35);
+  color:var(--sec-d,var(--text));}  /* type scale: see .header h1 */
+
+/* ── Cards ── */
+.card{background:var(--card-bg);border:var(--card-bd);border-radius:var(--radius);
+  padding:var(--card-py) var(--card-px);margin-bottom:var(--sp4);}
+/* ── Perf on huge notes (1000s of formulas) ──
+   content-visibility:auto lets the browser SKIP layout + paint of off-screen blocks, so opening a
+   <details> (or any reflow) no longer forces the whole tall page to re-layout/repaint — that whole-
+   page repaint on a 100k+ node page is what makes opening a solution jank for seconds. contain-
+   intrinsic-size is an estimated off-screen height; the 'auto' keyword caches the real size once a
+   block has rendered. Trade-off: scrollbar position and scroll-memory restore are approximate on
+   very long notes until scrolled through once (the doRestore retry below copes) — well worth it. */
 .card,.example-block{content-visibility:auto;contain-intrinsic-size:auto 600px;}
-.card h3{font-size:17px;font-weight:700;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--border);letter-spacing:-0.006em;line-height:1.45;}
+
+/* Level 1 card title: prominent, full-width bottom rule */
+.card h3{font-size:var(--fs-h3);font-weight:700;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--border);
+  letter-spacing:-0.006em;line-height:1.45;}  /* type scale: see .header h1 */
+
+/* Level 2 sub-heading: left accent bar + slightly indented */
 .card h4{font-size:14px;font-weight:700;margin:20px 0 8px;padding-left:10px;
   border-left:3px solid var(--border);color:var(--text);line-height:1.4;}
+
+/* Level 3 sub-sub-heading: muted, no decoration, tight top margin */
 .card h5{font-size:13px;font-weight:600;margin:14px 0 6px;color:var(--text2);letter-spacing:0.02em;line-height:1.5;}
+
 .card p{margin-bottom:10px;line-height:1.8;}
 .card p:last-child{margin-bottom:0;}
 .card ul,.card ol{padding-left:22px;margin-bottom:10px;}
 .card li{margin-bottom:6px;line-height:1.8;font-size:14px;}
-.fbox{background:var(--bg3);border-left:3.5px solid;border-radius:0 10px 10px 0;padding:18px 22px;margin:14px 0;overflow:visible;}
+
+/* Formula boxes */
+.fbox{background:var(--bg3);border-left:3.5px solid var(--sec,var(--border));
+  border-radius:0 var(--radius) var(--radius) 0;padding:18px 22px;margin:var(--sp3) 0;overflow:visible;}
 .fbox .flabel{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:12px;opacity:0.75;}
+/* inline math in a label must keep its real case: the uppercase transform above would otherwise turn x,y,z,t into X,Y,Z,T (a real render bug) */
+.fbox .flabel .katex, .fbox .flabel .katex *{text-transform:none;}
+/* CRITICAL: never set line-height on .frow — KaTeX uses internal vertical-align to position
+   fractions, integrals, matrices. If line-height is smaller than the formula's rendered height,
+   the inline content inside .katex-display protrudes below the line box, and the NEXT element's
+   background covers it (paint order issue). Use line-height:normal to reset the inherited
+   body line-height of 1.8 which is the root cause of the occlusion bug. */
 .fbox .frow{margin:10px 0;line-height:normal;overflow:visible;}
 .fbox .frow:first-of-type{margin-top:0;}
 .fbox .fnote{font-size:13px;color:var(--text2);margin-top:10px;line-height:1.6;}
+
+/* Same fix for big-formula — must not inherit body line-height */
 .big-formula{text-align:center;padding:22px 18px;background:var(--bg2);border-radius:10px;margin:18px 0;overflow:visible;border:1px solid var(--border);line-height:normal;}
 .big-formula.highlight{border-width:2px;}
+
+/* Callouts */
 .callout{border-radius:9px;padding:14px 18px;margin:14px 0;display:flex;gap:13px;}
 .callout-icon{font-size:15px;flex-shrink:0;margin-top:3px;line-height:1;}
 .callout-body{flex:1;}
+/* Only the direct-child <strong> (the callout title line) gets display:block.
+   <strong> nested inside <p> or <li> stays inline — never add display:block
+   to a general tag selector like 'strong' without a '>' combinator. */
 .callout-body > strong{display:block;font-size:13px;font-weight:700;margin-bottom:5px;}
 .callout-body p strong,.callout-body li strong{display:inline;font-size:inherit;font-weight:700;}
 .callout-body p,.callout-body li{font-size:14px;margin:0 0 4px;line-height:1.7;}
 .callout-body ul{padding-left:18px;margin:0;}
+/* note=blue💡, tip=teal✦, warn=amber⚠, exam=red★, intuition=purple🔍, mistake=pink✗, derivation=gray∴ */
 .note{background:var(--blue-light);border:1px solid rgba(24,95,165,0.18);}
 .note .callout-icon::before{content:"💡";}
 .tip{background:var(--teal-light);border:1px solid rgba(15,110,86,0.18);}
@@ -157,54 +313,84 @@ table{overflow-x:auto;display:block;}
 .mistake .callout-icon::before{content:"✗";color:var(--pink);font-size:13px;}
 .derivation{background:var(--bg3);border:1px solid var(--border);}
 .derivation .callout-icon::before{content:"∴";color:var(--text3);font-size:14px;font-weight:700;}
+
+/* Tables */
 table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0;}
 th{background:var(--bg3);font-weight:600;padding:10px 14px;text-align:left;border:1px solid var(--border);}
 td{padding:10px 14px;border:1px solid var(--border);vertical-align:middle;line-height:1.9;}
 tr:nth-child(even) td{background:var(--bg2);}
 td .katex,th .katex{font-size:0.95em;}
+
+/* Collapsible details —
+   overflow:hidden would clip tall KaTeX content (fractions, integrals, matrices)
+   at the bottom of an open <details> block. Use overflow:visible instead.
+   border-radius still renders on the border itself; only interior corner-clipping
+   of overflowing children is lost, which is acceptable. */
 details{border:1px solid var(--border);border-radius:9px;margin-bottom:10px;overflow:visible;}
 summary{padding:13px 18px;font-weight:600;font-size:14px;cursor:pointer;background:var(--bg2);display:flex;align-items:center;gap:8px;list-style:none;user-select:none;}
 summary::-webkit-details-marker{display:none;}
-/* Press feedback. summary is a full-width row, so darken it rather than scale it (that would
-   visibly shrink the whole card header); real buttons get the scale -- see #nav-btn. */
+/* Press feedback. Something pressable that does nothing on pointer-down reads as dead — the
+   feedback belongs on the press, not the release. summary is a full-width row, so the usual
+   button treatment (scale 0.97) would visibly shrink the whole card header; darken the
+   background instead. Real buttons do get the scale — see #nav-btn. */
 summary:active{background:var(--bg3);}
+/* The arrow morphs in place rather than entering or leaving, so it takes --ease-in-out. */
 summary::before{content:"▶";font-size:9px;color:var(--text3);transition:transform 0.2s var(--ease-in-out);flex-shrink:0;}
 details[open] summary::before{transform:rotate(90deg);}
 .details-body{padding:18px 20px;}
 .details-body p{margin-bottom:8px;font-size:14px;}
-.step{display:flex;gap:14px;margin-bottom:16px;}
-.step-num{width:28px;height:28px;border-radius:50%;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
-.step-body{flex:1;font-size:14px;line-height:1.75;}
-.step-body > strong{display:block;margin-bottom:4px;}
+
+/* Steps —
+   .step is a flex row: [step-num] [step-body]. The IDEAL nesting puts every formula/callout
+   INSIDE .step-body. But a block (.fbox/.callout/.answer-box/.big-formula or a <p>) sometimes
+   ends up as a DIRECT child of .step (a sibling of .step-body) — e.g. a solver agent emits
+   <div class="step-body">…</div><div class="fbox">…</div>. Without the guards below that block
+   becomes a third flex item, and a wide display formula's min-content width squeezes .step-body
+   toward 0 so CJK text shatters to ONE CHARACTER PER LINE (a real MODE-C failure: 4 solutions
+   rendered as vertical columns of single chars). Three load-bearing guards make .step robust to
+   that mis-nesting:
+     • flex-wrap:wrap            — lets a stray block move to its own line instead of competing
+     • .step-body{flex:1 1 0;min-width:0} — min-width:0 lets the text body shrink/wrap normally
+                                    (default min-width:auto is what lets a sibling starve it)
+     • .step>BLOCK{flex:0 0 100%} — forces any stray block child to a full-width row BELOW
+   build_and_check.py also WARNs on the mis-nesting so it gets cleaned up at the source. */
+.step{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:16px;}
+.step-num{width:28px;height:28px;border-radius:var(--num-radius,50%);font-size:var(--fs-sm);font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:var(--font-num);
+  background:var(--sec-l,var(--bg3));color:var(--sec-d,var(--text));}
+.step-body{flex:1 1 0;min-width:0;font-size:14px;line-height:1.75;}
+.step>.fbox,.step>.callout,.step>.answer-box,.step>.big-formula,.step>p{flex:0 0 100%;width:100%;box-sizing:border-box;margin-top:0;}
+/* Bold has exactly TWO levels in a step, and only the FIRST gets a line of its own:
+   • Step title = the first direct-child <strong> → display:block (its own line).
+   • In-text emphasis = any LATER <strong>, including one written directly under .step-body
+     because the model didn't wrap the prose in <p> → must stay INLINE.
+   The old rule block-ified EVERY direct-child <strong>, so each bold term in the running text
+   shattered onto its own line and the title/emphasis hierarchy collapsed into one flat level.
+   :first-of-type (not :first-child) finds the title even if a badge/icon precedes it. */
+.step-body > strong{display:inline;font-weight:700;}
+.step-body > strong:first-of-type{display:block;margin-bottom:4px;}
 .step-body p strong,.step-body li strong{display:inline;font-weight:700;}
-.sec-purple .section-num{background:var(--purple-light);color:var(--purple-dark);}
-.sec-purple .section h2{color:var(--purple-dark);}
-.sec-purple .fbox{border-color:var(--purple);}
-.sec-purple .step-num{background:var(--purple-light);color:var(--purple-dark);}
-.sec-teal .section-num{background:var(--teal-light);color:var(--teal-dark);}
-.sec-teal .section h2{color:var(--teal-dark);}
-.sec-teal .fbox{border-color:var(--teal);}
-.sec-teal .step-num{background:var(--teal-light);color:var(--teal-dark);}
-.sec-coral .section-num{background:var(--coral-light);color:var(--coral-dark);}
-.sec-coral .section h2{color:var(--coral-dark);}
-.sec-coral .fbox{border-color:var(--coral);}
-.sec-coral .step-num{background:var(--coral-light);color:var(--coral-dark);}
-.sec-amber .section-num{background:var(--amber-light);color:var(--amber-dark);}
-.sec-amber .section h2{color:var(--amber-dark);}
-.sec-amber .fbox{border-color:var(--amber);}
-.sec-amber .step-num{background:var(--amber-light);color:var(--amber-dark);}
-.sec-blue .section-num{background:var(--blue-light);color:var(--blue-dark);}
-.sec-blue .section h2{color:var(--blue-dark);}
-.sec-blue .fbox{border-color:var(--blue);}
-.sec-blue .step-num{background:var(--blue-light);color:var(--blue-dark);}
-.sec-green .section-num{background:var(--green-light);color:var(--green-dark);}
-.sec-green .section h2{color:var(--green-dark);}
-.sec-green .fbox{border-color:var(--green);}
-.sec-green .step-num{background:var(--green-light);color:var(--green-dark);}
-.sec-red .section-num{background:var(--red-light);color:var(--red-dark);}
-.sec-red .section h2{color:var(--red-dark);}
-.sec-red .fbox{border-color:var(--red);}
-.sec-red .step-num{background:var(--red-light);color:var(--red-dark);}
+
+/* 分区槽位。旧类名保留为别名，老笔记一个字都不用改；新笔记写 .sec-1 .. .sec-7。
+   组件不再需要 28 行 .sec-X .Y 规则：--sec* 是自定义属性，会从外层继承下来。 */
+:root{
+  --s1:var(--purple); --s1-l:var(--purple-light); --s1-d:var(--purple-dark); --s1-m:var(--purple-mid);
+  --s2:var(--teal);   --s2-l:var(--teal-light);   --s2-d:var(--teal-dark);   --s2-m:var(--teal-mid);
+  --s3:var(--coral);  --s3-l:var(--coral-light);  --s3-d:var(--coral-dark);  --s3-m:var(--coral-mid);
+  --s4:var(--amber);  --s4-l:var(--amber-light);  --s4-d:var(--amber-dark);  --s4-m:var(--amber-mid);
+  --s5:var(--blue);   --s5-l:var(--blue-light);   --s5-d:var(--blue-dark);   --s5-m:var(--blue-mid);
+  --s6:var(--green);  --s6-l:var(--green-light);  --s6-d:var(--green-dark);  --s6-m:var(--green-mid);
+  --s7:var(--red);    --s7-l:var(--red-light);    --s7-d:var(--red-dark);    --s7-m:var(--red);
+}
+.sec-1,.sec-purple{--sec:var(--s1);--sec-l:var(--s1-l);--sec-d:var(--s1-d);--sec-m:var(--s1-m);}
+.sec-2,.sec-teal  {--sec:var(--s2);--sec-l:var(--s2-l);--sec-d:var(--s2-d);--sec-m:var(--s2-m);}
+.sec-3,.sec-coral {--sec:var(--s3);--sec-l:var(--s3-l);--sec-d:var(--s3-d);--sec-m:var(--s3-m);}
+.sec-4,.sec-amber {--sec:var(--s4);--sec-l:var(--s4-l);--sec-d:var(--s4-d);--sec-m:var(--s4-m);}
+.sec-5,.sec-blue  {--sec:var(--s5);--sec-l:var(--s5-l);--sec-d:var(--s5-d);--sec-m:var(--s5-m);}
+.sec-6,.sec-green {--sec:var(--s6);--sec-l:var(--s6-l);--sec-d:var(--s6-d);--sec-m:var(--s6-m);}
+.sec-7,.sec-red   {--sec:var(--s7);--sec-l:var(--s7-l);--sec-d:var(--s7-d);--sec-m:var(--s7-m);}
+
+/* Badges */
 .badge{display:inline-block;padding:2px 9px;border-radius:4px;font-size:11px;font-weight:600;margin-right:4px;}
 .b-purple{background:var(--purple-light);color:var(--purple-dark);}
 .b-teal{background:var(--teal-light);color:var(--teal-dark);}
@@ -213,43 +399,331 @@ details[open] summary::before{transform:rotate(90deg);}
 .b-blue{background:var(--blue-light);color:var(--blue-dark);}
 .b-green{background:var(--green-light);color:var(--green-dark);}
 .b-red{background:var(--red-light);color:var(--red-dark);}
-/* Verification badges (boxed): green=已核验 (x-verify passed), amber=未自动核验 (abstain, not red — not 'wrong'). */
+/* Verification badges (boxed highlight). b-verified = a solution whose executable x-verify block
+   PASSED (green box). b-unverified = 未自动核验, an honest abstention — not machine-verified, may
+   still be correct (amber "heads-up" box, deliberately NOT red so it doesn't read as "wrong"). */
 .b-verified{background:var(--green-light);color:var(--green-dark);border:1px solid var(--green);font-weight:700;}
 .b-unverified{background:var(--amber-light);color:var(--amber-dark);border:1px solid var(--amber);}
+
+/* "How to use" lead box at top of a solutions page (用法说明 + 核验图例). */
+.lead{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:28px;}
+.lead p{margin-bottom:8px;}
+.lead a{color:var(--blue);font-weight:600;}
+/* Legend chip — looks like a verification badge but is NOT counted as one (class is .lgnd, not .badge),
+   so a legend that demonstrates 已核验/未自动核验 never inflates the badge gate. Use ONLY in the legend. */
+.lgnd{display:inline-block;padding:1px 8px;border-radius:4px;font-size:12px;font-weight:700;}
+.lg-v{background:var(--green-light);color:var(--green-dark);border:1px solid var(--green);}
+.lg-u{background:var(--amber-light);color:var(--amber-dark);border:1px solid var(--amber);}
+
+/* Example blocks — no fixed height, no max-height, no writing-mode.
+   The header is a horizontal strip at the top; content expands to fit.
+   NEVER use writing-mode, transform:rotate, or height/max-height on these. */
+.example-block{border:1px solid var(--border);border-radius:9px;overflow:visible;margin:14px 0;
+  height:auto !important;max-height:none !important;}
+.example-header{background:var(--bg3);padding:10px 18px;font-size:13px;font-weight:700;line-height:1.7;
+  /* Block flow, NOT flex. The header holds free text broken up by inline elements — a KaTeX
+     $v$ span, <strong>, a trailing 已核验 badge. Under display:flex each text run becomes a
+     separate anonymous flex item that shrinks to min-width on a phone, shattering the Chinese
+     title into vertical columns. Inline/block flow lets badge+text+math wrap as one normal
+     line. writing-mode/height stay !important to keep the past vertical-text fix. */
+  border-bottom:1px solid var(--border);border-radius:9px 9px 0 0;
+  writing-mode:horizontal-tb !important;height:auto !important;}
+.example-header .badge{vertical-align:middle;}
+.example-body{padding:16px 20px;height:auto !important;max-height:none !important;}
+.example-body p{font-size:14px;margin-bottom:8px;line-height:1.75;}
+.example-body p:last-child{margin-bottom:0;}
+
+/* Answer highlight */
 .answer-box{background:var(--green-light);border:1.5px solid rgba(59,109,17,0.25);border-radius:8px;padding:12px 16px;margin-top:10px;}
 .answer-box p{font-size:14px;margin:0;}
-/* ── extra helpers for exam questions ── */
+
+/* Two-column layout */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+@media(max-width:580px){.two-col{grid-template-columns:1fr;}}
+
+/* ── Floating section navigator ── */
+#nav-btn{
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  width:34px;height:34px;border-radius:8px;
+  background:var(--bg2);color:var(--text2);
+  border:1px solid var(--border);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 1px 6px rgba(0,0,0,0.18);
+  transition:background 0.15s,color 0.15s,box-shadow 0.15s,transform 0.12s var(--ease-out);
+  font-size:15px;line-height:1;
+}
+@media(hover:hover) and (pointer:fine){
+  #nav-btn:hover{background:var(--bg3);color:var(--text);box-shadow:0 2px 12px rgba(0,0,0,0.22);}
+}
+/* This one IS a real button, so it takes the press scale rather than a background shift. */
+#nav-btn:active{transform:scale(0.94);}
+#nav-panel{
+  position:fixed;bottom:66px;right:24px;z-index:9998;
+  background:var(--bg);border:1px solid var(--border);border-radius:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.18);
+  width:240px;max-height:65vh;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--text2) transparent;  /* Firefox: thin themed bar */
+  padding:8px 0;
+  opacity:0;transform:translateY(8px) scale(0.97);
+  pointer-events:none;transition:opacity 0.15s var(--ease-out),transform 0.15s var(--ease-out);
+}
+/* WebKit: the panel scrolls vertically when the list is long. Without this it falls back to the
+   OS-native scrollbar, whose light track shows as an ugly white strip down the dark panel.
+   Give it the same thin themed bar as .katex-display/table; the 2px transparent border +
+   padding-box clip insets the thumb so it clears the panel's 10px corner radius. */
+#nav-panel::-webkit-scrollbar{width:8px;}
+#nav-panel::-webkit-scrollbar-track{background:transparent;}
+#nav-panel::-webkit-scrollbar-thumb{background:var(--text2);border-radius:5px;
+  border:2px solid transparent;background-clip:padding-box;}
+#nav-panel:hover::-webkit-scrollbar-thumb{background:var(--text);background-clip:padding-box;}
+#nav-panel::-webkit-scrollbar-button{display:none;width:0;height:0;}
+#nav-panel.open{opacity:1;transform:none;pointer-events:auto;}
+#nav-panel a{
+  display:flex;align-items:center;gap:9px;
+  padding:6px 14px;font-size:13px;color:var(--text);
+  text-decoration:none;line-height:1.4;
+  transition:background 0.1s;
+}
+@media(hover:hover) and (pointer:fine){#nav-panel a:hover{background:var(--bg2);}}
+#nav-panel a:active{background:var(--bg3);}
+#nav-panel a .nd{
+  width:20px;height:20px;border-radius:5px;font-size:10px;font-weight:700;
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+  color:#fff;
+}
+#nav-panel .nav-title{
+  font-size:10px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:0.08em;
+  padding:0 14px 5px;border-bottom:1px solid var(--border);margin-bottom:3px;
+}
+
+/* ── Universal overflow guard ──
+   Long inline math, URLs, or unbroken strings must wrap instead of pushing the page wide.
+   (KaTeX inline atoms still won't split mid-symbol, but this stops prose from overflowing.) */
+.card p,.card li,.callout-body p,.callout-body li,.example-body p,.details-body p,.step-body,
+.answer-box p,.fnote{overflow-wrap:break-word;}
+
+/* ── Mobile (≤600px) ──
+   Wide-formula overflow is already handled width-independently by .katex-display above; here
+   we only reclaim horizontal space (tighter padding) and shrink oversized headings/math so
+   long rows need less scrolling in the first place. */
+@media(max-width:600px){
+  body{font-size:14px;}
+  .page{padding:24px 14px 80px;}
+  .card{padding:18px 16px;}
+  .fbox{padding:14px 16px;}
+  .big-formula{padding:18px 12px;}
+  .katex{font-size:1em;}
+  .header h1{font-size:24px;}
+  .section h2{font-size:20px;}
+}
+
+/* ── Reduced motion ──
+   This block MUST stay at the END of the sheet. #nav-panel's transform is set at plain #id
+   specificity above, so an equal-specificity @media block placed earlier would simply lose the
+   cascade and silently do nothing.
+   The rule is DOWNGRADE, not zero: drop the vestibular triggers (long scroll journeys, translate,
+   scale) and keep opacity and colour, which aid comprehension. Hence the panel still fades — it
+   just no longer flies. The dominant motion source on this page is smooth scrolling: every TOC
+   and floating-nav click sweeps the entire page past the eye, which is exactly the case the
+   preference exists for. The JS paths are already safe and need no guard (scroll-memory restore
+   passes behavior:'instant'; the panel's scrollIntoView is 'auto' on a container that never sets
+   scroll-behavior, so it is instant too). */
+/* ── 节奏破格：通栏。长笔记从头到尾都是灰卡片，读三屏眼睛就不分层级了。
+   每 3～4 节插一条，也是放整幅插图、阶段小结、章节导读的天然位置。 */
+.band{margin:var(--sp7) calc(50% - 50vw);padding:var(--sp7) calc(50vw - 50% + var(--sp5));
+  background:var(--band-bg,var(--bg3));
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.band .band-inner{max-width:var(--measure);margin:0 auto;}
+.band h3{font-size:var(--fs-xl);font-weight:700;margin-bottom:var(--sp3);}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   主题层 —— 写在 <html data-theme="journal|editorial|console">，省略 = 旧版暖米白多彩。
+   命名与 visual-report 一致，两个 skill 共用一套词汇。
+   每套只覆盖变量，组件规则一律不动；核验徽章的绿/琥珀走语义色，不受主题影响。
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 纸本学刊 journal｜衬线正文 + 窄版心｜长推导、通读复习（推荐默认）。
+      衬线与 KaTeX（Computer Modern 血统）同源，公式和正文不再像两种东西 ── */
+[data-theme="journal"]{
+  --bg:#FCFBF8; --bg2:#F6F3ED; --bg3:#F1EDE4; --bg4:#E9E3D6; --card-solid:transparent;
+  --text:#1B1815; --text2:#5C554C; --text3:#746D64;
+  --border:rgba(27,24,21,.16);
+  --font-body:var(--font-serif); --font-display:var(--font-serif); --font-num:var(--font-serif);
+  --fs-body:16px; --fs-h1:var(--fs-4xl); --fs-h2:26px; --fs-h3:var(--fs-xl);
+  --lh-body:1.95; --radius:0px; --num-radius:0px;
+  --card-px:0px; --card-py:0px; --card-bg:transparent; --card-bd:0;
+  --rule-w:1px; --measure:760px;
+  --blue:#2B4A6B;  --blue-light:#E8EDF2;  --blue-dark:#1A3350;  --blue-mid:#4A7099;
+  --teal:#3F5A44;  --teal-light:#E8EEE8;  --teal-dark:#2A3F2E;  --teal-mid:#5C7F62;
+  --amber:#8A6410; --amber-light:#F5EDDB; --amber-dark:#5F4408; --amber-mid:#C89422;
+  --red:#7C2A22;   --red-light:#F4E9E7;   --red-dark:#5C1D17;
+  --pink:#7A3550;  --pink-light:#F4E9ED;
+  --green:#3B5E40; --green-light:#E7EEE7; --green-dark:#264229; --green-mid:#57814E;
+  --purple:#4A3F63;--purple-light:#EDEAF2;--purple-dark:#332A48;--purple-mid:#726399;
+  --coral:#8A4A2A; --coral-light:#F5EAE3; --coral-dark:#5F311A; --coral-mid:#B5714A;
+  --s1:#7C2A22;--s1-l:#F4E9E7;--s1-d:#5C1D17;--s1-m:#A8483C;
+  --s2:#7C2A22;--s2-l:#F4E9E7;--s2-d:#5C1D17;--s2-m:#A8483C;
+  --s3:#7C2A22;--s3-l:#F4E9E7;--s3-d:#5C1D17;--s3-m:#A8483C;
+  --s4:#7C2A22;--s4-l:#F4E9E7;--s4-d:#5C1D17;--s4-m:#A8483C;
+  --s5:#7C2A22;--s5-l:#F4E9E7;--s5-d:#5C1D17;--s5-m:#A8483C;
+  --s6:#7C2A22;--s6-l:#F4E9E7;--s6-d:#5C1D17;--s6-m:#A8483C;
+  --s7:#7C2A22;--s7-l:#F4E9E7;--s7-d:#5C1D17;--s7-m:#A8483C;
+}
+[data-theme="journal"] .card{border-bottom:1px solid var(--border);
+  padding-bottom:var(--sp5);margin-bottom:var(--sp5);}
+[data-theme="journal"] .card:last-child{border-bottom:0;}
+[data-theme="journal"] .card h3{border-bottom:0;padding-bottom:0;margin-bottom:var(--sp3);}
+[data-theme="journal"] .section-num{background:transparent;border:1px solid var(--border);
+  color:var(--text2);}
+[data-theme="journal"] summary{background:transparent;border-bottom:1px dashed var(--border);}
+[data-theme="journal"] details{border:0;}
+
+/* ── 高对比杂志 editorial｜大号衬线标题 + 强层级跳跃 + 一支正红
+      ｜考前速览、重点复习、要快速扫读抓重点的笔记 ── */
+[data-theme="editorial"]{
+  --bg:#FFFFFF; --bg2:#F6F5F3; --bg3:#EDEBE7; --bg4:#E2DFDA; --card-solid:#ffffff;
+  --text:#0B0B0C; --text2:#54524F; --text3:#716E6B;
+  --border:rgba(0,0,0,.13);
+  --font-display:var(--font-serif); --font-num:var(--font-serif);
+  --fs-body:15.5px; --fs-h1:46px; --fs-h2:30px; --fs-h3:var(--fs-xl);
+  --lh-body:1.8; --h2-lh:1.22;
+  --radius:6px; --num-radius:50%;
+  --card-px:28px; --card-py:24px; --rule-w:3px; --measure:840px;
+  --blue:#1B4F8F;  --blue-light:#E7EFF8;  --blue-dark:#0F3567;  --blue-mid:#3F7CC4;
+  --teal:#1D5C4A;  --teal-light:#E3F0EB;  --teal-dark:#124034;  --teal-mid:#2E8A6D;
+  --amber:#9A6A0F; --amber-light:#F7EFDC; --amber-dark:#6B4A08; --amber-mid:#D19A22;
+  --red:#C31F2E;   --red-light:#FAE9EA;   --red-dark:#8E1520;
+  --pink:#9A2B55;  --pink-light:#FAE8EE;
+  --green:#356515; --green-light:#EAF2E1; --green-dark:#22470A; --green-mid:#5A9128;
+  --purple:#4A31A8;--purple-light:#EDE9FA;--purple-dark:#33207A;--purple-mid:#7A63D6;
+  --coral:#A2431F; --coral-light:#F9EBE4; --coral-dark:#752D11; --coral-mid:#D06A38;
+  --s1:#C31F2E;--s1-l:#FAE9EA;--s1-d:#8E1520;--s1-m:#E14A57;
+  --s2:#C31F2E;--s2-l:#FAE9EA;--s2-d:#8E1520;--s2-m:#E14A57;
+  --s3:#C31F2E;--s3-l:#FAE9EA;--s3-d:#8E1520;--s3-m:#E14A57;
+  --s4:#C31F2E;--s4-l:#FAE9EA;--s4-d:#8E1520;--s4-m:#E14A57;
+  --s5:#C31F2E;--s5-l:#FAE9EA;--s5-d:#8E1520;--s5-m:#E14A57;
+  --s6:#C31F2E;--s6-l:#FAE9EA;--s6-d:#8E1520;--s6-m:#E14A57;
+  --s7:#C31F2E;--s7-l:#FAE9EA;--s7-d:#8E1520;--s7-m:#E14A57;
+}
+[data-theme="editorial"] .card{background:var(--card-solid);}
+/* 标题区左对齐、字重拉到 900：更像刊物不像证书。
+   .header h1 的 font-weight/letter-spacing 是写死的（v0.8.17 的字距刻度），只能在这里覆盖。 */
+[data-theme="editorial"] .header{text-align:left;}
+[data-theme="editorial"] .header h1{font-weight:900;line-height:1.08;letter-spacing:-0.02em;}
+[data-theme="editorial"] .header .subtitle,
+[data-theme="editorial"] .tags{justify-content:flex-start;text-align:left;}
+
+/* ── 工程终端 console｜等宽承担数字/单位/序号，紧排宽版心｜电子、算法、实验数据、代码类 ── */
+[data-theme="console"]{
+  --bg:#FBFBFA; --bg2:#F2F2F0; --bg3:#E7E7E4; --bg4:#DCDCD8; --card-solid:#ffffff;
+  --text:#16171A; --text2:#575A5E; --text3:#6B6D70;
+  --border:rgba(0,0,0,.14);
+  --font-num:var(--font-mono);
+  --fs-body:14.5px; --fs-h1:28px; --fs-h2:20px; --fs-h3:16px;
+  --lh-body:1.72; --radius:2px; --num-radius:2px;
+  --card-px:20px; --card-py:18px; --rule-w:1px; --measure:960px;
+  --blue:#0E6E78;  --blue-light:#E1EFF0;  --blue-dark:#085057;  --blue-mid:#1B9AA8;
+  --teal:#146B4E;  --teal-light:#E2F0EA;  --teal-dark:#0B4B36;  --teal-mid:#219A71;
+  --amber:#94670E; --amber-light:#F6EEDC; --amber-dark:#684808; --amber-mid:#CE9420;
+  --red:#A03434;   --red-light:#F8EAEA;   --red-dark:#762323;
+  --pink:#8E3556;  --pink-light:#F7E9EE;
+  --green:#3E6B18; --green-light:#EBF2E2; --green-dark:#2A4C0C; --green-mid:#639922;
+  --purple:#4B4392;--purple-light:#EBEAF5;--purple-dark:#332C6B;--purple-mid:#7970C4;
+  --coral:#8E4423; --coral-light:#F6EBE5; --coral-dark:#622C14; --coral-mid:#C06B41;
+  --s1:#0E6E78;--s1-l:#E1EFF0;--s1-d:#085057;--s1-m:#1B9AA8;
+  --s2:#0E6E78;--s2-l:#E1EFF0;--s2-d:#085057;--s2-m:#1B9AA8;
+  --s3:#0E6E78;--s3-l:#E1EFF0;--s3-d:#085057;--s3-m:#1B9AA8;
+  --s4:#0E6E78;--s4-l:#E1EFF0;--s4-d:#085057;--s4-m:#1B9AA8;
+  --s5:#0E6E78;--s5-l:#E1EFF0;--s5-d:#085057;--s5-m:#1B9AA8;
+  --s6:#0E6E78;--s6-l:#E1EFF0;--s6-d:#085057;--s6-m:#1B9AA8;
+  --s7:#A03434;--s7-l:#F8EAEA;--s7-d:#762323;--s7-m:#A03434;
+}
+[data-theme="console"] .card{background:var(--card-solid);}
+[data-theme="console"] .section-num{background:transparent;border:1px solid var(--sec);
+  color:var(--sec);width:auto;padding:0 8px;height:26px;font-size:12px;}
+[data-theme="console"] .section-num::before{content:"[";}
+[data-theme="console"] .section-num::after{content:"]";}
+
+/* ══ 各方向的深色版本 ══
+   ⚠ 必须写在主题块之后：@media 不提升特异性，:root 与 [data-theme=x] 同为 (0,1,0)，
+     同分比先后。放前面会被主题静默吃掉 —— 表现为深色模式下主题全停在白底。 */
+@media(prefers-color-scheme:dark){
+  [data-theme="journal"]{
+    --bg:#18160F; --bg2:#201D16; --bg3:#28241C; --bg4:#302B21; --card-solid:transparent;
+    --text:#EDE7DA; --text2:#A9A08E; --text3:#908571;
+    --border:rgba(237,231,218,.18);
+    --blue:#7FA8CC;   --blue-light:#1B2A38;   --blue-dark:#B4CFE6;   --blue-mid:#6289AB;
+    --teal:#89B08F;   --teal-light:#1D2C1F;   --teal-dark:#B2CFB6;   --teal-mid:#6D9474;
+    --amber:#D9A63A;  --amber-light:#33260A;  --amber-dark:#EDC97D;  --amber-mid:#BE8E28;
+    --red:#E08B7E;    --red-light:#3B1B15;    --red-dark:#F1B4A8;
+    --pink:#CE8AA2;   --pink-light:#33202A;
+    --green:#93BE99;  --green-light:#1E2F20;  --green-dark:#BBD6BF;  --green-mid:#74A07B;
+    --purple:#A79BC9; --purple-light:#2A2338; --purple-dark:#C7BFE0; --purple-mid:#8B7DB4;
+    --coral:#D69068;  --coral-light:#3A2413;  --coral-dark:#EBB795;  --coral-mid:#B8794F;
+    --s1:#E08B7E;--s1-l:#3B1B15;--s1-d:#F1B4A8;--s1-m:#C46A5C;
+    --s2:#E08B7E;--s2-l:#3B1B15;--s2-d:#F1B4A8;--s2-m:#C46A5C;
+    --s3:#E08B7E;--s3-l:#3B1B15;--s3-d:#F1B4A8;--s3-m:#C46A5C;
+    --s4:#E08B7E;--s4-l:#3B1B15;--s4-d:#F1B4A8;--s4-m:#C46A5C;
+    --s5:#E08B7E;--s5-l:#3B1B15;--s5-d:#F1B4A8;--s5-m:#C46A5C;
+    --s6:#E08B7E;--s6-l:#3B1B15;--s6-d:#F1B4A8;--s6-m:#C46A5C;
+    --s7:#E08B7E;--s7-l:#3B1B15;--s7-d:#F1B4A8;--s7-m:#C46A5C;
+  }
+  [data-theme="editorial"]{
+    --bg:#0B0B0C; --bg2:#151517; --bg3:#1D1D20; --bg4:#26262A; --card-solid:#141416;
+    --text:#F2F1EF; --text2:#A2A09C; --text3:#82807B;
+    --border:rgba(255,255,255,.15);
+    --blue:#6BA3E8;   --blue-light:#12263D;   --blue-dark:#A6CBF2;   --blue-mid:#4A83C9;
+    --teal:#43AC8E;   --teal-light:#0D2C24;   --teal-dark:#7BD2B4;   --teal-mid:#31967A;
+    --amber:#DDA733;  --amber-light:#33270A;  --amber-dark:#EFCA74;  --amber-mid:#C29024;
+    --red:#F0616D;    --red-light:#3E1219;    --red-dark:#F79EA6;
+    --pink:#E089A8;   --pink-light:#3D1A28;
+    --green:#90C258;  --green-light:#1E2F11;  --green-dark:#B5DC89;  --green-mid:#76A644;
+    --purple:#9C8FF0; --purple-light:#231C57; --purple-dark:#C4BBF7; --purple-mid:#7E70DC;
+    --coral:#EE9264;  --coral-light:#3F1E0D;  --coral-dark:#F7BA96;  --coral-mid:#D07444;
+    --s1:#F0616D;--s1-l:#3E1219;--s1-d:#F79EA6;--s1-m:#E8505E;
+    --s2:#F0616D;--s2-l:#3E1219;--s2-d:#F79EA6;--s2-m:#E8505E;
+    --s3:#F0616D;--s3-l:#3E1219;--s3-d:#F79EA6;--s3-m:#E8505E;
+    --s4:#F0616D;--s4-l:#3E1219;--s4-d:#F79EA6;--s4-m:#E8505E;
+    --s5:#F0616D;--s5-l:#3E1219;--s5-d:#F79EA6;--s5-m:#E8505E;
+    --s6:#F0616D;--s6-l:#3E1219;--s6-d:#F79EA6;--s6-m:#E8505E;
+    --s7:#F0616D;--s7-l:#3E1219;--s7-d:#F79EA6;--s7-m:#E8505E;
+  }
+  [data-theme="console"]{
+    --bg:#121214; --bg2:#19191C; --bg3:#212124; --bg4:#2A2A2E; --card-solid:#171719;
+    --text:#E5E5E8; --text2:#9A9B9F; --text3:#828388;
+    --border:rgba(255,255,255,.14);
+    --blue:#3FB8C4;   --blue-light:#0A2E33;   --blue-dark:#7FDCE5;   --blue-mid:#2AA0AC;
+    --teal:#4FBF95;   --teal-light:#0C2E22;   --teal-dark:#88DCB6;   --teal-mid:#37A67C;
+    --amber:#D9A32E;  --amber-light:#33250A;  --amber-dark:#EEC670;  --amber-mid:#BE8C1F;
+    --red:#E07A7A;    --red-light:#3A1818;    --red-dark:#F1ADAD;
+    --pink:#D37F9E;   --pink-light:#381824;
+    --green:#88C34E;  --green-light:#1C2F0E;  --green-dark:#B0DC80;  --green-mid:#6FA83C;
+    --purple:#8F86DC; --purple-light:#201C4A; --purple-dark:#BAB4EE; --purple-mid:#7168C4;
+    --coral:#DE8459;  --coral-light:#3A1C0C;  --coral-dark:#F0AF8D;  --coral-mid:#C26A3F;
+    --s1:#3FB8C4;--s1-l:#0A2E33;--s1-d:#7FDCE5;--s1-m:#2AA0AC;
+    --s2:#3FB8C4;--s2-l:#0A2E33;--s2-d:#7FDCE5;--s2-m:#2AA0AC;
+    --s3:#3FB8C4;--s3-l:#0A2E33;--s3-d:#7FDCE5;--s3-m:#2AA0AC;
+    --s4:#3FB8C4;--s4-l:#0A2E33;--s4-d:#7FDCE5;--s4-m:#2AA0AC;
+    --s5:#3FB8C4;--s5-l:#0A2E33;--s5-d:#7FDCE5;--s5-m:#2AA0AC;
+    --s6:#3FB8C4;--s6-l:#0A2E33;--s6-d:#7FDCE5;--s6-m:#2AA0AC;
+    --s7:#E07A7A;--s7-l:#3A1818;--s7-d:#F1ADAD;--s7-m:#E07A7A;
+  }
+}
+
+/* ── 本示例自带的额外组件（design-system.md 里属于另一个代码块）── */
+.card p,.card li,.callout-body p,.callout-body li{overflow-wrap:break-word;}
 .qstem{font-size:15px;line-height:2.0;margin-bottom:12px;}
 .opts{margin:8px 0 4px;}
 .opt{padding:8px 14px;margin:7px 0;background:var(--bg3);border-radius:8px;font-size:14px;line-height:1.85;}
 .opt .ol{font-weight:700;margin-right:9px;color:var(--text2);}
 .opt.correct{background:var(--green-light);border:1px solid rgba(59,109,17,0.35);}
 .opt.correct .ol{color:var(--green-dark);}
-#nav-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:34px;height:34px;border-radius:8px;
-  background:var(--bg2);color:var(--text2);border:1px solid var(--border);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;box-shadow:0 1px 6px rgba(0,0,0,0.18);
-  transition:background 0.15s,color 0.15s,box-shadow 0.15s,transform 0.12s var(--ease-out);font-size:15px;line-height:1;}
-@media(hover:hover) and (pointer:fine){#nav-btn:hover{background:var(--bg3);color:var(--text);box-shadow:0 2px 12px rgba(0,0,0,0.22);}}
-/* This one IS a real button, so it takes the press scale. */
-#nav-btn:active{transform:scale(0.94);}
-#nav-panel{position:fixed;bottom:66px;right:24px;z-index:9998;background:var(--bg);border:1px solid var(--border);border-radius:10px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.18);width:240px;max-height:65vh;overflow-y:auto;padding:8px 0;
-  opacity:0;transform:translateY(8px) scale(0.97);pointer-events:none;transition:opacity 0.15s var(--ease-out),transform 0.15s var(--ease-out);}
-#nav-panel.open{opacity:1;transform:none;pointer-events:auto;}
-#nav-panel a{display:flex;align-items:center;gap:9px;padding:6px 14px;font-size:13px;color:var(--text);text-decoration:none;line-height:1.4;transition:background 0.1s;}
-@media(hover:hover) and (pointer:fine){#nav-panel a:hover{background:var(--bg2);}}
-#nav-panel a:active{background:var(--bg3);}
-#nav-panel .nav-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;padding:0 14px 5px;border-bottom:1px solid var(--border);margin-bottom:3px;}
 
-/* Reduced motion. MUST be last in the sheet -- #nav-panel's transform is set at plain #id
-   specificity above, so an equal-specificity block placed earlier would silently lose the
-   cascade. The rule is DOWNGRADE, not zero: drop the vestibular triggers (long scroll journeys,
-   translate/scale), keep opacity and colour. Smooth scrolling is the dominant motion here --
-   every TOC / nav click sweeps the whole page past the eye. */
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto;}
-  #nav-panel{transform:none;transition:opacity 0.15s var(--ease-out);}
-  summary::before{transition:none;}
+  #nav-panel{transform:none;transition:opacity 0.15s var(--ease-out);}  /* keep the fade, drop translateY+scale */
+  summary::before{transition:none;}                                      /* arrow snaps instead of rotating */
 }
 </style>
 </head>
@@ -276,27 +750,27 @@ details[open] summary::before{transform:rotate(90deg);}
 
 <div class="toc">
   <div class="toc-title">目录 · 20 题</div>
-  <div class="toc-l1"><a href="#q1"><span class="sec-dot" style="background:var(--purple-mid)"></span>第 1 题 · 分段函数的偏导数存在性</a></div>
-  <div class="toc-l1"><a href="#q2"><span class="sec-dot" style="background:var(--teal-mid)"></span>第 2 题 · 隐函数的二阶偏导关系</a></div>
-  <div class="toc-l1"><a href="#q3"><span class="sec-dot" style="background:var(--coral-mid)"></span>第 3 题 · 全微分的判定（相等条件）</a></div>
-  <div class="toc-l1"><a href="#q4"><span class="sec-dot" style="background:var(--amber-mid)"></span>第 4 题 · 极值点的必要条件</a></div>
-  <div class="toc-l1"><a href="#q5"><span class="sec-dot" style="background:var(--blue-mid)"></span>第 5 题 · 处处连续的二元函数</a></div>
-  <div class="toc-l1"><a href="#q6"><span class="sec-dot" style="background:var(--green-mid)"></span>第 6 题 · 二阶判别法（鞍点）</a></div>
-  <div class="toc-l1"><a href="#q7"><span class="sec-dot" style="background:var(--red)"></span>第 7 题 · 偏导数的几何意义（切向量）</a></div>
-  <div class="toc-l1"><a href="#q8"><span class="sec-dot" style="background:var(--purple-mid)"></span>第 8 题 · 由全微分还原原函数</a></div>
-  <div class="toc-l1"><a href="#q9"><span class="sec-dot" style="background:var(--teal-mid)"></span>第 9 题 · 判别失效时的极值分析</a></div>
-  <div class="toc-l1"><a href="#q10"><span class="sec-dot" style="background:var(--coral-mid)"></span>第 10 题 · 连续但偏导不存在</a></div>
-  <div class="toc-l1"><a href="#q11"><span class="sec-dot" style="background:var(--amber-mid)"></span>第 11 题 · 介值定理（连通性）</a></div>
-  <div class="toc-l1"><a href="#q12"><span class="sec-dot" style="background:var(--blue-mid)"></span>第 12 题 · 二重极限的存在性</a></div>
-  <div class="toc-l1"><a href="#q13"><span class="sec-dot" style="background:var(--green-mid)"></span>第 13 题 · 由极限条件判极值</a></div>
-  <div class="toc-l1"><a href="#q14"><span class="sec-dot" style="background:var(--red)"></span>第 14 题 · 二阶偏导存在的推论</a></div>
-  <div class="toc-l1"><a href="#q15"><span class="sec-dot" style="background:var(--purple-mid)"></span>第 15 题 · 连续且偏导存在</a></div>
-  <div class="toc-l1"><a href="#q16"><span class="sec-dot" style="background:var(--teal-mid)"></span>第 16 题 · 间断点的判定</a></div>
-  <div class="toc-l1"><a href="#q17"><span class="sec-dot" style="background:var(--coral-mid)"></span>第 17 题 · 隐函数求导 (x^y=y^x)</a></div>
-  <div class="toc-l1"><a href="#q18"><span class="sec-dot" style="background:var(--amber-mid)"></span>第 18 题 · 曲面图形与方程匹配</a></div>
-  <div class="toc-l1"><a href="#q19"><span class="sec-dot" style="background:var(--blue-mid)"></span>第 19 题 · 连续性与偏导（含 sin）</a></div>
-  <div class="toc-l1"><a href="#q20"><span class="sec-dot" style="background:var(--green-mid)"></span>第 20 题 · 反正弦函数的定义域</a></div>
-  <div class="toc-l1"><a href="#key"><span class="sec-dot" style="background:var(--red)"></span>答案速查表 &amp; 考点小结</a></div>
+  <div class="toc-l1"><a href="#q1"><span class="sec-dot" style="background:var(--s1-m)"></span>第 1 题 · 分段函数的偏导数存在性</a></div>
+  <div class="toc-l1"><a href="#q2"><span class="sec-dot" style="background:var(--s2-m)"></span>第 2 题 · 隐函数的二阶偏导关系</a></div>
+  <div class="toc-l1"><a href="#q3"><span class="sec-dot" style="background:var(--s3-m)"></span>第 3 题 · 全微分的判定（相等条件）</a></div>
+  <div class="toc-l1"><a href="#q4"><span class="sec-dot" style="background:var(--s4-m)"></span>第 4 题 · 极值点的必要条件</a></div>
+  <div class="toc-l1"><a href="#q5"><span class="sec-dot" style="background:var(--s5-m)"></span>第 5 题 · 处处连续的二元函数</a></div>
+  <div class="toc-l1"><a href="#q6"><span class="sec-dot" style="background:var(--s6-m)"></span>第 6 题 · 二阶判别法（鞍点）</a></div>
+  <div class="toc-l1"><a href="#q7"><span class="sec-dot" style="background:var(--s7-m)"></span>第 7 题 · 偏导数的几何意义（切向量）</a></div>
+  <div class="toc-l1"><a href="#q8"><span class="sec-dot" style="background:var(--s1-m)"></span>第 8 题 · 由全微分还原原函数</a></div>
+  <div class="toc-l1"><a href="#q9"><span class="sec-dot" style="background:var(--s2-m)"></span>第 9 题 · 判别失效时的极值分析</a></div>
+  <div class="toc-l1"><a href="#q10"><span class="sec-dot" style="background:var(--s3-m)"></span>第 10 题 · 连续但偏导不存在</a></div>
+  <div class="toc-l1"><a href="#q11"><span class="sec-dot" style="background:var(--s4-m)"></span>第 11 题 · 介值定理（连通性）</a></div>
+  <div class="toc-l1"><a href="#q12"><span class="sec-dot" style="background:var(--s5-m)"></span>第 12 题 · 二重极限的存在性</a></div>
+  <div class="toc-l1"><a href="#q13"><span class="sec-dot" style="background:var(--s6-m)"></span>第 13 题 · 由极限条件判极值</a></div>
+  <div class="toc-l1"><a href="#q14"><span class="sec-dot" style="background:var(--s7-m)"></span>第 14 题 · 二阶偏导存在的推论</a></div>
+  <div class="toc-l1"><a href="#q15"><span class="sec-dot" style="background:var(--s1-m)"></span>第 15 题 · 连续且偏导存在</a></div>
+  <div class="toc-l1"><a href="#q16"><span class="sec-dot" style="background:var(--s2-m)"></span>第 16 题 · 间断点的判定</a></div>
+  <div class="toc-l1"><a href="#q17"><span class="sec-dot" style="background:var(--s3-m)"></span>第 17 题 · 隐函数求导 (x^y=y^x)</a></div>
+  <div class="toc-l1"><a href="#q18"><span class="sec-dot" style="background:var(--s4-m)"></span>第 18 题 · 曲面图形与方程匹配</a></div>
+  <div class="toc-l1"><a href="#q19"><span class="sec-dot" style="background:var(--s5-m)"></span>第 19 题 · 连续性与偏导（含 sin）</a></div>
+  <div class="toc-l1"><a href="#q20"><span class="sec-dot" style="background:var(--s6-m)"></span>第 20 题 · 反正弦函数的定义域</a></div>
+  <div class="toc-l1"><a href="#key"><span class="sec-dot" style="background:var(--s7-m)"></span>答案速查表 &amp; 考点小结</a></div>
 </div>
 <!-- ===================== 第 1 题 ===================== -->
 <div class="sec-purple" id="q1">
