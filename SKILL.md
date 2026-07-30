@@ -298,10 +298,22 @@ If there are many problems (≈8+) or they are independent of each other, you ma
 
 1. **Route**: read the input and pick the mode (Section 0).
 2. **Read** `references/design-system.md` before writing any code. For MODE A & MODE B also read `references/workflow-orchestration.md` (the plan→fan-out→verify→assemble workflow). For MODE C / any solutions also read `references/problem-solutions.md`.
-3. **Read inputs**: PDF (Step 0 / `scripts/extract_pdf.py`) and/or problem images.
-4. **Plan → fan-out → verify**: build the TOC + shared spec once, generate one unit per section/problem, and **verify every answer** (blind double-solve + checklist, compute with code) — see §0.5. Write HTML in part files.
-5. **Build + check**: run `scripts/build_and_check.py build <part1> <part2> ... -o <output.html>` to concatenate and run the static checks, then run `scripts/verify_solutions.py <output.html>` to **execute** every verification block, then the six post-generation checks below (Check 6 hands the file to codex for a semantic proofread, when available) and the coherence pass. Fix and re-run until clean.
-6. **Output** to `<outdir>/<name>.html` and call `present_files`.
+3. **Pick a direction** — `<html data-theme="…">`. One fixed look on every note is what makes a set of notes feel tired after a few dozen; choose it from **what this note is**. Full spec in `design-system.md` → **Section Color Assignment Guide**:
+
+   | 这份笔记是 | `data-theme` |
+   |---|---|
+   | 日常笔记、概念课、理论章节 — **拿不准就这套** | `lecture`（默认） |
+   | 长推导、通读复习、数学/物理（衬线正文，与 KaTeX 同源） | `textbook` |
+   | 算法、实验数据、代码类（等宽数字与单位，宽表格） | `lab` |
+
+   Keep one direction for the whole note — don't hand-tune variables mid-document. The verification
+   badges (`.b-verified` green / `.b-unverified` amber) are semantic colors and stay put in every
+   direction; never re-point them at a section slot.
+
+4. **Read inputs**: PDF (Step 0 / `scripts/extract_pdf.py`) and/or problem images.
+5. **Plan → fan-out → verify**: build the TOC + shared spec once, generate one unit per section/problem, and **verify every answer** (blind double-solve + checklist, compute with code) — see §0.5. Write HTML in part files.
+6. **Build + check**: run `scripts/build_and_check.py build <part1> <part2> ... -o <output.html>` to concatenate and run the static checks, then run `scripts/verify_solutions.py <output.html>` to **execute** every verification block, then the six post-generation checks below (Check 6 hands the file to codex for a semantic proofread, when available) and the coherence pass. Fix and re-run until clean.
+7. **Output** to `<outdir>/<name>.html` and call `present_files`.
 
 ## Content Structure
 
