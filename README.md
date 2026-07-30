@@ -159,6 +159,20 @@ python evals/check_features.py <输出>.html             # 10 项结构+正确�
 
 ## 更新记录
 
+- **2026-07-29 · v0.9** — 加入三套按「学习笔记」情景定制的设计方向，并把分区色与语义色解耦。
+  - **为什么**：此前只有一套固定观感——暖米白 `#f7f6f2`/`#f0ede6` ＋琥珀赭石、七色分区固定轮转、全文一种裸系统栈字体。三条加在一起，正是 [claude-design-system-prompt](https://github.com/Trystan-SA/claude-design-system-prompt) 的 `ai-slop-check` 第 9 条点名的 "editorial-warm house style"——它把这套称作「今天的紫色渐变」，即当前这一代的默认 AI 味。根因不是配色不好看，是**观感被写死成常量**，翻上几十份笔记必然疲劳。
+  - **三套方向**（写在 `<html data-theme="…">`，各配深色版；省略则保持旧观感，老笔记零改动）：
+    `journal` 纸本学刊（思源宋体正文 16px/1.95、760px 窄版心、取消卡片改发丝线——**衬线与 KaTeX 的 Computer Modern 同源，公式和正文不再像两种东西**；长推导与通读复习，**推荐默认**）、
+    `editorial` 高对比杂志（思源宋体 Black 46px 大标题，46/30/20/15.5 真尺寸跳跃，标题区左对齐 ＋一支正红；考前速览、重点复习，要快速扫读抓重点时）、
+    `console` 工程终端（等宽字承担数字/单位/`[01]` 序号，紧排 960px 宽版心，放得下更宽的数据表；**电子、电路、信号**及算法、实验、代码类）。
+    命名与 `visual-report` 一致，两个 skill 共用一套词汇。
+  - **关键重构**：旧版 `.sec-green` 与核验徽章 `.b-verified` 共用 `--green`、`.sec-amber` 与 `.b-unverified` 共用 `--amber`——**分区色一改成单色，就会把「已核验（绿框）/ 未自动核验（琥珀框）」一起染掉**，而那是笔记里最不能丢的语义。拆成两套 token：`--green/--amber/--blue/--red/…` 只服务语义，`--s1..--s7` 只服务分区。`--sec*` 是自定义属性会自动继承，组件直接读即可，原先 28 行 `.sec-X .Y` 重复规则收敛成 4 条声明；旧类名保留为别名，**老笔记一个字都不用改**。`--s7`（练习题/考题）在所有方向里保持红色——那是语义不是装饰。
+  - **地基修正**：4px 间距刻度（替换 22/26/13/18/2.5px 散值）、字号刻度、字体族变量、`text-wrap: pretty`、通栏 `.band` 节奏破格（长笔记从头到尾都是灰卡片，读三屏眼睛就不再分层级）。v0.8.17 的标题字距/行高刻度、v0.6 的 `content-visibility`、v0.8.11 的正文链接配色**原样保留**。
+  - **顺带修掉两个既有缺陷**：① `--text3` 在 `--bg2` 卡片上**只有 3.21:1**，低于 AA，而图注 / TOC 标题 / meta 标签都吃它 → 按保持色相、只调明度解出达标值；三份 examples 的内嵌压缩 CSS 一并同步（逐条精确替换 ＋ 断言，每份各 2 处）。② 浮动导航把分区色**写死成明暗两张十六进制表**，换主题必然错色 → 改为把分区类挂到导航行上、颜色由 CSS 求值，实时跟随主题与明暗；徽章配色也从硬编码 `#fff` 改成与页面 `.section-num` 同一组（深色下底色变亮后白字只剩 2.5:1）。
+  - **两处「变量没人消费」的坑**（渲染实测才抓到，静态检查看不出来）：`.header h1` 与 `.card h3` 的字号是**写死的**（v0.8.17 留下的标题刻度），主题设的 `--fs-h1`/`--fs-h3` 根本没被读取——`editorial` 的 46px 大标题实测仍是 30px。改成 `var(--fs-h1)`/`var(--fs-h3)` 后层级才真的分开：base 30/23/17/15（**旧笔记完全不变**）、`journal` 38/26/20/16、`editorial` 46/30/20/15.5、`console` 28/20/16/14.5。另外目录圆点 `.sec-dot` 的内联色写死成 `var(--purple-mid)`/`var(--teal-mid)`，单色方向下仍是紫绿多彩，已改成吃 `var(--sN-m)`。
+  - **层叠注意**：主题块插在 `prefers-reduced-motion` **之前**——那块覆盖 `#nav-panel`，必须留在样式表最末尾（v0.8.17 踩过：同 `#id` 特异性放前面会静默输掉层叠）。而深色主题块必须放在主题块**之后**，同理：`@media` 不提升特异性，`:root` 与 `[data-theme=x]` 同为 (0,1,0)，同分比先后（开发中实测踩到，表现为深色模式下主题全停在白底）。生成测试页时加了一条断言把这个顺序锁死。
+  - **实测**：从改后的 `design-system.md` 抽出 CSS ＋模板拼成真实页面（七个分区槽、通栏、公式、两种核验徽章全覆盖），**4 方向 × 明暗 2 模式 = 8 组合**（三套方向 ＋ 省略 data-theme 的旧观感），逐元素按真实计算样式 ＋ 逐层向上解析有效背景做 WCAG 扫描：**0 处未达标**，横向溢出 0，KaTeX 报错 0，且**每个组合下 `.b-verified` 与 `.b-unverified` 的底色都仍然相异**（语义没被主题吞掉）。回归全绿：`build_and_check` 35/35、三份 examples 各自 `all checks passed`、`extract_pdf` 13/13、`embed_images` 8/8。
+
 - **2026-07-16 · v0.8.19** — 把 v0.8.18 那套自清理补齐到剩下三个出图脚本：`make_hero.py`、`make_demo_gif.py`、`make_showcase.sh`。
   - **为什么**：v0.8.18 只修了 `make_mobile_shot.py`，但同一个坑在旁边三个脚本里一字不差地存在——它们本来就是一个模子里抄出来的，清理全写在成功路径的最后几句。① `make_hero.py` 的 `os.remove(dtmp)` / `os.remove(hero)` 是 `main()` 的倒数第三、四句，`shot()` 或 PIL 任何一步抛异常，`_hero_desktop.png`（1180×1500 @2x 的真截图）和 `_hero_layout.html`（内嵌两张 base64 图，实测 142 KB）就一起留在 `assets/` 里。② `make_demo_gif.py` 的 `os.remove(tmp)` 排在所有拼帧工作之后，而拼帧那段（`content_bottom` 扫描、crop/resize/量化、GIF 保存）恰恰是最容易炸的地方，留下的 `<out>.full.png` 是一张 1000×16000 的整页截图，实测 1.0 MB。③ `make_showcase.sh` 删 `assets/_full_b.png` 的那句写在 `PYCROP` heredoc 里，而脚本跑在 `set -euo pipefail` 下——PIL 一炸整个脚本当场退出，那句 `os.remove` 根本轮不到，实测残留 307 KB。漏的都不是 v0.8.18 那种 178 字节空壳，是几百 KB 到 1 MB 的二进制。
   - **怎么改**：① `make_demo_gif.py` 最直白，`main()` 主体整段包进 `try`，`finally` 删 `<out>.full.png`。② `make_hero.py` **没有**硬把那段 40 行的 HTML f-string 塞进 `try`——只为多一层缩进就把整段 diff 搅浑，评审反而读不出真正改了什么。改成把写布局那段抽成模块级的 `write_layout(path, desk, mob)`，f-string 连同缩进原样平移（`with` / `f.write` 的层级前后一致，diff 里整段是上下文而非改动），`main()` 里只剩 `try` / `finally`；两个临时路径顺手提成模块级常量 `DESKTOP_TMP` / `LAYOUT_TMP`，`finally` 一处收口。③ `make_showcase.sh` 用 `trap 'rm -f assets/_full_b.png' EXIT`，放在 `cd` 之后——路径是相对的，放前面就指向别处了。heredoc 里原来那句 `os.remove` 留着：正常路径它先删、`trap` 只是个 no-op，异常路径才轮到 `trap` 兜。
