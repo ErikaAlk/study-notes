@@ -375,6 +375,27 @@ The notes should be detailed enough that a student who has attended lectures but
 
 这正是 **Check 6** 的第 ⑥ 审查项。生成阶段就守住它，能少一轮外部审查的返工——生成与审查用的是同一套标准。
 
+## 中文文风：别写出 AI 腔
+
+产出是给人读的。结构和配色那两层已经有规矩了，这一节管措辞。写的时候就守住，
+别等交出去再返工。
+
+- 破折号别当万能连接词。一份文档里 `——` 出现三五次就该警觉，能换成句号、
+  逗号、冒号的一律换。成对使用（`A——B——C`）改成括号。
+- 加粗要克制。一段最多点一两个关键词，整句加粗只留给「踩了会出事」的警告。
+  最要避开的是「每条以加粗短句开头」的列表（`- **标签**：说明`），它是最容易
+  一眼认出来的 AI 腔。
+- 标题就是标题。后面不要挂一句同义复述（`## 4★「必留」——最后进 Lightroom 的
+  就是这一档` 应该只写 `## 4★「必留」`）。要解释就写成正文第一句。
+- emoji 不做装饰。标题前、列表项前一律不加。callout 组件自带的语义图标
+  （★ ✦ ⚠ 🔍 💡 ∴ ✗）不算，那是组件的一部分。
+- 不写三连排比、不写升华结尾。「不仅…而且…」「综上所述」「值得一提的是」
+  「标志着…的新阶段」全部删掉，结束在最后一个具体事实上。
+- 不确定就说不确定。数字、日期、来源查不到就写「未核实」或直接不写，不要编。
+
+自检：交付前把全文的 `——`、`**`、装饰性 emoji 各数一遍，多了就是没改干净。
+需要更细的清单时读 `humanizer` skill（基于维基百科「Signs of AI writing」的 35 条）。
+
 ## TOC Structure — Hierarchical Outline (MANDATORY)
 
 Use `.toc-l1` / `.toc-l2` classes from the design system. Markup example: `references/design-system.md` → **HTML Page Template** (the `<div class="toc">` block).
